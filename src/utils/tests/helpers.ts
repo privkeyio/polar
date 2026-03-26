@@ -197,7 +197,7 @@ export const testRepoState: DockerRepoState = {
     },
     'bitcoind-knots': {
       latest: '29.3',
-      versions: ['29.3', '29.2', '28.0', '27.0', '26.0'],
+      versions: ['29.3', '29.2', '28.1', '27.1', '26.1'],
     },
     btcd: {
       latest: '',

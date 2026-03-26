@@ -60,7 +60,7 @@ Replace `<version>` with the desired bitcoind version (ex: `0.18.1`)
 
 ```sh
 $ cd bitcoind-knots
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg BITCOIN_VERSION=<version> --build-arg KNOTS_DATE=<date> -t polarlightning/bitcoind-knots:<version> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg BITCOIN_VERSION=<version> --build-arg KNOTS_DATE=<date> -t polarlightning/bitcoindknots:<version> --push .
 ```
 
 Replace `<version>` with the desired Bitcoin Knots version (ex: `29.2`) and `<date>` with the Knots release date suffix (ex: `20251110`)
