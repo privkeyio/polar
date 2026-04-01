@@ -75,7 +75,18 @@ class ComposeFile {
     // replace the variables in the command
     const command = this.mergeCommand(nodeCommand, variables);
     // add the docker service
-    const svc = bitcoind(name, container, image, rpc, p2p, zmqBlock, zmqTx, command);
+    const volumeDirName = dockerConfigs[implementation].volumeDirName;
+    const svc = bitcoind(
+      name,
+      container,
+      image,
+      rpc,
+      p2p,
+      zmqBlock,
+      zmqTx,
+      command,
+      volumeDirName,
+    );
     this.addService(svc);
   }
 

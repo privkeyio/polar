@@ -489,7 +489,7 @@ export const createNetwork = (config: {
   clightningNodes: number;
   eclairNodes: number;
   bitcoindNodes: number;
-  bitcoindKnotsNodes?: number;
+  bitcoindKnotsNodes: number;
   tapdNodes: number;
   litdNodes: number;
   repoState: DockerRepoState;
@@ -508,7 +508,7 @@ export const createNetwork = (config: {
     clightningNodes,
     eclairNodes,
     bitcoindNodes,
-    bitcoindKnotsNodes = 0,
+    bitcoindKnotsNodes,
     tapdNodes,
     litdNodes,
     repoState,

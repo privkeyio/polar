@@ -49,7 +49,7 @@ interface AddNetworkArgs {
   clightningNodes: number;
   eclairNodes: number;
   bitcoindNodes: number;
-  bitcoindKnotsNodes?: number;
+  bitcoindKnotsNodes: number;
   tapdNodes: number;
   litdNodes: number;
   customNodes: Record<string, number>;
@@ -326,7 +326,7 @@ const networkModel: NetworkModel = {
         clightningNodes: payload.clightningNodes,
         eclairNodes: payload.eclairNodes,
         bitcoindNodes: payload.bitcoindNodes,
-        bitcoindKnotsNodes: payload.bitcoindKnotsNodes || 0,
+        bitcoindKnotsNodes: payload.bitcoindKnotsNodes,
         tapdNodes: payload.tapdNodes,
         litdNodes: payload.litdNodes,
         repoState: dockerRepoState,
@@ -350,7 +350,7 @@ const networkModel: NetworkModel = {
           'c-lightning': payload.clightningNodes,
           eclair: payload.eclairNodes,
           bitcoind: payload.bitcoindNodes,
-          'bitcoind-knots': payload.bitcoindKnotsNodes || 0,
+          'bitcoind-knots': payload.bitcoindKnotsNodes,
           tapd: payload.tapdNodes,
           litd: payload.litdNodes,
           btcd: 0,
