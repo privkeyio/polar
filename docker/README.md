@@ -51,10 +51,11 @@ Replace `<version>` with the desired bitcoind version (ex: `0.18.1`)
 
 ### Tags
 
+- `29.3` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
 - `29.2` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
-- `28.0` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
-- `27.0` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
-- `26.0` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
+- `28.1` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
+- `27.1` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
+- `26.1` ([bitcoind-knots/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind-knots/Dockerfile))
 
 **Building the image**
 

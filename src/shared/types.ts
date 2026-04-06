@@ -82,16 +82,6 @@ export interface BitcoindNode extends BitcoinNode {
   };
 }
 
-export interface BitcoindKnotsNode extends BitcoinNode {
-  implementation: 'bitcoind-knots';
-  ports: {
-    rpc: number;
-    p2p: number;
-    zmqBlock: number;
-    zmqTx: number;
-  };
-}
-
 export interface TapNode extends CommonNode {
   type: 'tap';
   implementation: 'tapd' | 'litd';
