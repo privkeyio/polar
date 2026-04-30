@@ -38,7 +38,7 @@ import { read, rm } from './files';
 import { migrateNetworksFile } from './migrations';
 import { getName } from './names';
 import { range } from './numbers';
-import { isVersionBelow, isVersionCompatible } from './strings';
+import { isMajorVersionCompatible, isVersionBelow, isVersionCompatible } from './strings';
 import { getPolarPlatform } from './system';
 import { prefixTranslation } from './translate';
 
@@ -177,7 +177,7 @@ export const filterCompatibleBackends = (
   if (!compatibility || !compatibility[version]) return backends;
   const requiredVersion = compatibility[version];
   const compatibleBackends = backends.filter(n =>
-    isVersionCompatible(n.version, requiredVersion),
+    isMajorVersionCompatible(n.version, requiredVersion),
   );
   if (compatibleBackends.length === 0) {
     throw new Error(
