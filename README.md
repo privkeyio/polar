@@ -10,7 +10,7 @@ This is an unofficial fork of [Polar](https://github.com/jamaljsr/polar) that fo
 - **Lightning nodes that follow BLAKE2b.** LND is [paulscode/lightning-fork](https://github.com/paulscode/lightning-fork) and Core Lightning is [privkeyio/lightning](https://github.com/privkeyio/lightning). Both sign channels with the unified opt-in signature hash and advertise `option_blake2b`, so they peer with each other and not with Lightning nodes on the SHA256d rules.
 - **Removed:** Bitcoin Core, Eclair, Taproot Assets and Lightning Terminal, which do not follow BLAKE2b.
 - **Images** are published to `ghcr.io/privkeyio/polar` from the Dockerfiles in [docker](docker), and the image list is fetched from this repository rather than upstream's.
-- **Separate data directory.** Networks, settings and logs live in `~/.polar-blake2b` (or `~/.local/share/polar-blake2b`), so it installs alongside upstream Polar without sharing networks. Networks made with upstream Polar have SHA256d blocks; create new ones here.
+- **Separate data directory.** Networks, settings and logs live in `~/.polar-blake2b` (or `~/.local/share/polar-blake2b`), so it installs alongside upstream Polar without sharing networks. Do not run both at once: they use the same container names and host ports. Networks made with upstream Polar have SHA256d blocks; create new ones here.
 - **Knots policy.** Bitcoin Knots also runs with `-rejectparasites=0`, so a Core Lightning wallet transaction is not refused for a locktime that policy reads as a parasite.
 
 ## Releases
