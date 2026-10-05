@@ -78,7 +78,7 @@ export const bitcoinCredentials = {
 export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = {
   LND: {
     name: 'LND',
-    imageName: 'ghcr.io/privkeyio/polar/lnd',
+    imageName: `${DOCKER_REPO}/lnd`,
     logo: lndLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'lnd',
@@ -112,7 +112,7 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
   },
   'c-lightning': {
     name: 'Core Lightning',
-    imageName: 'ghcr.io/privkeyio/polar/clightning',
+    imageName: `${DOCKER_REPO}/clightning`,
     logo: clightningLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'c-lightning',
@@ -146,7 +146,7 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
   },
   bitcoind: {
     name: 'Bitcoin Knots',
-    imageName: 'ghcr.io/privkeyio/polar/bitcoind',
+    imageName: `${DOCKER_REPO}/bitcoind`,
     logo: bitcoindLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'bitcoind',
