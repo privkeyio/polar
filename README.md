@@ -1,3 +1,31 @@
+# Polar with BLAKE2b proof of work
+
+This is an unofficial fork of [Polar](https://github.com/jamaljsr/polar) that follows Bitcoin's change of proof-of-work algorithm to BLAKE2b. It is not affiliated with the Polar project. Upstream Polar has not adopted the change, so use it instead if that is what you want.
+
+> **For regtest only, and not audited. Use at your own risk, and no warranty of any kind, see the [MIT license](LICENSE).** Everything below the divider is upstream's documentation and describes Polar rather than this fork.
+
+## What differs from Polar
+
+- **Bitcoin Knots.** The Bitcoin node is Bitcoin Knots, started with `-testactivationheight=blake2b@1`, so every block past the genesis block has the 164 byte v2 header and its BLAKE2b hash as the block id.
+- **Lightning nodes that follow BLAKE2b.** LND is [paulscode/lightning-fork](https://github.com/paulscode/lightning-fork) and Core Lightning is [privkeyio/lightning](https://github.com/privkeyio/lightning). Both sign channels with the unified opt-in signature hash and advertise `option_blake2b`, so they peer with each other and not with Lightning nodes on the SHA256d rules.
+- **Removed:** Bitcoin Core, Eclair, Taproot Assets and Lightning Terminal, which do not follow BLAKE2b.
+- **Images** are published to `ghcr.io/privkeyio/polar` from the Dockerfiles in [docker](docker), and the image list is fetched from this repository rather than upstream's.
+- **Separate data directory.** Networks, settings and logs live in `~/.polar-blake2b` (or `~/.local/share/polar-blake2b`), so it installs alongside upstream Polar without sharing networks. Networks made with upstream Polar have SHA256d blocks; create new ones here.
+- **Knots policy.** Bitcoin Knots also runs with `-rejectparasites=0`, so a Core Lightning wallet transaction is not refused for a locktime that policy reads as a parasite.
+
+## Releases
+
+Published under [Releases](https://github.com/privkeyio/polar/releases) with a signed shasums file covering every artifact:
+
+```bash
+gpg --verify polar-*-shasums.txt.asc polar-*-shasums.txt
+sha256sum -c polar-*-shasums.txt --ignore-missing
+```
+
+The signing key is `A47D 99B6 DB0D 715D 40C5 9A20 23AE 8A8E A7E2 4E38`.
+
+---
+
 # Polar
 
 > One-click Bitcoin Lightning networks for local app development & testing
