@@ -50,11 +50,10 @@ const CustomImageModal: React.FC<Props> = ({ image, onClose }) => {
   };
 
   const platform = getPolarPlatform();
-  const lnImpls: NodeImplementation[] = ['LND', 'c-lightning', 'eclair', 'litd'];
+  const lnImpls: NodeImplementation[] = ['LND', 'c-lightning'];
   const implGroups: Record<string, NodeImplementation[]> = {
     Lightning: lnImpls.filter(i => dockerConfigs[i].platforms.includes(platform)),
     Bitcoin: ['bitcoind'],
-    'Taproot Assets': ['tapd'],
   };
 
   return (

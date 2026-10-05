@@ -2070,14 +2070,6 @@
     "@grpc/proto-loader" "^0.7.13"
     "@js-sdsl/ordered-map" "^4.4.2"
 
-"@grpc/grpc-js@^1.12.2":
-  version "1.12.2"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.12.2.tgz#97eda82dd49bb9c24eaf6434ea8d7de446e95aac"
-  integrity sha512-bgxdZmgTrJZX50OjyVwz3+mNEnCTNkh3cIqGPWVNeW9jX6bn1ZkU80uPd+67/ZpIJIjRQ9qaHCjhavyoWYxumg==
-  dependencies:
-    "@grpc/proto-loader" "^0.7.13"
-    "@js-sdsl/ordered-map" "^4.4.2"
-
 "@grpc/proto-loader@0.7.13", "@grpc/proto-loader@^0.7.13":
   version "0.7.13"
   resolved "https://registry.yarnpkg.com/@grpc/proto-loader/-/proto-loader-0.7.13.tgz#f6a44b2b7c9f7b609f5748c6eac2d420e37670cf"
@@ -2568,28 +2560,12 @@
   resolved "https://registry.yarnpkg.com/@keyv/serialize/-/serialize-1.1.1.tgz#0c01dd3a3483882af7cf3878d4e71d505c81fc4a"
   integrity sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==
 
-"@lightningpolar/litd-api@0.16.0-alpha":
-  version "0.16.0-alpha"
-  resolved "https://registry.yarnpkg.com/@lightningpolar/litd-api/-/litd-api-0.16.0-alpha.tgz#ecfc0a001eb4312b83b33f2eb6c985009e27002f"
-  integrity sha512-e+DXdZ0Ku+3TkU81CgafnIv1p/LBp0pQNg8szS7Ja1TUHQVlJSDPlo32EeRZfqb4AZVenwGUd+xgafWfreK+Wg==
-  dependencies:
-    "@grpc/grpc-js" "1.10.8"
-    "@grpc/proto-loader" "0.7.13"
-
 "@lightningpolar/lnd-api@0.20.0-beta":
   version "0.20.0-beta"
   resolved "https://registry.yarnpkg.com/@lightningpolar/lnd-api/-/lnd-api-0.20.0-beta.tgz#2402b5c274d336d21bfaa131d631868cf5fefc15"
   integrity sha512-AXz6ph/rfFgF/rRhB3AM38vZ8DaDkMsuOtYnzP1JyQ02c0zIioxbYiDGrQTuzM/oUfPxQhTJDunT4O6lqoMouQ==
   dependencies:
     "@grpc/grpc-js" "1.10.8"
-    "@grpc/proto-loader" "0.7.13"
-
-"@lightningpolar/tapd-api@0.7.0-alpha":
-  version "0.7.0-alpha"
-  resolved "https://registry.yarnpkg.com/@lightningpolar/tapd-api/-/tapd-api-0.7.0-alpha.tgz#b1720aa70347385d19f7541912ca106bdb5f7014"
-  integrity sha512-aK8pX7MLyv0I8YYEJriPll79feCsoGiAHYOF5ktJHOE6R+0b9JlG6SGNzrxcS8ea6CJo+deQa3j/pfFIfA+vRQ==
-  dependencies:
-    "@grpc/grpc-js" "^1.12.2"
     "@grpc/proto-loader" "0.7.13"
 
 "@malept/cross-spawn-promise@^1.1.0":

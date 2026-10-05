@@ -42,9 +42,6 @@ const OpenTerminalButton: React.FC<Props> = ({ node, type }) => {
     case 'bitcoind':
       cmd = 'bitcoin-cli';
       break;
-    case 'tapd':
-      cmd = 'tapcli';
-      break;
   }
   return (
     <Form.Item label={l('title')} help={l('info', { cmd })} colon={false}>

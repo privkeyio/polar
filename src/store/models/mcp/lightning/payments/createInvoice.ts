@@ -37,7 +37,7 @@ export const createInvoiceDefinition: McpToolDefinition = {
     'Generates a payment request string (BOLT11 invoice) that can be paid by other Lightning nodes. ' +
     'The invoice contains the payment amount and an optional memo. ' +
     'Returns the payment request string that can be used with pay_invoice. ' +
-    'Works with LND, c-lightning, eclair, and litd nodes.',
+    'Works with LND and c-lightning nodes.',
   inputSchema: {
     type: 'object',
     properties: {

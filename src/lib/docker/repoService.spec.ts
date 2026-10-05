@@ -111,7 +111,7 @@ describe('RepoService', () => {
         version: localState.version + 1,
         images: {
           ...localState.images,
-          eclair: undefined,
+          'c-lightning': undefined,
         },
       };
       utilsMock.httpRequest.mockResolvedValue(JSON.stringify(remoteState));

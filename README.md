@@ -1,3 +1,31 @@
+# Polar with BLAKE2b proof of work
+
+This is an unofficial fork of [Polar](https://github.com/jamaljsr/polar) that follows Bitcoin's change of proof-of-work algorithm to BLAKE2b. It is not affiliated with the Polar project. Upstream Polar has not adopted the change, so use it instead if that is what you want.
+
+> **For regtest only, and not audited. Use at your own risk, and no warranty of any kind, see the [MIT license](LICENSE).** Everything below the divider is upstream's documentation and describes Polar rather than this fork.
+
+## What differs from Polar
+
+- **Bitcoin Knots.** The Bitcoin node is Bitcoin Knots, started with `-testactivationheight=blake2b@1`, so every block past the genesis block has the 164 byte v2 header and its BLAKE2b hash as the block id.
+- **Lightning nodes that follow BLAKE2b.** LND is [paulscode/lightning-fork](https://github.com/paulscode/lightning-fork) and Core Lightning is [privkeyio/lightning](https://github.com/privkeyio/lightning). Both sign channels with the unified opt-in signature hash and advertise `option_blake2b`, so they peer with each other and not with Lightning nodes on the SHA256d rules.
+- **Removed:** Bitcoin Core, Eclair, Taproot Assets and Lightning Terminal, which do not follow BLAKE2b.
+- **Images** are published to `ghcr.io/privkeyio/polar` from the Dockerfiles in [docker](docker), and the image list is fetched from this repository rather than upstream's.
+- **Separate data directory.** Networks, settings and logs live in `~/.polar-blake2b` (or `~/.local/share/polar-blake2b`), so it installs alongside upstream Polar without sharing networks. Do not run both at once: they use the same container names and host ports. Networks made with upstream Polar have SHA256d blocks; create new ones here.
+- **Knots policy.** Bitcoin Knots also runs with `-rejectparasites=0`, so a Core Lightning wallet transaction is not refused for a locktime that policy reads as a parasite.
+
+## Releases
+
+Published under [Releases](https://github.com/privkeyio/polar/releases) with a signed shasums file covering every artifact:
+
+```bash
+gpg --verify polar-*-shasums.txt.asc polar-*-shasums.txt
+sha256sum -c polar-*-shasums.txt --ignore-missing
+```
+
+The signing key is `A47D 99B6 DB0D 715D 40C5 9A20 23AE 8A8E A7E2 4E38`.
+
+---
+
 # Polar
 
 > One-click Bitcoin Lightning networks for local app development & testing
@@ -31,8 +59,6 @@ With Polar you can:
 - View streaming logs from each node
 - Manually mine new blocks
 - Deposit regtest coins into each Lightning node
-- Mint, Send & Receive Taproot Assets
-- Create & Pay Taproot Asset invoices
 - Export and import networks, for sharing with other Lightning developers
 - Create you own docker images to use as [custom nodes](https://github.com/jamaljsr/polar/blob/master/docs/custom-nodes.md) (ex: master branch, local fork)
 
@@ -40,10 +66,7 @@ Supported Network Node Versions:
 
 - [LND](https://github.com/lightningnetwork/lnd) - v0.20.0, v0.19.3, v0.19.2, v0.19.1, v0.18.5, v0.18.4, v0.18.3, v0.17.5, v0.16.4
 - [Core Lightning](https://github.com/ElementsProject/lightning) - v25.12, v25.09.3, v25.05, v25.02, v24.11.1, v24.08.1
-- [Eclair](https://github.com/ACINQ/eclair/) - v0.13.1, v0.12.0, v0.11.0, v0.10.0, v0.9.0
 - [Bitcoin Core](https://github.com/bitcoin/bitcoin) - v30.0, v29.0, v28.0, v27.0, v26.0
-- [Taproot Assets](https://github.com/lightninglabs/taproot-assets) - v0.7.0, v0.6.1, v0.6.0, v0.5.1, v0.5.0, v0.4.1, v0.3.3
-- [Terminal](https://github.com/lightninglabs/lightning-terminal) - v0.16.0, v0.15.3, v0.15.1, v0.15.0, v0.14.1,
 
 ### MCP (Model Context Protocol)
 

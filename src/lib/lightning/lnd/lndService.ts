@@ -144,29 +144,14 @@ class LndService implements LightningService {
     amount: number,
     memo?: string,
     expiry?: number,
-    assetInfo?: {
-      nodeId: string;
-      scid: string;
-      msats: string;
-    },
   ): Promise<string> {
     const req: LND.InvoicePartial = {
       value: amount.toString(),
       memo,
       expiry: expiry?.toString(),
     };
-    // hop hints are used for creating TAP invoices
-    if (assetInfo) {
-      // set the msats value instead of sats
-      req.value = undefined;
-      req.valueMsat = assetInfo.msats;
-      // add the hop hint for the asset channel
-      const hopHint = await this.createHopHint(node, assetInfo.nodeId, assetInfo.scid);
-      req.routeHints = [{ hopHints: [hopHint] }];
-    } else {
-      // set the private flag to allow payments over private channels
-      req.private = true;
-    }
+    // set the private flag to allow payments over private channels
+    req.private = true;
 
     const res = await proxy.createInvoice(this.cast(node), req);
     return res.paymentRequest;
@@ -333,50 +318,8 @@ class LndService implements LightningService {
     proxy.unsubscribeEvents(this.cast(node));
   }
 
-  /**
-   * When creating a TAP invoice, we need to add a hop hint because the channel is private
-   * and the sender will not be able to find a route without it. The hop hint needs to
-   * include additional information about the channel, such as the fee rate and time lock
-   * delta.
-   */
-  private async createHopHint(
-    node: LightningNode,
-    nodeId: string,
-    chanId: string,
-  ): Promise<LND.HopHint> {
-    // find the asset channel with the peer
-    const { channels } = await proxy.listChannels(this.cast(node), {
-      peer: Buffer.from(nodeId, 'hex'),
-    });
-    const channel = channels
-      .map(c => ({ chanId: c.chanId, ...mapOpenChannel(c) }))
-      .find(c => !!c.assets);
-    if (!channel) {
-      throw new Error(`No asset channel found with peer ${nodeId}`);
-    }
-    const info = await proxy.getChanInfo(this.cast(node), {
-      chanId: channel.chanId,
-    });
-    if (!info) {
-      throw new Error(`No channel info found for channel ${channel.chanId}`);
-    }
-
-    const policy = info.node1Pub === nodeId ? info.node1Policy : info.node2Policy;
-    if (!policy) {
-      throw new Error(`No channel policy found for channel ${channel.chanId}`);
-    }
-
-    return {
-      nodeId,
-      chanId,
-      feeBaseMsat: parseInt(policy.feeBaseMsat),
-      feeProportionalMillionths: parseInt(policy.feeRateMilliMsat),
-      cltvExpiryDelta: policy.timeLockDelta,
-    };
-  }
-
   private cast(node: LightningNode): LndNode {
-    if (node.implementation !== 'LND' && node.implementation !== 'litd')
+    if (node.implementation !== 'LND')
       throw new Error(`LndService cannot be used for '${node.implementation}' nodes`);
 
     return node as LndNode;

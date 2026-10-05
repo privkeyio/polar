@@ -1,8 +1,8 @@
 {
-  "appId": "com.polarlightning.app",
-  "productName": "Polar",
+  "appId": "io.privkey.polar-blake2b",
+  "productName": "Polar BLAKE2b",
   "copyright": "Copyright © 2019 ${author}",
-  "artifactName": "polar-${os}-${arch}-v${version}.${ext}",
+  "artifactName": "polar-blake2b-${os}-${arch}-v${version}.${ext}",
   "files": ["build/**/*", "assets/**/*", "node_modules/**/*", "node_modules/**/*.proto"],
   "directories": {
     "buildResources": "assets"

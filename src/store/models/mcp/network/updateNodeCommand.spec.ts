@@ -20,10 +20,7 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -53,10 +50,7 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -86,10 +80,7 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 1,
-      eclairNodes: 1,
       bitcoindNodes: 1,
-      tapdNodes: 1,
-      litdNodes: 1,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -106,29 +97,15 @@ describe('MCP model > updateNodeCommand', () => {
     expect(bitcoinResult.success).toBe(true);
     expect(bitcoinResult.nodeName).toBe('backend1');
 
-    // Test with lightning node (eclair node should be 'carol')
+    // Test with lightning node (c-lightning node should be 'bob')
     const lightningResult = await store.getActions().mcp.updateNodeCommand({
       networkId: network.id,
-      nodeName: 'carol',
-      command: 'eclair --custom-flag',
+      nodeName: 'bob',
+      command: 'lightningd --custom-flag',
     });
 
     expect(lightningResult.success).toBe(true);
-    expect(lightningResult.nodeName).toBe('carol');
-
-    // Test with tap node - use the correct name
-    const tapNodeNames = network.nodes.tap.map(n => n.name);
-    expect(tapNodeNames.length).toBeGreaterThan(0);
-    const tapNodeName = tapNodeNames[0];
-
-    const tapResult = await store.getActions().mcp.updateNodeCommand({
-      networkId: network.id,
-      nodeName: tapNodeName,
-      command: 'tapd --custom-flag',
-    });
-
-    expect(tapResult.success).toBe(true);
-    expect(tapResult.nodeName).toBe(tapNodeName);
+    expect(lightningResult.nodeName).toBe('bob');
   });
 
   it('should throw error when networkId is missing', async () => {
@@ -174,10 +151,7 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });

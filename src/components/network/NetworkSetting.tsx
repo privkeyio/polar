@@ -55,15 +55,8 @@ const NetworkSetting: React.FC = () => {
           rest: values['c-lightning'],
           grpc: values['grpcC-lightning'],
         },
-        eclair: {
-          rest: values.eclair,
-        },
         bitcoind: {
           rest: values.bitcoind,
-        },
-        tapd: {
-          rest: values.tapd,
-          grpc: values.grpcTapd,
         },
       };
 
@@ -89,12 +82,9 @@ const NetworkSetting: React.FC = () => {
           initialValues={{
             LND: settings.basePorts.LND.rest,
             'c-lightning': settings.basePorts['c-lightning'].rest,
-            eclair: settings.basePorts.eclair.rest,
             bitcoind: settings.basePorts.bitcoind.rest,
-            tapd: settings.basePorts.tapd.rest,
             grpcLND: settings.basePorts.LND.grpc,
             'grpcC-lightning': settings.basePorts['c-lightning'].grpc,
-            grpcTapd: settings.basePorts.tapd.grpc,
           }}
           onFinish={saveSettingsAsync.execute}
         >
@@ -112,17 +102,7 @@ const NetworkSetting: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name="eclair" label={dockerConfigs.eclair.name}>
-                <InputNumber />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
               <Form.Item name="bitcoind" label={dockerConfigs.bitcoind.name}>
-                <InputNumber />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="tapd" label={dockerConfigs.tapd.name}>
                 <InputNumber />
               </Form.Item>
             </Col>
@@ -136,11 +116,6 @@ const NetworkSetting: React.FC = () => {
             </Col>
             <Col span={6}>
               <Form.Item name="grpcC-lightning" label={dockerConfigs['c-lightning'].name}>
-                <InputNumber />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="grpcTapd" label={dockerConfigs.tapd.name}>
                 <InputNumber />
               </Form.Item>
             </Col>

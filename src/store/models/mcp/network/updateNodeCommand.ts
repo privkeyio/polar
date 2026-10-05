@@ -68,11 +68,9 @@ export const updateNodeCommandTool = thunk<
   const network = getStoreState().network.networkById(args.networkId);
 
   // Find the node in the network
-  const node = [
-    ...network.nodes.bitcoin,
-    ...network.nodes.lightning,
-    ...network.nodes.tap,
-  ].find(n => n.name === args.nodeName);
+  const node = [...network.nodes.bitcoin, ...network.nodes.lightning].find(
+    n => n.name === args.nodeName,
+  );
 
   if (!node) {
     throw new Error(`Node "${args.nodeName}" not found in network "${network.name}"`);

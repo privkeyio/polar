@@ -2,7 +2,6 @@ import React from 'react';
 import { ILink } from '@mrblenny/react-flow-chart';
 import { fireEvent, waitFor } from '@testing-library/react';
 import { Status } from 'shared/types';
-import { LightningNodeChannelAsset } from 'lib/lightning/types';
 import { initChartFromNetwork } from 'utils/chart';
 import {
   bitcoinServiceMock,
@@ -18,7 +17,6 @@ describe('Channel component', () => {
     status = Status.Stopped,
     sourceNode = 'alice',
     destNode = 'bob',
-    assets?: LightningNodeChannelAsset[],
   ) => {
     const network = getNetwork(1, 'test network', status);
     const fromNode = network.nodes.lightning.find(node => node.name === sourceNode);
@@ -39,7 +37,6 @@ describe('Channel component', () => {
         status: 'Open',
         channelPoint: '884b29be9946380937cba43cefe431b75c1a9ad3c45184e55f444eda09e56150',
         isPrivate: false,
-        assets,
       },
     };
     const initialState = {
@@ -95,12 +92,6 @@ describe('Channel component', () => {
 
     it('should display "Channel ID" when source node is CLN (bob)', () => {
       const { getByText } = renderComponent(Status.Stopped, 'bob', 'alice');
-      expect(getByText('Channel ID')).toBeInTheDocument();
-      expect(getByText('884b...e56150')).toBeInTheDocument();
-    });
-
-    it('should display "Channel ID" when source node is Eclair (carol)', () => {
-      const { getByText } = renderComponent(Status.Stopped, 'carol', 'bob');
       expect(getByText('Channel ID')).toBeInTheDocument();
       expect(getByText('884b...e56150')).toBeInTheDocument();
     });
@@ -212,28 +203,6 @@ describe('Channel component', () => {
         expect(getByText('Unable to close the channel')).toBeInTheDocument();
         expect(getByText('test error')).toBeInTheDocument();
       });
-    });
-  });
-
-  describe('with assets', () => {
-    it('should display list of assets', async () => {
-      const asset: LightningNodeChannelAsset = {
-        id: 'testId',
-        name: 'test asset',
-        capacity: '2,345',
-        localBalance: '1,647',
-        remoteBalance: '853',
-        decimals: 0,
-      };
-      const { getByText } = renderComponent(Status.Stopped, 'alice', 'bob', [asset]);
-      expect(getByText('test asset')).toBeInTheDocument();
-      expect(getByText('(Taproot Asset)')).toBeInTheDocument();
-      expect(getByText('testId')).toBeInTheDocument();
-      expect(getByText('Asset ID')).toBeInTheDocument();
-      expect(getByText('testId')).toBeInTheDocument();
-      expect(getByText('2,345')).toBeInTheDocument();
-      expect(getByText('1,647')).toBeInTheDocument();
-      expect(getByText('853')).toBeInTheDocument();
     });
   });
 });

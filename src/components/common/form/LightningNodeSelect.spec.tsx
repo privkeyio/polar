@@ -1,6 +1,7 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { Form } from 'antd';
+import { LightningNode } from 'shared/types';
 import { LightningNodeModel } from 'store/models/lightning';
 import { defaultStateBalances, getNetwork } from 'utils/tests';
 import LightningNodeSelect from './LightningNodeSelect';
@@ -9,6 +10,9 @@ describe('LightningNodeSelect', () => {
   const renderComponent = (
     initialNodes?: { [key: string]: LightningNodeModel },
     initialValue?: string,
+    implementation:
+      | LightningNode['implementation']
+      | LightningNode['implementation'][] = ['LND'],
   ) => {
     const network = getNetwork(1, 'test network');
     const nodes = initialNodes || {
@@ -23,7 +27,7 @@ describe('LightningNodeSelect', () => {
             name="from"
             label="Source"
             initialValue={initialValue}
-            implementation={['LND']}
+            implementation={implementation}
             nodes={nodes}
           />
         </Form>
@@ -42,6 +46,17 @@ describe('LightningNodeSelect', () => {
     expect(getByLabelText('Source')).toBeInTheDocument();
   });
 
+  it('should filter nodes by a single implementation', () => {
+    const { getByLabelText, getAllByText, queryByText } = renderComponent(
+      undefined,
+      undefined,
+      'c-lightning',
+    );
+    fireEvent.mouseDown(getByLabelText('Source'));
+    expect(getAllByText('bob')[0]).toBeInTheDocument();
+    expect(queryByText('alice')).not.toBeInTheDocument();
+  });
+
   it('should display the initial nodes balance', () => {
     const nodes = {
       alice: {
@@ -57,7 +72,7 @@ describe('LightningNodeSelect', () => {
       alice: {
         walletBalance: defaultStateBalances({ confirmed: '100' }),
       },
-      dave: {
+      carol: {
         walletBalance: defaultStateBalances({ confirmed: '200' }),
       },
     };
@@ -72,7 +87,7 @@ describe('LightningNodeSelect', () => {
     // click on bob option
     // Select renders two lists of the options to the dom. click on the
     // second one if it exists, otherwise click the only one
-    fireEvent.click(getAllByText('dave')[1]);
+    fireEvent.click(getAllByText('carol')[1]);
     // confirm the balance updates
     expect(await findByText('Balance: 200 sats')).toBeInTheDocument();
   });

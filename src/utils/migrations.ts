@@ -1,7 +1,7 @@
 import { debug, error } from 'electron-log';
 import { join } from 'path';
-import { CLightningNode, LndNode } from 'shared/types';
-import { AutoMineMode, NetworksFile } from 'types';
+import { CLightningNode, CommonNode, LndNode } from 'shared/types';
+import { AutoMineMode, Network, NetworksFile } from 'types';
 import { networksPath } from './config';
 import { APP_VERSION, BasePorts, dockerConfigs } from './constants';
 import { getCLightningFilePaths, getLndFilePaths } from './network';
@@ -167,23 +167,38 @@ const v200 = (file: NetworksFile): NetworksFile => {
       debug(`${pre} set autoMineMode to 'AutoOff'`);
       network.autoMineMode = AutoMineMode.AutoOff;
     }
-    // tapd nodes was added to networks in PR #641
-    if (network.nodes.tap === undefined) {
-      debug(`${pre} add tap node list to network`);
-      network.nodes.tap = [];
-    }
-
-    network.nodes.lightning
-      .filter(n => n.implementation === 'LND')
-      .forEach(node => {
-        const chartNode = file.charts[network.id].nodes[node.name];
-        if (!chartNode.ports['lndbackend']) {
-          debug(`${pre} add lndbackend port to LND chart node ${node.name}`);
-          chartNode.ports['lndbackend'] = { id: 'lndbackend', type: 'top' };
-        }
-      });
   });
 
+  return file;
+};
+
+export const removeUnsupportedNodes = (file: NetworksFile): NetworksFile => {
+  file.networks.forEach(network => {
+    const nodes = network.nodes as Network['nodes'] & { tap?: CommonNode[] };
+    const { tap = [] } = nodes;
+    delete nodes.tap;
+    const removed = [
+      ...network.nodes.lightning.filter(n => !dockerConfigs[n.implementation]),
+      ...tap,
+    ].map(n => n.name);
+    if (!removed.length) return;
+    debug(`[${network.id}] ${network.name}: removing unsupported nodes ${removed}`);
+    network.nodes.lightning = network.nodes.lightning.filter(
+      n => !removed.includes(n.name),
+    );
+    if (network.simulation) {
+      network.simulation.activity = network.simulation.activity.filter(
+        a => !removed.includes(a.source) && !removed.includes(a.destination),
+      );
+    }
+    const chart = file.charts[network.id];
+    removed.forEach(name => delete chart.nodes[name]);
+    Object.entries(chart.links).forEach(([id, { from, to }]) => {
+      if (removed.includes(from.nodeId) || removed.includes(to.nodeId as string)) {
+        delete chart.links[id];
+      }
+    });
+  });
   return file;
 };
 

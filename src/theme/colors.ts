@@ -11,7 +11,6 @@ export interface ThemeColors {
   link: { default: string };
   channel: {
     bitcoin: { local: string; remote: string };
-    asset: { local: string; remote: string };
   };
   node: { background: string; border: string };
   port: { outer: string; inner: string; border: string };
@@ -30,7 +29,6 @@ export const themeColors: Record<AppSettings['theme'], ThemeColors> = {
     link: { default: 'lightgray' },
     channel: {
       bitcoin: { local: '#F7931A', remote: '#D74E14' },
-      asset: { local: '#BE8FFF', remote: '#8957E5' },
     },
     node: { background: '#ffffff', border: '#ffffff' },
     port: { outer: '#ffffff', inner: 'grey', border: '#ffffff' },
@@ -47,7 +45,6 @@ export const themeColors: Record<AppSettings['theme'], ThemeColors> = {
     link: { default: '#1b1b1b' },
     channel: {
       bitcoin: { local: '#F7931A', remote: '#D74E14' },
-      asset: { local: '#BE8FFF', remote: '#8957E5' },
     },
     node: { background: '#1f1f1f', border: '#303030' },
     port: { outer: '#1f1f1f', inner: '#383838', border: '#303030' },

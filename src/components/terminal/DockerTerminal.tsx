@@ -13,7 +13,6 @@ import { FitAddon } from 'xterm-addon-fit';
 import { getDocker } from 'lib/docker/dockerService';
 import { useStoreActions } from 'store';
 import { delay } from 'utils/async';
-import { eclairCredentials } from 'utils/constants';
 import { nord } from './themes';
 
 // exec command and options configuration
@@ -63,25 +62,9 @@ const nodeConfig: Record<string, { user: string; commands: string[] }> = {
     user: 'clightning',
     commands: ['alias lightning-cli="lightning-cli --network regtest"'],
   },
-  eclair: {
-    user: 'eclair',
-    commands: [`alias eclair-cli="eclair-cli -p ${eclairCredentials.pass}"`],
-  },
   bitcoind: {
     user: 'bitcoin',
     commands: ['alias bitcoin-cli="bitcoin-cli -regtest"'],
-  },
-  tapd: {
-    user: 'tap',
-    commands: ['alias tapcli="tapcli --network regtest --tapddir=~/.tapd"'],
-  },
-  litd: {
-    user: 'litd',
-    commands: [
-      'alias litcli="litcli --network regtest"',
-      'alias lncli="lncli --network regtest --rpcserver localhost:8443 --tlscertpath ~/.lit/tls.cert"',
-      'alias tapcli="tapcli --network regtest --rpcserver localhost:8443 --tlscertpath ~/.lit/tls.cert"',
-    ],
   },
 };
 

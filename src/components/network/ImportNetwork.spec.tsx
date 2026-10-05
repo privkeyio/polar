@@ -64,10 +64,7 @@ describe('ImportNetwork component', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 1,
-      eclairNodes: 1,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 1,
       status: Status.Started,
       repoState: defaultRepoState,
       managedImages: testManagedImages,
@@ -157,31 +154,6 @@ describe('ImportNetwork component', () => {
 
   it('should throw for an unknown LN implementation', async () => {
     network.nodes.lightning[0].implementation = 'asdf' as any;
-    filesMock.read.mockResolvedValue(JSON.stringify({ network, chart }));
-    const { findByText, fileInput } = renderComponent();
-    fireEvent.change(fileInput);
-    expect(await findByText("Could not import 'file.zip'")).toBeInTheDocument();
-    const msg = "Cannot import unknown node implementation 'asdf'";
-    expect(await findByText(msg)).toBeInTheDocument();
-  });
-
-  it('should import a TAP network successfully', async () => {
-    network = getNetwork(1, 'tap network', Status.Stopped, 2);
-    chart = initChartFromNetwork(network);
-    filesMock.read.mockResolvedValue(JSON.stringify({ network, chart }));
-    const { queryByLabelText, findByText, fileInput } = renderComponent();
-    expect(queryByLabelText('loading')).not.toBeInTheDocument();
-    fireEvent.change(fileInput);
-    expect(queryByLabelText('loading')).toBeInTheDocument();
-    expect(
-      await findByText("Imported network 'tap network' successfully"),
-    ).toBeInTheDocument();
-  });
-
-  it('should throw for an unknown TAP implementation', async () => {
-    network = getNetwork(1, 'tap network', Status.Stopped, 2);
-    chart = initChartFromNetwork(network);
-    network.nodes.tap[0].implementation = 'asdf' as any;
     filesMock.read.mockResolvedValue(JSON.stringify({ network, chart }));
     const { findByText, fileInput } = renderComponent();
     fireEvent.change(fileInput);

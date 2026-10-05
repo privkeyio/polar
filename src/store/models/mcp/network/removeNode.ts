@@ -1,6 +1,6 @@
 import { info } from 'electron-log';
 import { thunk, Thunk } from 'easy-peasy';
-import { BitcoinNode, CommonNode, LightningNode, TapNode } from 'shared/types';
+import { BitcoinNode, CommonNode, LightningNode } from 'shared/types';
 import { RootModel } from 'store/models';
 import { validateNetworkId, validateRequired } from 'store/models/mcp/helpers';
 import { McpToolDefinition } from 'store/models/mcp/types';
@@ -23,8 +23,8 @@ export const removeNodeDefinition: McpToolDefinition = {
   name: 'remove_node',
   description:
     'Removes a node from an existing Polar network. This will permanently delete ' +
-    'the node and all its data. Supports removing Lightning nodes (LND, c-lightning, ' +
-    'eclair, litd), Bitcoin nodes (bitcoind), and Taproot Asset nodes (tapd). ' +
+    'the node and all its data. Supports removing Lightning nodes (LND, c-lightning) ' +
+    'and Bitcoin nodes (bitcoind). ' +
     'If the network is running, the node will be stopped before removal.',
   inputSchema: {
     type: 'object',
@@ -67,11 +67,7 @@ export const removeNodeTool: Thunk<
     }
 
     // Find the node in the network
-    const allNodes: CommonNode[] = [
-      ...network.nodes.lightning,
-      ...network.nodes.bitcoin,
-      ...network.nodes.tap,
-    ];
+    const allNodes: CommonNode[] = [...network.nodes.lightning, ...network.nodes.bitcoin];
     const nodeToRemove = allNodes.find(n => n.name === args.nodeName);
     if (!nodeToRemove) {
       throw new Error(
@@ -94,22 +90,12 @@ export const removeNodeTool: Thunk<
           node: nodeToRemove as BitcoinNode,
         });
         break;
-      case 'tap':
-        await getStoreActions().network.removeTapNode({
-          node: nodeToRemove as TapNode,
-        });
-        break;
       default:
         throw new Error(`Unsupported node type: ${(nodeToRemove as any).type}`);
     }
 
     // Return success message
-    const nodeTypeName =
-      nodeToRemove.type === 'bitcoin'
-        ? 'Bitcoin'
-        : nodeToRemove.type === 'tap'
-        ? 'Taproot Asset'
-        : 'Lightning';
+    const nodeTypeName = nodeToRemove.type === 'bitcoin' ? 'Bitcoin' : 'Lightning';
     return {
       success: true,
       message: `${nodeTypeName} node "${args.nodeName}" removed from network "${network.name}" successfully`,

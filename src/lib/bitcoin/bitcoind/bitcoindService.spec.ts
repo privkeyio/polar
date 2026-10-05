@@ -51,6 +51,15 @@ describe('BitcoindService', () => {
     expect(info.blocks).toEqual(10);
   });
 
+  it('should report the BLAKE2b difficulty as difficulty', async () => {
+    const raw = Object.assign(Object.create(null), { blocks: 10, difficulty_blake2b: 2 });
+    mockProto.getBlockchainInfo = jest.fn().mockResolvedValue(raw);
+    const info = await bitcoindService.getBlockchainInfo(node);
+    expect(info.difficulty).toEqual(2);
+    expect(info).not.toHaveProperty('difficulty_blake2b');
+    expect(Object.getPrototypeOf(info)).toBe(Object.prototype);
+  });
+
   it('should get wallet info', async () => {
     const info = await bitcoindService.getWalletInfo(node);
     expect(mockBitcoin.mock.instances[0].getWalletInfo).toBeCalledTimes(1);

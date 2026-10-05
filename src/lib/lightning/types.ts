@@ -24,16 +24,6 @@ export interface LightningNodeAddress {
   address: string;
 }
 
-export interface LightningNodeChannelAsset {
-  id: string;
-  name: string;
-  groupKey?: string;
-  capacity: string;
-  localBalance: string;
-  remoteBalance: string;
-  decimals: number;
-}
-
 export interface LightningNodeChannel {
   pending: boolean;
   uniqueId: string;
@@ -51,7 +41,6 @@ export interface LightningNodeChannel {
     | 'Closed'
     | 'Error';
   isPrivate: boolean;
-  assets?: LightningNodeChannelAsset[];
 }
 
 export interface LightningNodeChannelPoint {

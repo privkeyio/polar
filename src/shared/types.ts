@@ -11,7 +11,7 @@ export interface CommonNode {
   id: number;
   networkId: number;
   name: string;
-  type: 'bitcoin' | 'lightning' | 'tap';
+  type: 'bitcoin' | 'lightning';
   version: string;
   status: Status;
   errorMsg?: string;
@@ -23,7 +23,7 @@ export interface CommonNode {
 
 export interface LightningNode extends CommonNode {
   type: 'lightning';
-  implementation: 'LND' | 'c-lightning' | 'eclair' | 'litd';
+  implementation: 'LND' | 'c-lightning';
   backendName: string;
   ports: Record<string, number | undefined>;
 }
@@ -58,14 +58,6 @@ export interface CLightningNode extends LightningNode {
   };
 }
 
-export interface EclairNode extends LightningNode {
-  implementation: 'eclair';
-  ports: {
-    rest: number;
-    p2p: number;
-  };
-}
-
 export interface BitcoinNode extends CommonNode {
   type: 'bitcoin';
   implementation: 'bitcoind' | 'btcd';
@@ -83,61 +75,13 @@ export interface BitcoindNode extends BitcoinNode {
   };
 }
 
-export interface TapNode extends CommonNode {
-  type: 'tap';
-  implementation: 'tapd' | 'litd';
-  ports: Record<string, number | undefined>;
-}
-
-export interface TapdNode extends TapNode {
-  lndName: string;
-  paths: {
-    tlsCert: string;
-    adminMacaroon: string;
-  };
-  ports: {
-    rest: number;
-    grpc: number;
-  };
-}
-
-export interface LitdNode extends LightningNode {
-  implementation: 'litd';
-  // lndName is the name of the lnd node that the lit node is connected to. For litd,
-  // this will always be the same as the litd node name, since it runs tapd integrated.
-  // We keep it also under this field for consistency with TapdNode. It greatly simplifies
-  // the code used to get the lnd node name that the lit node is connected to.
-  lndName: string;
-  paths: {
-    // lnd paths
-    tlsCert: string;
-    adminMacaroon: string;
-    invoiceMacaroon: string;
-    readonlyMacaroon: string;
-    // lit paths
-    litTlsCert: string;
-    litMacaroon: string;
-    // tap paths
-    tapMacaroon: string;
-  };
-  ports: {
-    rest: number;
-    grpc: number;
-    p2p: number;
-    web: number;
-  };
-}
-
 export type NodeImplementation =
   | BitcoinNode['implementation']
-  | LightningNode['implementation']
-  | TapNode['implementation'];
+  | LightningNode['implementation'];
 
 export type NodeImplementationWithSimln = NodeImplementation | 'simln';
 
-export type AnyNode = BitcoinNode | LightningNode | TapNode;
-
-export type TapSupportedNode = TapdNode | LitdNode;
+export type AnyNode = BitcoinNode | LightningNode;
 
 export interface OpenChannelOptions {
   from: LightningNode;

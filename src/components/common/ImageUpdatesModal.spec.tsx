@@ -74,11 +74,8 @@ describe('ImageUpdatesModal', () => {
         updates: {
           LND: ['1.2.3'],
           'c-lightning': [],
-          eclair: [],
-          litd: [],
           bitcoind: ['4.5.6'],
           btcd: [],
-          tapd: [],
         },
       });
     });
@@ -89,7 +86,7 @@ describe('ImageUpdatesModal', () => {
         await findByText('There are new node versions available'),
       ).toBeInTheDocument();
 
-      ['LND', 'v1.2.3', 'Bitcoin Core', 'v4.5.6'].forEach(text => {
+      ['LND', 'v1.2.3', 'Bitcoin Knots', 'v4.5.6'].forEach(text => {
         expect(getByText(text)).toBeInTheDocument();
       });
     });

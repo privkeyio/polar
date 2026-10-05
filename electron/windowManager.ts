@@ -5,7 +5,6 @@ import { join } from 'path';
 import { initAppIpcListener } from './appIpcListener';
 import { appMenuTemplate } from './appMenu';
 import { APP_ROOT, BASE_URL, IS_DEV } from './constants';
-import { initLitdProxy } from './litd/litdProxyServer';
 import {
   clearLndProxyCache,
   initLndProxy,
@@ -13,7 +12,6 @@ import {
   initLndWalletUnlockerProxy,
 } from './lnd/lndProxyServer';
 import { startMcpBridge } from './mcpBridge';
-import { initTapdProxy } from './tapd/tapdProxyServer';
 import TrayManager from './trayManager';
 
 class WindowManager {
@@ -24,8 +22,6 @@ class WindowManager {
     app.on('ready', async () => {
       await this.createMainWindow();
       initLndProxy(ipcMain);
-      initTapdProxy(ipcMain);
-      initLitdProxy(ipcMain);
       initAppIpcListener(ipcMain);
       initLndSubscriptions(this.sendMessageToRenderer);
       initLndWalletUnlockerProxy(ipcMain);

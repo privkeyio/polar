@@ -11,11 +11,8 @@ import {
   BitcoinNode,
   CLightningNode,
   CommonNode,
-  EclairNode,
   LightningNode,
-  LitdNode,
   LndNode,
-  TapdNode,
 } from 'shared/types';
 import stripAnsi from 'strip-ansi';
 import {
@@ -27,7 +24,7 @@ import {
   SimulationNodeConfig,
 } from 'types';
 import { legacyDataPath, networksPath, nodePath } from 'utils/config';
-import { APP_VERSION, dockerConfigs, eclairCredentials } from 'utils/constants';
+import { APP_VERSION, dockerConfigs } from 'utils/constants';
 import { exists, read, renameFile, rm, write } from 'utils/files';
 import { migrateNetworksFile } from 'utils/migrations';
 import { getContainerName } from 'utils/network';
@@ -133,7 +130,7 @@ class DockerService implements DockerLibrary {
    */
   async saveComposeFile(network: Network) {
     const file = new ComposeFile(network.id);
-    const { bitcoin, lightning, tap } = network.nodes;
+    const { bitcoin, lightning } = network.nodes;
 
     bitcoin.forEach(node => file.addBitcoind(node));
     lightning.forEach(node => {
@@ -147,29 +144,7 @@ class DockerService implements DockerLibrary {
         const backend = bitcoin.find(n => n.name === cln.backendName) || bitcoin[0];
         file.addClightning(cln, backend);
       }
-      if (node.implementation === 'eclair') {
-        const eclair = node as EclairNode;
-        const backend = bitcoin.find(n => n.name === eclair.backendName) || bitcoin[0];
-        file.addEclair(eclair, backend);
-      }
-      if (node.implementation === 'litd') {
-        const litd = node as LitdNode;
-        const backend = bitcoin.find(n => n.name === litd.backendName) || bitcoin[0];
-        // Always set the first litd node as the proof courier, even if it's the same node
-        const proofCourier = lightning.find(n => n.implementation === 'litd') as LitdNode;
-        file.addLitd(litd, backend, proofCourier);
-      }
     });
-    tap.forEach(node => {
-      if (node.implementation === 'tapd') {
-        const tapd = node as TapdNode;
-        const lndBackend =
-          lightning.find(n => n.name === tapd.lndName) ||
-          lightning.filter(n => n.implementation === 'LND')[0];
-        file.addTapd(tapd, lndBackend as LndNode);
-      }
-    });
-
     if (network.simulation) {
       file.addSimln(network.id);
     }
@@ -185,8 +160,8 @@ class DockerService implements DockerLibrary {
    * @param network the network to start
    */
   async start(network: Network) {
-    const { bitcoin, lightning, tap } = network.nodes;
-    await this.ensureDirs(network, [...bitcoin, ...lightning, ...tap]);
+    const { bitcoin, lightning } = network.nodes;
+    await this.ensureDirs(network, [...bitcoin, ...lightning]);
 
     info(`Starting docker containers for ${network.name}`);
     info(` - path: ${network.path}`);
@@ -408,10 +383,6 @@ class DockerService implements DockerLibrary {
         const { dataDir, apiDir } = dockerConfigs['c-lightning'];
         await ensureDir(join(nodeDir, dataDir as string));
         await ensureDir(join(nodeDir, apiDir as string));
-      } else if (node.implementation === 'litd') {
-        await ensureDir(join(nodeDir, 'lit'));
-        await ensureDir(join(nodeDir, 'lnd'));
-        await ensureDir(join(nodeDir, 'tapd'));
       }
     }
   }
@@ -471,16 +442,6 @@ class DockerService implements DockerLibrary {
             };
             break;
 
-          case 'eclair':
-            const eclair = node as EclairNode;
-            simNode = {
-              id: eclair.name,
-              base_url: `http://${getContainerName(node)}:8080`,
-              api_username: '',
-              api_password: eclairCredentials.pass,
-            };
-            break;
-
           case 'c-lightning':
             const cln = node as CLightningNode;
             simNode = {
@@ -489,16 +450,6 @@ class DockerService implements DockerLibrary {
               ca_cert: `/home/simln/.${getPosixPath(cln.paths.tlsCert)}`,
               client_cert: `/home/simln/.${getPosixPath(cln.paths.tlsClientCert)}`,
               client_key: `/home/simln/.${getPosixPath(cln.paths.tlsClientKey)}`,
-            };
-            break;
-
-          case 'litd':
-            const litd = node as LitdNode;
-            simNode = {
-              id: litd.name,
-              address: `${getContainerName(node)}:10009`,
-              cert: `/home/simln/.${getPosixPath(litd.paths.tlsCert)}`,
-              macaroon: `/home/simln/.${getPosixPath(litd.paths.adminMacaroon)}`,
             };
             break;
         }
@@ -536,7 +487,6 @@ class DockerService implements DockerLibrary {
     await this.ensureDirs(network, [
       ...network.nodes.bitcoin,
       ...network.nodes.lightning,
-      ...network.nodes.tap,
     ]);
     // we need to create this dir as the current host user, otherwise it will be created
     // by the simln container and the owner will be set to root on linux. This prevents

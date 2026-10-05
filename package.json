@@ -1,6 +1,6 @@
 {
-  "name": "polar",
-  "version": "4.0.0",
+  "name": "polar-blake2b",
+  "version": "4.0.0-blake2b.1",
   "homepage": "https://lightningpolar.com",
   "description": "One-click Bitcoin Lightning networks for local app development & testing",
   "author": {
@@ -43,9 +43,7 @@
     "tsc": "tsc --noEmit"
   },
   "dependencies": {
-    "@lightningpolar/litd-api": "0.16.0-alpha",
     "@lightningpolar/lnd-api": "0.20.0-beta",
-    "@lightningpolar/tapd-api": "0.7.0-alpha",
     "@types/lodash": "4.17.21",
     "archiver": "7.0.1",
     "docker-compose": "0.24.0",

@@ -3,13 +3,7 @@ import * as log from 'electron-log';
 import { waitFor } from '@testing-library/react';
 import detectPort from 'detect-port';
 import { createStore } from 'easy-peasy';
-import {
-  CLightningNode,
-  LndNode,
-  NodeImplementation,
-  Status,
-  TapdNode,
-} from 'shared/types';
+import { CLightningNode, LndNode, NodeImplementation, Status } from 'shared/types';
 import { AutoMineMode, CustomImage, Network } from 'types';
 import * as asyncUtil from 'utils/async';
 import { initChartFromNetwork } from 'utils/chart';
@@ -24,9 +18,7 @@ import {
   getNetwork,
   injections,
   lightningServiceMock,
-  litdServiceMock,
   lndServiceMock,
-  tapServiceMock,
   testCustomImages,
   testRepoState,
 } from 'utils/tests';
@@ -34,9 +26,7 @@ import appModel from './app';
 import bitcoinModel from './bitcoin';
 import designerModel from './designer';
 import lightningModel from './lightning';
-import litModel from './lit';
 import networkModel from './network';
-import tapModel from './tap';
 
 jest.mock('utils/files', () => ({
   waitForFile: jest.fn(),
@@ -66,8 +56,6 @@ describe('Network model', () => {
     lightning: lightningModel,
     bitcoin: bitcoinModel,
     designer: designerModel,
-    tap: tapModel,
-    lit: litModel,
   };
   // initialize store for type inference
   let store = createStore(rootModel, { injections });
@@ -78,12 +66,9 @@ describe('Network model', () => {
   const addNetworkArgs = {
     name: 'test',
     description: 'test description',
-    lndNodes: 2,
+    lndNodes: 4,
     clightningNodes: 1,
-    eclairNodes: 1,
     bitcoindNodes: 1,
-    tapdNodes: 0,
-    litdNodes: 1,
     customNodes: {},
     manualMineCount: 6,
   };
@@ -95,7 +80,6 @@ describe('Network model', () => {
     filesMock.waitForFile.mockResolvedValue();
     lightningServiceMock.waitUntilOnline.mockResolvedValue();
     bitcoinServiceMock.waitUntilOnline.mockResolvedValue();
-    litdServiceMock.waitUntilOnline.mockResolvedValue();
   });
 
   it('should have a valid initial state', () => {
@@ -111,6 +95,47 @@ describe('Network model', () => {
     const [net1, net2] = store.getState().network.networks;
     expect(net1.name).toBe('test 1');
     expect(net2.name).toBe('test 2');
+  });
+
+  it('should remove unsupported nodes when loading networks', async () => {
+    const mockNetworks = [
+      getNetwork(1, 'test 1'),
+      getNetwork(2, 'test 2'),
+      getNetwork(3, 'test 3'),
+    ];
+    const mockCharts = Object.fromEntries(
+      mockNetworks.map(n => [n.id, initChartFromNetwork(n)]),
+    );
+    mockNetworks[0].nodes.lightning[2].implementation = 'eclair' as any;
+    mockNetworks[0].simulation = {
+      activity: [
+        { id: 0, source: 'alice', destination: 'carol', intervalSecs: 60, amountMsat: 1 },
+        { id: 1, source: 'carol', destination: 'bob', intervalSecs: 60, amountMsat: 1 },
+        { id: 2, source: 'alice', destination: 'bob', intervalSecs: 60, amountMsat: 1 },
+      ],
+      status: Status.Stopped,
+    };
+    mockNetworks[1].nodes.lightning[3].implementation = 'eclair' as any;
+    (mockNetworks[1].nodes as any).tap = [{ name: 'alice-tap' }];
+    const mockedLoad = injections.dockerService.loadNetworks as jest.Mock;
+    mockedLoad.mockResolvedValue({ networks: mockNetworks, charts: mockCharts });
+    await store.getActions().network.load();
+    const [net1, net2, net3] = store.getState().network.networks;
+    const names = (n: Network) => n.nodes.lightning.map(ln => ln.name);
+    expect(names(net1)).toEqual(['alice', 'bob', 'dave']);
+    expect(net1.simulation?.activity.map(a => a.id)).toEqual([2]);
+    expect(names(net2)).toEqual(['alice', 'bob', 'carol']);
+    expect((net2.nodes as any).tap).toBeUndefined();
+    expect(names(net3)).toEqual(['alice', 'bob', 'carol', 'dave']);
+    const chart = store.getState().designer.allCharts[1];
+    expect(chart.nodes['carol']).toBeUndefined();
+    expect(chart.nodes['alice']).toBeDefined();
+    const linkNodes = Object.values(chart.links).flatMap(l => [
+      l.from.nodeId,
+      l.to.nodeId,
+    ]);
+    expect(linkNodes).not.toContain('carol');
+    expect(linkNodes).toContain('alice');
   });
 
   describe('Fetching', () => {
@@ -220,7 +245,6 @@ describe('Network model', () => {
         customNodes: {
           '123': 1, // LND
           '456': 1, // c-lightning
-          '789': 1, // Eclair
           '012': 1, // bitcoind
           '999': 1, // invalid
         },
@@ -235,7 +259,6 @@ describe('Network model', () => {
   describe('Adding a Node', () => {
     const lndLatest = defaultRepoState.images.LND.latest;
     const clnLatest = defaultRepoState.images['c-lightning'].latest;
-    const eclairLatest = defaultRepoState.images.eclair.latest;
 
     beforeEach(async () => {
       await store.getActions().network.addNetwork(addNetworkArgs);
@@ -261,15 +284,6 @@ describe('Network model', () => {
       expect(lightning).toHaveLength(6);
       expect(lightning[1].name).toBe('bob');
       expect(lightning[1].implementation).toBe('c-lightning');
-    });
-
-    it('should add an Eclair node to an existing network', async () => {
-      const payload = { id: firstNetwork().id, type: 'eclair', version: eclairLatest };
-      store.getActions().network.addNode(payload);
-      const { lightning } = firstNetwork().nodes;
-      expect(lightning).toHaveLength(6);
-      expect(lightning[2].name).toBe('carol');
-      expect(lightning[2].implementation).toBe('eclair');
     });
 
     it('should throw an error if the network id is invalid', async () => {
@@ -416,12 +430,6 @@ describe('Network model', () => {
 
     it('should remove a c-lightning node from an existing network', async () => {
       const node = firstNetwork().nodes.lightning[1];
-      await store.getActions().network.removeLightningNode({ node });
-      expect(firstNetwork().nodes.lightning).toHaveLength(4);
-    });
-
-    it('should remove a litd node from an existing network', async () => {
-      const node = firstNetwork().nodes.lightning[3];
       await store.getActions().network.removeLightningNode({ node });
       expect(firstNetwork().nodes.lightning).toHaveLength(4);
     });
@@ -619,7 +627,6 @@ describe('Network model', () => {
 
     it('should set lightning node status to error if the node startup fails', async () => {
       lightningServiceMock.waitUntilOnline.mockRejectedValue(new Error('test-error'));
-      litdServiceMock.waitUntilOnline.mockRejectedValue(new Error('test-error'));
       const { start } = store.getActions().network;
       await start(firstNetwork().id);
       const { lightning } = firstNetwork().nodes;
@@ -970,7 +977,7 @@ describe('Network model', () => {
     });
 
     it('should update node ports when starting', async () => {
-      const portsInUse = [8084];
+      const portsInUse = [8085];
       detectPortMock.mockImplementation(port =>
         Promise.resolve(portsInUse.includes(port) ? port + 1 : port),
       );
@@ -979,7 +986,7 @@ describe('Network model', () => {
       await toggleNode(node);
       // get a reference to the updated nodes
       node = firstNetwork().nodes.lightning[4];
-      expect(node.ports.rest).toBe(8085);
+      expect(node.ports.rest).toBe(8086);
     });
 
     it('should start the node with its updated ports, not the stale ones', async () => {
@@ -1029,88 +1036,6 @@ describe('Network model', () => {
       expect(injections.dockerService.startNode).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ name: originalName }),
-      );
-    });
-  });
-
-  describe('TAP network', () => {
-    beforeEach(() => {
-      (() => {
-        const network = getNetwork(1, 'test network', Status.Stopped, 2);
-        store.getActions().network.setNetworks([network]);
-        const chart = initChartFromNetwork(network);
-        store.getActions().designer.setChart({ id: network.id, chart });
-        store.getActions().designer.setActiveId(network.id);
-        return network;
-      })();
-    });
-
-    it('should remove a tap network', async () => {
-      await store.getActions().network.remove(firstNetwork().id);
-      expect(firstNetwork()).toBeUndefined();
-    });
-
-    it('should throw when removing a node with an invalid network id', async () => {
-      const node = {
-        ...firstNetwork().nodes.tap[0],
-        networkId: 999,
-      };
-      const { removeTapNode } = store.getActions().network;
-      await expect(removeTapNode({ node })).rejects.toThrow(
-        "Network with the id '999' was not found.",
-      );
-    });
-
-    it('should set tap node status to error if the node startup fails', async () => {
-      tapServiceMock.waitUntilOnline.mockRejectedValue(new Error('test-error'));
-      const { start } = store.getActions().network;
-      await start(firstNetwork().id);
-      const { tap } = firstNetwork().nodes;
-      tap.forEach(node => expect(node.status).toBe(Status.Error));
-      tap.forEach(node => expect(node.errorMsg).toBe('test-error'));
-    });
-    it('should update the backend LND node', async () => {
-      const { updateTapBackendNode } = store.getActions().network;
-      const { id, nodes } = firstNetwork();
-      const tapdNode = nodes.tap[0] as TapdNode;
-      expect(tapdNode.lndName).toBe('alice');
-      await updateTapBackendNode({ id, lndName: 'bob', tapName: 'alice-tap' });
-      expect(tapdNode.lndName).toBe('bob');
-    });
-
-    it('should throw an error if the network id is not valid', async () => {
-      const { updateTapBackendNode } = store.getActions().network;
-      const args = { id: 999, tapName: 'alice-tap', lndName: 'alice' };
-      await expect(updateTapBackendNode(args)).rejects.toThrow(
-        "Network with the id '999' was not found.",
-      );
-    });
-
-    it('should throw an error if the tap node name is not valid', async () => {
-      const { updateTapBackendNode } = store.getActions().network;
-      const args = { id: firstNetwork().id, tapName: 'xxx', lndName: 'alice' };
-      await expect(updateTapBackendNode(args)).rejects.toThrow(
-        "The node 'xxx' was not found.",
-      );
-    });
-
-    it('should throw an error if the LND node name is not valid', async () => {
-      const { updateTapBackendNode } = store.getActions().network;
-      const args = { id: firstNetwork().id, tapName: 'alice', lndName: 'xxx' };
-      await expect(updateTapBackendNode(args)).rejects.toThrow(
-        "The node 'xxx' was not found.",
-      );
-    });
-
-    it('should throw an error if the LND node name is already set on the tap node', async () => {
-      const { updateTapBackendNode } = store.getActions().network;
-      const args = {
-        id: firstNetwork().id,
-        tapName: 'alice-tap',
-        lndName: 'alice',
-      };
-      await expect(updateTapBackendNode(args)).rejects.toThrow(
-        "The node 'alice-tap' is already connected to 'alice'",
       );
     });
   });

@@ -33,7 +33,7 @@ export const payInvoiceDefinition: McpToolDefinition = {
     'The invoice is a BOLT11 payment request string. ' +
     'An optional amount can be provided for invoices without a specific amount. ' +
     'Returns a payment receipt with the preimage and fees paid. ' +
-    'Works with LND, c-lightning, eclair, and litd nodes.',
+    'Works with LND and c-lightning nodes.',
   inputSchema: {
     type: 'object',
     properties: {

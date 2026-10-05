@@ -25,10 +25,7 @@ describe('MCP model > listNetworks', () => {
       description: 'Test Network 1',
       lndNodes: 2,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -38,10 +35,7 @@ describe('MCP model > listNetworks', () => {
       description: 'Test Network 2',
       lndNodes: 1,
       clightningNodes: 1,
-      eclairNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });

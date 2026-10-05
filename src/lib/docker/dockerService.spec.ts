@@ -6,7 +6,7 @@ import { IChart } from '@mrblenny/react-flow-chart';
 import { v2 as compose } from 'docker-compose';
 import Dockerode from 'dockerode';
 import os from 'os';
-import { CLightningNode, LitdNode, LndNode, Status, TapdNode } from 'shared/types';
+import { CLightningNode, LndNode, Status } from 'shared/types';
 import { dockerService } from 'lib/docker';
 import { Network, NetworksFile } from 'types';
 import { initChartFromNetwork } from 'utils/chart';
@@ -186,10 +186,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 1,
         clightningNodes: 0,
-        eclairNodes: 0,
         bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 0,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
         customImages: [],
@@ -212,36 +209,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 0,
         clightningNodes: 1,
-        eclairNodes: 0,
         bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 0,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      net.nodes.lightning[0].backendName = 'invalid';
-      dockerService.saveComposeFile(net);
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.stringContaining(
-          `container_name: polar-n1-${network.nodes.lightning[0].name}`,
-        ),
-      );
-    });
-
-    it('should save the eclair node with the first bitcoin node as backend', () => {
-      const net = createNetwork({
-        id: 1,
-        name: 'my network',
-        description: 'network description',
-        lndNodes: 0,
-        clightningNodes: 0,
-        eclairNodes: 1,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 0,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
         customImages: [],
@@ -268,113 +236,6 @@ describe('DockerService', () => {
       );
     });
 
-    it('should save the tapd node with the named LND node as backend', () => {
-      const net = getNetwork(1, 'my network', undefined, 2);
-      dockerService.saveComposeFile(net);
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.stringContaining(`--lnd.host=polar-n1-${net.nodes.lightning[1].name}`),
-      );
-    });
-
-    it('should save the tapd node with the first LND node as backend', () => {
-      const net = getNetwork(1, 'my network', undefined, 2);
-      const tapNode = net.nodes.tap[0] as TapdNode;
-      tapNode.lndName = 'invalid';
-      dockerService.saveComposeFile(net);
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.stringContaining(`--lnd.host=polar-n1-${net.nodes.lightning[0].name}`),
-      );
-    });
-
-    it('should not save unknown tap implementation', () => {
-      const net = getNetwork(1, 'my network', undefined, 2);
-      net.nodes.tap[0].implementation = 'unknown' as any;
-      dockerService.saveComposeFile(net);
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.not.stringContaining(`container_name: polar-n1-${net.nodes.tap[0].name}`),
-      );
-    });
-
-    it('should save the litd node with the named LND node as backend', () => {
-      const net = createNetwork({
-        id: 1,
-        name: 'my network',
-        description: 'network description',
-        lndNodes: 0,
-        clightningNodes: 0,
-        eclairNodes: 0,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 1,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      dockerService.saveComposeFile(net);
-      const { backendName } = net.nodes.lightning[0] as LitdNode;
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.stringContaining(`--lnd.bitcoind.rpchost=polar-n1-${backendName}`),
-      );
-    });
-
-    it('should save the litd node with the first bitcoin node as backend', () => {
-      const net = createNetwork({
-        id: 1,
-        name: 'my network',
-        description: 'network description',
-        lndNodes: 0,
-        clightningNodes: 0,
-        eclairNodes: 0,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 1,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      const litdNode = net.nodes.lightning[0] as LitdNode;
-      litdNode.backendName = 'invalid';
-      dockerService.saveComposeFile(net);
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.stringContaining(
-          `--lnd.bitcoind.rpchost=polar-n1-${net.nodes.bitcoin[0].name}`,
-        ),
-      );
-    });
-
-    it('should not save unknown litd implementation', () => {
-      const net = createNetwork({
-        id: 1,
-        name: 'my network',
-        description: 'network description',
-        lndNodes: 0,
-        clightningNodes: 0,
-        eclairNodes: 0,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 1,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      net.nodes.lightning[0].implementation = 'unknown' as any;
-      dockerService.saveComposeFile(net);
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.not.stringContaining(
-          `container_name: polar-n1-${net.nodes.lightning[0].name}`,
-        ),
-      );
-    });
-
     it('should save a list of networks to disk', () => {
       dockerService.saveNetworks({ version: '0.1.0', networks: [network], charts: {} });
       expect(filesMock.write).toHaveBeenCalledWith(
@@ -392,10 +253,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 2,
         clightningNodes: 1,
-        eclairNodes: 0,
         bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 0,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
         customImages: [],
@@ -473,12 +331,6 @@ describe('DockerService', () => {
       const { net, chart } = createTestNetwork();
       // added in v2.0.0
       delete net.autoMineMode;
-      delete net.nodes.tap;
-      net.nodes.lightning.forEach((n: any) => {
-        if (n.implementation === 'LND') {
-          delete chart.nodes[n.name].ports['lndbackend'];
-        }
-      });
       return { net, chart };
     };
 
@@ -523,10 +375,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 2,
         clightningNodes: 1,
-        eclairNodes: 0,
         bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 0,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
         customImages: [],
@@ -660,7 +509,6 @@ describe('DockerService', () => {
       expect(version).toEqual(APP_VERSION);
       // added in v2.0.0
       expect(networks[0].autoMineMode).toBeDefined();
-      expect(networks[0].nodes.tap).toBeDefined();
     });
 
     it('should not run migrations in production with up to date version', async () => {
@@ -709,27 +557,6 @@ describe('DockerService', () => {
       composeMock.upAll.mockResolvedValue(mockResult);
       await dockerService.start(network);
       expect(fsMock.ensureDir).toHaveBeenCalledTimes(7);
-    });
-
-    it('should create volume dirs when the network is started', async () => {
-      const net = createNetwork({
-        id: 1,
-        name: 'my network',
-        description: 'network description',
-        lndNodes: 1,
-        clightningNodes: 1,
-        eclairNodes: 0,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 1,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      composeMock.upAll.mockResolvedValue(mockResult);
-      await dockerService.start(net);
-      expect(fsMock.ensureDir).toHaveBeenCalledTimes(9);
     });
 
     it('should call compose.down when a network is stopped', async () => {
@@ -896,10 +723,7 @@ describe('DockerService', () => {
       description: 'network description',
       lndNodes: 1,
       clightningNodes: 1,
-      eclairNodes: 1,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 1,
       repoState: defaultRepoState,
       managedImages: testManagedImages,
       customImages: [],
@@ -907,13 +731,9 @@ describe('DockerService', () => {
     });
     const mockResult = { err: '', out: '', exitCode: 0 };
     const lndNodes = network.nodes.lightning.filter(n => n.implementation === 'LND');
-    const eclairNodes = network.nodes.lightning.filter(
-      n => n.implementation === 'eclair',
-    );
     const clightningNodes = network.nodes.lightning.filter(
       n => n.implementation === 'c-lightning',
     );
-    const litdNodes = network.nodes.lightning.filter(n => n.implementation === 'litd');
     beforeEach(() => {
       // Add simulation config to the test network
       network.simulation = {
@@ -921,7 +741,7 @@ describe('DockerService', () => {
           {
             id: 0,
             source: lndNodes[0].name,
-            destination: eclairNodes[0].name,
+            destination: clightningNodes[0].name,
             intervalSecs: 60,
             amountMsat: 1000,
           },
@@ -1004,14 +824,14 @@ describe('DockerService', () => {
       );
     });
 
-    // Now we should be able to use c-lightning and litd in the simulation
+    // Now we should be able to use c-lightning in the simulation
     it('should add c-lightning to the docker-compose.yml file', async () => {
       network.simulation = {
         activity: [
           {
             id: 0,
             source: clightningNodes[0].name,
-            destination: litdNodes[0].name,
+            destination: lndNodes[0].name,
             intervalSecs: 60,
             amountMsat: 1000,
           },
@@ -1059,7 +879,7 @@ describe('DockerService', () => {
           {
             id: 0,
             source: lndNodes[0].name,
-            destination: eclairNodes[0].name,
+            destination: clightningNodes[0].name,
             intervalSecs: 60,
             amountMsat: 1000,
           },

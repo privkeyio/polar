@@ -98,94 +98,6 @@ export const clightning = (
   ].filter(p => !!p), // filer out empty strings
 });
 
-export const eclair = (
-  name: string,
-  container: string,
-  image: string,
-  restPort: number,
-  p2pPort: number,
-  command: string,
-): ComposeService => ({
-  image,
-  container_name: container,
-  hostname: name,
-  command: trimInside(command),
-  restart: 'always',
-  volumes: [
-    `./volumes/${dockerConfigs.eclair.volumeDirName}/${name}:/home/eclair/.eclair`,
-  ],
-  expose: [
-    '8080', // REST
-    '9735', // p2p
-  ],
-  ports: [
-    `${restPort}:8080`, // REST
-    `${p2pPort}:9735`, // p2p
-  ],
-});
-
-export const tapd = (
-  name: string,
-  container: string,
-  image: string,
-  restPort: number,
-  grpcPort: number,
-  lndName: string,
-  command: string,
-): ComposeService => ({
-  image,
-  container_name: container,
-  hostname: name,
-  command: trimInside(command),
-  restart: 'always',
-  volumes: [
-    `./volumes/${dockerConfigs.LND.volumeDirName}/${lndName}:/home/tap/.lnd`,
-    `./volumes/${dockerConfigs.tapd.volumeDirName}/${name}:/home/tap/.tapd`,
-  ],
-  expose: [
-    '8089', // REST
-    '10029', // gRPC
-  ],
-  ports: [
-    `${restPort}:8089`, // REST
-    `${grpcPort}:10029`, // gRPC
-  ],
-});
-
-export const litd = (
-  name: string,
-  container: string,
-  image: string,
-  restPort: number,
-  grpcPort: number,
-  p2pPort: number,
-  webPort: number,
-  command: string,
-): ComposeService => ({
-  image,
-  container_name: container,
-  hostname: name,
-  command: trimInside(command),
-  restart: 'always',
-  volumes: [
-    `./volumes/${dockerConfigs.litd.volumeDirName}/${name}/lit:/home/litd/.lit`,
-    `./volumes/${dockerConfigs.litd.volumeDirName}/${name}/lnd:/home/litd/.lnd`,
-    `./volumes/${dockerConfigs.litd.volumeDirName}/${name}/tapd:/home/litd/.tapd`,
-  ],
-  expose: [
-    '8080', // REST
-    '10009', // gRPC
-    '9735', // p2p
-    '8443', // web
-  ],
-  ports: [
-    `${restPort}:8080`, // REST
-    `${grpcPort}:10009`, // gRPC
-    `${p2pPort}:9735`, // p2p
-    `${webPort}:8443`, // web
-  ],
-});
-
 export const simln = (
   name: string,
   container: string,
@@ -203,7 +115,6 @@ export const simln = (
     `./volumes/${name}:/home/simln/.simln`,
     `./volumes/${dockerConfigs.LND.volumeDirName}:/home/simln/.lnd`,
     `./volumes/${dockerConfigs['c-lightning'].volumeDirName}:/home/simln/.c-lightning`,
-    `./volumes/${dockerConfigs.litd.volumeDirName}:/home/simln/.litd`,
   ],
   expose: [],
   ports: [],

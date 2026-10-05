@@ -62,11 +62,8 @@ class RepoService implements RepoServiceInjection {
     const updates: DockerRepoUpdates['updates'] = {
       LND: [],
       'c-lightning': [],
-      eclair: [],
-      litd: [],
       bitcoind: [],
       btcd: [],
-      tapd: [],
     };
     // find the different versions between the two states
     let newVersionCount = 0;

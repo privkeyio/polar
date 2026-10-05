@@ -17,210 +17,52 @@ $ docker buildx use polar-builder
 $ docker buildx inspect --bootstrap
 ```
 
-## Bitcoin Core
+## Bitcoin Knots
 
 ### Tags
 
-- `30.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `29.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `28.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `27.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `26.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `25.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `24.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `23.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `22.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `0.21.1` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `0.21.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `0.20.1` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `0.20.0` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `0.19.1` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `0.19.0.1` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
-- `0.18.1` ([bitcoind/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/bitcoind/Dockerfile))
+- `29.4.2` ([bitcoind/Dockerfile](bitcoind/Dockerfile))
 
 **Building the image**
 
 ```sh
 $ cd bitcoind
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg BITCOIN_VERSION=<version> -t polarlightning/bitcoind:<version> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg BITCOIN_VERSION=<version> --build-arg BITCOIN_SHA256SUMS=<sums> -t ghcr.io/privkeyio/polar/bitcoind:<tag> --push .
 ```
 
-Replace `<version>` with the desired bitcoind version (ex: `0.18.1`)
+Replace `<version>` with the Bitcoin Knots release (ex: `29.4.2.knots20260508`), `<tag>` with its version number (ex: `29.4.2`), and `<sums>` with the sha256 of that release's `SHA256SUMS` once you have checked its `SHA256SUMS.asc` against Luke Dashjr's key `1A3E 761F 19D2 CC77 85C5 502E A291 A2C4 5D0C 504A` (for `29.4.2.knots20260508`: `90bd17505d37b92b7ac3c55a6d7109b9415c96711d04b9041e37b3fc67557f67`).
 
 ## LND
 
 ### Tags
 
-- `0.20.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.19.3-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.19.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.19.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.19.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.18.5-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.18.4-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.18.3-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.18.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.18.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.18.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.17.5-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.17.4-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.17.3-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.17.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.17.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.17.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.16.4-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.16.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.16.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.16.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.15.5-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.15.4-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.15.3-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.15.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.15.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.15.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.14.3-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.14.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.14.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.13.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.13.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.12.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.12.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.11.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.11.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.10.3-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.10.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.10.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.10.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.9.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.9.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.8.2-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.8.0-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
-- `0.7.1-beta` ([lnd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/lnd/Dockerfile))
+- `0.21.3-beta-blake2b.17` ([lnd/Dockerfile](lnd/Dockerfile))
 
 **Building the image**
 
 ```sh
 $ cd lnd
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg LND_VERSION=<version> -t polarlightning/lnd:<version> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg LND_VERSION=<version> --build-arg LND_COMMIT=<commit> -t ghcr.io/privkeyio/polar/lnd:<version> --push .
 ```
 
-Replace `<version>` with the desired LND version (ex: `0.7.1-beta`)
+Replace `<version>` with a tag of [paulscode/lightning-fork](https://github.com/paulscode/lightning-fork) without the leading `v` (ex: `0.21.3-beta-blake2b.17`) and `<commit>` with the commit that tag points at (for `0.21.3-beta-blake2b.17`: `cebc10fe01e811a38c2830c0396bd3c9182e5d62`). It is built from source, since the fork publishes no binaries, and the build fails if the tag has moved.
 
 ## Core Lightning
 
 ### Tags
 
-- `25.12` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `25.09.3` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `25.05` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `25.02.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `25.02` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `24.11.1` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `24.11` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `24.08.1` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `24.08` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `24.05` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `24.02.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `23.11.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `23.05.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `23.02.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `22.11` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.12.0` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.11.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.11.1` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.10.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.10.0` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.9.3` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.9.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.9.1` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.9.0` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.8.2` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.8.1` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
-- `0.8.0` ([clightning/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/clightning/Dockerfile))
+- `26.06.8-blake2b.6` ([clightning/Dockerfile](clightning/Dockerfile))
 
 **Building the image**
 
 ```sh
 $ cd clightning
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> -t polarlightning/clightning:<version> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> --build-arg CLN_SHA256SUMS=<sums> --build-arg BITCOIN_VERSION=<knots> --build-arg BITCOIN_SHA256SUMS=<knots-sums> -t ghcr.io/privkeyio/polar/clightning:<version> --push .
 ```
 
-Replace `<version>` with the desired c-lightning version (ex: `0.8.0`).
+Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.8-blake2b.6`) `<sums>` with the sha256 of its `SHA256SUMS-v<version>` once you have checked the `.asc` against the privkeyio key `A47D 99B6 DB0D 715D 40C5 9A20 23AE 8A8E A7E2 4E38` (for `26.06.8-blake2b.6`: `00de890637f5476a65de70bf52943d62173a5633b1c76b799bb2938b84bbd6bb`), and `<knots>` and `<knots-sums>` as for Bitcoin Knots above, whose `bitcoin-cli` it uses.
 
-## Eclair
-
-### Tags
-
-- `0.13.1` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.12.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.11.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.10.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.9.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.8.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.7.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.6.2` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.6.1` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.6.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.5.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.4.2` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.3.3` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-
-**Building the image**
-
-```sh
-$ cd eclair
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg ECLAIR_VERSION=<version> -t polarlightning/eclair:<version> --push .
-```
-
-Replace `<version>` with the desired Eclair version (ex: `0.3.3`).
-
-## Taproot Assets Protocol
-
-### Tags
-
-- `0.7.0-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.6.1-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.6.0-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.5.1-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.5.0-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.4.1-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.4.0-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.3.3-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.3.2-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.3.1-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.3.0-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.2.3-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.2.2-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-- `0.2.0-alpha` ([tap/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/tapd/Dockerfile))
-
-**Building the image**
-
-```sh
-$ cd tapd
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg TAPD_VERSION=<version> -t polarlightning/tapd:<version> --push .
-```
-
-Replace `<version>` with the desired Tap version (ex: `0.2.0-alpha`).
-
-## Lightning Terminal
-
-### Tags
-
-- `0.16.0-alpha` ([litd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/litd/Dockerfile))
-- `0.15.3-alpha` ([litd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/litd/Dockerfile))
-- `0.15.1-alpha` ([litd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/litd/Dockerfile))
-- `0.15.0-alpha` ([litd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/litd/Dockerfile))
-- `0.14.1-alpha` ([litd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/litd/Dockerfile))
-- `0.14.0-alpha` ([litd/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/litd/Dockerfile))
-
-**Building the image**
-
-```sh
-$ cd litd
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg LITD_VERSION=<version> -t polarlightning/litd:<version> --push .
-```
-
-Replace `<version>` with the desired Tap version (ex: `0.13.3-alpha`).
+The images can also be built and pushed from master with the `Images` workflow in GitHub Actions, passing the same build args one per line.
 
 ## SimLN
 

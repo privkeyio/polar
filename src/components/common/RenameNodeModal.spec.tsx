@@ -9,9 +9,7 @@ import {
   bitcoinServiceMock,
   injections,
   lightningServiceMock,
-  litdServiceMock,
   renderWithProviders,
-  tapServiceMock,
   testManagedImages,
 } from 'utils/tests';
 import RenameNodeModal from './RenameNodeModal';
@@ -33,10 +31,7 @@ describe('RenameNodeModal', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 1,
-      eclairNodes: 1,
-      litdNodes: 1,
       bitcoindNodes: 3,
-      tapdNodes: 1,
       status,
       repoState: defaultRepoState,
       managedImages: testManagedImages,
@@ -125,28 +120,10 @@ describe('RenameNodeModal', () => {
       expect(getByText('The node alice has been renamed to test')).toBeInTheDocument();
     });
 
-    it('should update the TAP node name', async () => {
-      const { getByText, getByLabelText, store } = await renderComponent(
-        Status.Stopped,
-        'alice-tap',
-      );
-      fireEvent.change(getByLabelText('New Node Name'), { target: { value: 'test' } });
-      fireEvent.click(getByText('Save'));
-      await waitFor(() => {
-        expect(store.getState().modals.advancedOptions.visible).toBe(false);
-        expect(store.getState().network.networks[0].nodes.tap[0].name).toBe('test');
-      });
-      expect(
-        getByText('The node alice-tap has been renamed to test'),
-      ).toBeInTheDocument();
-    });
-
     it('should update the started Backend node name', async () => {
       asyncUtilMock.delay.mockResolvedValue(Promise.resolve());
       lightningServiceMock.waitUntilOnline.mockResolvedValue();
       bitcoinServiceMock.waitUntilOnline.mockResolvedValue();
-      tapServiceMock.waitUntilOnline.mockResolvedValue();
-      litdServiceMock.waitUntilOnline.mockResolvedValue();
       const { getByText, getByLabelText, store } = await renderComponent(
         Status.Started,
         'backend1',

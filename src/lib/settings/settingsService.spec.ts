@@ -22,11 +22,8 @@ describe('SettingsService', () => {
       newNodeCounts: {
         LND: 1,
         'c-lightning': 1,
-        eclair: 1,
         bitcoind: 1,
         btcd: 0,
-        tapd: 0,
-        litd: 0,
       },
       basePorts: {
         LND: {
@@ -39,13 +36,6 @@ describe('SettingsService', () => {
         'c-lightning': {
           rest: 8181,
           grpc: 11001,
-        },
-        eclair: {
-          rest: 8281,
-        },
-        tapd: {
-          rest: 8289,
-          grpc: 12029,
         },
       },
     };

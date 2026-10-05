@@ -26,7 +26,7 @@ export const stopNodeDefinition: McpToolDefinition = {
   name: 'stop_node',
   description:
     'Stops a specific node in a Polar network. The node must be in Started state. ' +
-    'Supports Bitcoin Core, Lightning Network, and Taproot Assets daemon nodes.',
+    'Supports Bitcoin Knots and Lightning Network nodes.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -60,7 +60,7 @@ export const stopNodeTool = thunk<
   // Find the network (networkById throws if not found)
   const network = getStoreState().network.networkById(args.networkId);
 
-  // Find the node by name in any node type (bitcoin, lightning, tap)
+  // Find the node by name in any node type (bitcoin, lightning)
   const node = findNode(network, args.nodeName);
 
   // Check if node can be stopped

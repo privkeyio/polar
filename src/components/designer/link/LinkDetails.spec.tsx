@@ -8,7 +8,7 @@ import LinkDetails from './LinkDetails';
 
 describe('LinkDetails component', () => {
   const renderComponent = (from: string, to: string, properties: any) => {
-    const network = getNetwork(1, 'test network', Status.Stopped, 2);
+    const network = getNetwork(1, 'test network', Status.Stopped);
     network.nodes.bitcoin.push(
       createBitcoindNetworkNode(network, '0.18.1', testNodeDocker),
     );
@@ -71,15 +71,5 @@ describe('LinkDetails component', () => {
     const properties = { type: 'btcpeer' };
     const { getByText } = renderComponent('backend1', 'fake', properties);
     expect(getByText(/select an invalid link/)).toBeInTheDocument();
-  });
-  it('should display message for invalid TAP to lnd connection', () => {
-    const properties = { type: 'lndbackend' };
-    const { getByText } = renderComponent('alice-tap', 'fake', properties);
-    expect(getByText(/select an invalid link/)).toBeInTheDocument();
-  });
-  it('should display message for TAP to Lnd connection', () => {
-    const properties = { type: 'lndbackend' };
-    const { getByText } = renderComponent('alice-tap', 'alice', properties);
-    expect(getByText('TAP Backend Connection')).toBeInTheDocument();
   });
 });

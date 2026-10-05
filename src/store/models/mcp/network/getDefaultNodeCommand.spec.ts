@@ -56,45 +56,6 @@ describe('MCP model > getDefaultNodeCommand', () => {
     expect(result.message).toContain('Retrieved default command for bitcoind');
   });
 
-  it('should get default command for tapd', async () => {
-    const result = await store.getActions().mcp.getDefaultNodeCommand({
-      implementation: 'tapd',
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.implementation).toBe('tapd');
-    expect(result.version).toBeDefined();
-    expect(result.command).toBeDefined();
-    expect(result.command).toContain('tapd');
-    expect(result.message).toContain('Retrieved default command for tapd');
-  });
-
-  it('should get default command for eclair', async () => {
-    const result = await store.getActions().mcp.getDefaultNodeCommand({
-      implementation: 'eclair',
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.implementation).toBe('eclair');
-    expect(result.version).toBeDefined();
-    expect(result.command).toBeDefined();
-    expect(result.command).toContain('eclair');
-    expect(result.message).toContain('Retrieved default command for eclair');
-  });
-
-  it('should get default command for litd', async () => {
-    const result = await store.getActions().mcp.getDefaultNodeCommand({
-      implementation: 'litd',
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.implementation).toBe('litd');
-    expect(result.version).toBeDefined();
-    expect(result.command).toBeDefined();
-    expect(result.command).toContain('litd');
-    expect(result.message).toContain('Retrieved default command for litd');
-  });
-
   it('should get default command with specific version', async () => {
     const specificVersion = '0.17.0-beta';
 
@@ -110,23 +71,6 @@ describe('MCP model > getDefaultNodeCommand', () => {
     expect(result.message).toContain(
       `Retrieved default command for LND v${specificVersion}`,
     );
-  });
-
-  it('should handle version-specific command modifications for tapd', async () => {
-    // Test with a version that should trigger the old command format
-    const oldVersion = '0.3.0-alpha';
-
-    const result = await store.getActions().mcp.getDefaultNodeCommand({
-      implementation: 'tapd',
-      version: oldVersion,
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.implementation).toBe('tapd');
-    expect(result.version).toBe(oldVersion);
-    expect(result.command).toBeDefined();
-    // For older versions, the command should not contain the newer flags
-    expect(result.command).not.toContain('--universe.public-access=rw');
   });
 
   it('should handle version-specific command modifications for c-lightning', async () => {
@@ -163,10 +107,7 @@ describe('MCP model > getDefaultNodeCommand', () => {
   it.each([
     'LND' as NodeImplementation,
     'c-lightning' as NodeImplementation,
-    'eclair' as NodeImplementation,
     'bitcoind' as NodeImplementation,
-    'tapd' as NodeImplementation,
-    'litd' as NodeImplementation,
   ])('should return same command as getDefaultCommand utility for %s', async impl => {
     const result = await store.getActions().mcp.getDefaultNodeCommand({
       implementation: impl,

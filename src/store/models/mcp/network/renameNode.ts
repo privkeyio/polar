@@ -25,8 +25,8 @@ export const renameNodeDefinition: McpToolDefinition = {
   description:
     'Renames a node in an existing Polar network. This will update the node name ' +
     'throughout the system, including Docker containers, configuration files, and UI ' +
-    'references. Supports renaming Lightning nodes (LND, c-lightning, eclair, litd), ' +
-    'Bitcoin nodes (bitcoind), and Taproot Asset nodes (tapd). If the network is ' +
+    'references. Supports renaming Lightning nodes (LND, c-lightning) and ' +
+    'Bitcoin nodes (bitcoind). If the network is ' +
     'running, it will be temporarily stopped during the rename operation.',
   inputSchema: {
     type: 'object',
@@ -81,11 +81,7 @@ export const renameNodeTool: Thunk<
     }
 
     // Find the node in the network
-    const allNodes: CommonNode[] = [
-      ...network.nodes.lightning,
-      ...network.nodes.bitcoin,
-      ...network.nodes.tap,
-    ];
+    const allNodes: CommonNode[] = [...network.nodes.lightning, ...network.nodes.bitcoin];
     const nodeToRename = allNodes.find(n => n.name === args.oldName);
     if (!nodeToRename) {
       throw new Error(
@@ -111,12 +107,7 @@ export const renameNodeTool: Thunk<
     });
 
     // Return success message
-    const nodeTypeName =
-      nodeToRename.type === 'bitcoin'
-        ? 'Bitcoin'
-        : nodeToRename.type === 'tap'
-        ? 'Taproot Asset'
-        : 'Lightning';
+    const nodeTypeName = nodeToRename.type === 'bitcoin' ? 'Bitcoin' : 'Lightning';
     return {
       success: true,
       message: `${nodeTypeName} node "${args.oldName}" renamed to "${args.newName}" in network "${network.name}" successfully`,

@@ -34,7 +34,6 @@ describe('MCP model > exportNetworkToZip', () => {
         nodes: {
           bitcoin: [],
           lightning: [],
-          tap: [],
         },
         manualMineCount: 6,
       },
@@ -48,7 +47,6 @@ describe('MCP model > exportNetworkToZip', () => {
         nodes: {
           bitcoin: [],
           lightning: [],
-          tap: [],
         },
         manualMineCount: 6,
       },

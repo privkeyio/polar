@@ -6,7 +6,7 @@ import { validateRequired } from 'store/models/mcp/helpers';
 import { McpToolDefinition } from 'store/models/mcp/types';
 import { DockerRepoState, Network, StoreInjections } from 'types';
 import { initChartFromNetwork } from 'utils/chart';
-import { compareVersions, isVersionCompatible } from 'utils/strings';
+import { isVersionCompatible } from 'utils/strings';
 
 /** The arguments for the create_network tool */
 export interface CreateNetworkArgs {
@@ -37,10 +37,7 @@ interface NetworkPlan {
   baseCounts: {
     lndNodes: number;
     clightningNodes: number;
-    eclairNodes: number;
     bitcoindNodes: number;
-    tapdNodes: number;
-    litdNodes: number;
   };
   additionalNodes: NormalizedNodeRequest[];
 }
@@ -55,26 +52,15 @@ const SUPPORTED_IMPLEMENTATIONS: NodeImplementation[] = [
   'bitcoind',
   'LND',
   'c-lightning',
-  'eclair',
-  'litd',
-  'tapd',
 ];
 
 const ADDITION_PRIORITY: readonly NodeImplementation[] = [
   'bitcoind',
   'LND',
   'c-lightning',
-  'eclair',
-  'litd',
-  'tapd',
 ];
 
-const LIGHTNING_IMPLEMENTATIONS = new Set<NodeImplementation>([
-  'LND',
-  'c-lightning',
-  'eclair',
-  'litd',
-]);
+const LIGHTNING_IMPLEMENTATIONS = new Set<NodeImplementation>(['LND', 'c-lightning']);
 
 const DEFAULT_NODE_REQUESTS: CreateNetworkNodeRequest[] = [
   { implementation: 'LND', count: 2 },
@@ -98,16 +84,6 @@ const hasBitcoindUpTo = (requiredVersion: string | undefined, versions: Set<stri
   if (!requiredVersion) return true;
   for (const version of versions) {
     if (isVersionCompatible(version, requiredVersion)) {
-      return true;
-    }
-  }
-  return false;
-};
-
-const hasLndAtLeast = (minVersion: string | undefined, versions: Set<string>) => {
-  if (!minVersion) return true;
-  for (const version of versions) {
-    if (compareVersions(version, minVersion) >= 0) {
       return true;
     }
   }
@@ -177,10 +153,7 @@ const buildPlanContext = (
   const baseCounts = {
     lndNodes: 0,
     clightningNodes: 0,
-    eclairNodes: 0,
     bitcoindNodes: 0,
-    tapdNodes: 0,
-    litdNodes: 0,
   };
 
   const additionalNodes: NormalizedNodeRequest[] = [];
@@ -202,15 +175,6 @@ const buildPlanContext = (
           return;
         case 'c-lightning':
           baseCounts.clightningNodes += 1;
-          return;
-        case 'eclair':
-          baseCounts.eclairNodes += 1;
-          return;
-        case 'litd':
-          baseCounts.litdNodes += 1;
-          return;
-        case 'tapd':
-          baseCounts.tapdNodes += 1;
           return;
       }
     }
@@ -250,7 +214,7 @@ const buildPlanContext = (
     .filter(node => node.implementation === 'bitcoind')
     .forEach(node => bitcoindVersions.add(node.version));
 
-  // Queue nodes so that dependencies are added before consumers (bitcoin → LND → tapd)
+  // Queue nodes so that dependencies are added before consumers (bitcoin → LND)
   additionalNodes.sort(
     (a, b) =>
       ADDITION_PRIORITY.indexOf(a.implementation) -
@@ -265,41 +229,16 @@ const validateNetworkDependencies = ({
   additionalNodes,
   bitcoindVersions,
 }: PlanContext) => {
-  // Lightning nodes (LND, CLN, eclair, litd) cannot run without at least one bitcoind backend
+  // Lightning nodes (LND, CLN) cannot run without at least one bitcoind backend
   const additionalLightningCount = additionalNodes.filter(node =>
     LIGHTNING_IMPLEMENTATIONS.has(node.implementation),
   ).length;
   const totalLightningNodes =
-    baseCounts.lndNodes +
-    baseCounts.clightningNodes +
-    baseCounts.eclairNodes +
-    baseCounts.litdNodes +
-    additionalLightningCount;
-
-  // tapd requires LND; track both totals to enforce the one-to-one requirement
-  const additionalTapdCount = additionalNodes.filter(
-    node => node.implementation === 'tapd',
-  ).length;
-  const totalTapdNodes = baseCounts.tapdNodes + additionalTapdCount;
-
-  const additionalLndCount = additionalNodes.filter(
-    node => node.implementation === 'LND',
-  ).length;
-  const totalLndNodes = baseCounts.lndNodes + additionalLndCount;
+    baseCounts.lndNodes + baseCounts.clightningNodes + additionalLightningCount;
 
   if (totalLightningNodes > 0 && bitcoindVersions.size === 0) {
     throw new Error(
       'Lightning nodes require at least one bitcoind backend. Add a bitcoind entry to the nodes list.',
-    );
-  }
-
-  if (totalTapdNodes > 0 && totalLndNodes === 0) {
-    throw new Error('Tapd nodes require at least one LND node to act as a backend.');
-  }
-
-  if (totalTapdNodes > totalLndNodes) {
-    throw new Error(
-      'Each tapd node requires a dedicated LND backend. Increase the number of LND nodes or reduce tapd nodes.',
     );
   }
 };
@@ -324,47 +263,6 @@ const validateCompatibility = (context: PlanContext, repoState: DockerRepoState)
       throw new Error(
         `LND version ${version} requires a bitcoind node at version ${requiredBitcoind} ` +
           `or lower. Add a compatible bitcoind node.`,
-      );
-    }
-  }
-
-  // litd embeds LND; the docker image metadata exposes the same bitcoind compatibility requirements
-  const litdVersions = new Set<string>();
-  if (baseCounts.litdNodes > 0) {
-    litdVersions.add(repoState.images.litd.latest);
-  }
-  additionalNodes
-    .filter(node => node.implementation === 'litd')
-    .forEach(node => litdVersions.add(node.version));
-
-  const litdCompatibility = repoState.images.litd.compatibility || {};
-  for (const version of litdVersions) {
-    const requiredBitcoind = litdCompatibility[version];
-    const isCompatible = hasBitcoindUpTo(requiredBitcoind, bitcoindVersions);
-    if (!isCompatible) {
-      throw new Error(
-        `litd version ${version} requires a bitcoind node at version ${requiredBitcoind} ` +
-          `or lower. Add a compatible bitcoind node.`,
-      );
-    }
-  }
-
-  // Tapd depends on an LND backend with a minimum supported version; validate the aggregated set
-  const tapdVersions = new Set<string>();
-  if (baseCounts.tapdNodes > 0) {
-    tapdVersions.add(repoState.images.tapd.latest);
-  }
-  additionalNodes
-    .filter(node => node.implementation === 'tapd')
-    .forEach(node => tapdVersions.add(node.version));
-
-  const tapdCompatibility = repoState.images.tapd.compatibility || {};
-  for (const version of tapdVersions) {
-    const minLndVersion = tapdCompatibility[version];
-    const isCompatible = hasLndAtLeast(minLndVersion, lndVersions);
-    if (!isCompatible) {
-      throw new Error(
-        `tapd version ${version} requires an LND node at version ${minLndVersion} or higher. Add a compatible LND node.`,
       );
     }
   }
@@ -415,7 +313,7 @@ export const createNetworkDefinition: McpToolDefinition = {
           properties: {
             implementation: {
               type: 'string',
-              enum: ['bitcoind', 'LND', 'c-lightning', 'eclair', 'litd', 'tapd'],
+              enum: ['bitcoind', 'LND', 'c-lightning'],
               description: 'Node implementation to add to the network',
             },
             version: {
@@ -461,10 +359,7 @@ export const createNetworkTool = thunk<
     description: args.description || '',
     lndNodes: baseCounts.lndNodes,
     clightningNodes: baseCounts.clightningNodes,
-    eclairNodes: baseCounts.eclairNodes,
     bitcoindNodes: baseCounts.bitcoindNodes,
-    tapdNodes: baseCounts.tapdNodes,
-    litdNodes: baseCounts.litdNodes,
     customNodes: {},
     manualMineCount: 6,
   };

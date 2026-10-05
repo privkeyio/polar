@@ -36,7 +36,7 @@ describe('NetworkView Component', () => {
     images?: string[],
     withBitcoinData = true,
   ) => {
-    const network = getNetwork(1, 'test network', status, 0, 'network description');
+    const network = getNetwork(1, 'test network', status, 'network description');
     const bitcoinData = {
       nodes: {
         '1-backend1': {
@@ -148,10 +148,9 @@ describe('NetworkView Component', () => {
     const msg =
       'Starting this network will take a bit longer than normal because it uses docker images that have not been downloaded yet.';
     const pulledImages = [
-      `polarlightning/lnd:${defaultRepoState.images.LND.latest}`,
-      `polarlightning/clightning:${defaultRepoState.images['c-lightning'].latest}`,
-      `polarlightning/eclair:${defaultRepoState.images.eclair.latest}`,
-      `polarlightning/bitcoind:${defaultRepoState.images.bitcoind.latest}`,
+      `ghcr.io/privkeyio/polar/lnd:${defaultRepoState.images.LND.latest}`,
+      `ghcr.io/privkeyio/polar/clightning:${defaultRepoState.images['c-lightning'].latest}`,
+      `ghcr.io/privkeyio/polar/bitcoind:${defaultRepoState.images.bitcoind.latest}`,
     ];
 
     it('should display a message if the docker images are not downloaded', async () => {

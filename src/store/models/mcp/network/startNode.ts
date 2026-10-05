@@ -26,7 +26,7 @@ export const startNodeDefinition: McpToolDefinition = {
   name: 'start_node',
   description:
     'Starts a specific node in a Polar network. The node must be in Stopped or Error state. ' +
-    'Supports Bitcoin Core, Lightning Network, and Taproot Assets daemon nodes.',
+    'Supports Bitcoin Knots and Lightning Network nodes.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -60,7 +60,7 @@ export const startNodeTool = thunk<
   // Find the network (networkById throws if not found)
   const network = getStoreState().network.networkById(args.networkId);
 
-  // Find the node by name in any node type (bitcoin, lightning, tap)
+  // Find the node by name in any node type (bitcoin, lightning)
   const node = findNode(network, args.nodeName);
 
   // Check if node can be started

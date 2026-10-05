@@ -1,12 +1,8 @@
 import React from 'react';
 import { act, fireEvent, waitFor } from '@testing-library/react';
-import { Status } from 'shared/types';
 
-import { LightningNodeChannelAsset } from 'lib/lightning/types';
 import { Network } from 'types';
 import { initChartFromNetwork } from 'utils/chart';
-import { defaultRepoState } from 'utils/constants';
-import { createNetwork, mapToTapd } from 'utils/network';
 import {
   defaultStateChannel,
   defaultStateInfo,
@@ -14,8 +10,6 @@ import {
   lightningServiceMock,
   renderWithProviders,
   suppressConsoleErrors,
-  tapServiceMock,
-  testManagedImages,
 } from 'utils/tests';
 import PayInvoiceModal from './PayInvoiceModal';
 
@@ -264,6 +258,11 @@ describe('PayInvoiceModal', () => {
           localBalance: 'not-a-number',
           remoteBalance: '0',
         }),
+        defaultStateChannel({
+          uniqueId: 'channel-4',
+          localBalance: '',
+          remoteBalance: '0',
+        }),
       ]);
       const { findByText, getByText } = await renderComponent();
       expect(getByText('Pay Invoice').closest('button')).toBeDisabled();
@@ -273,87 +272,6 @@ describe('PayInvoiceModal', () => {
         ),
       ).toBeInTheDocument();
       expect(lightningServiceMock.payInvoice).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('with assets', () => {
-    beforeEach(() => {
-      network = createNetwork({
-        id: 1,
-        name: 'test network',
-        description: 'network description',
-        lndNodes: 0,
-        clightningNodes: 0,
-        eclairNodes: 0,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 3,
-        status: Status.Started,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      const asset: LightningNodeChannelAsset = {
-        id: 'abcd',
-        name: 'test asset',
-        capacity: '1000',
-        localBalance: '600',
-        remoteBalance: '400',
-        decimals: 0,
-      };
-      lightningServiceMock.getChannels.mockResolvedValue([
-        defaultStateChannel({ assets: [asset] }),
-      ]);
-      lightningServiceMock.decodeInvoice.mockResolvedValue({
-        paymentHash: 'pmt-hash',
-        amountMsat: '400000',
-        expiry: '123456',
-      });
-      tapServiceMock.assetRoots.mockResolvedValue([
-        { id: 'abcd', name: 'test asset', rootSum: 100 },
-      ]);
-      tapServiceMock.sendPayment.mockResolvedValue({
-        preimage: 'preimage',
-        amount: 1000,
-        destination: 'asdf',
-      });
-    });
-
-    it('should still load asset data when another litd node fails to return its info', async () => {
-      // info is fetched for every litd node, so an unreachable peer must not
-      // prevent the selected node's assets from loading
-      lightningServiceMock.getInfo.mockRejectedValue(new Error('info-failed'));
-      const { getByText } = await renderComponent('bob');
-      expect(getByText('From Node')).toBeInTheDocument();
-      expect(getByText('Asset to Send')).toBeInTheDocument();
-    });
-
-    it('should display the asset dropdown', async () => {
-      const { findByText, getByText } = await renderComponent('bob');
-      expect(await findByText('From Node')).toBeInTheDocument();
-      expect(getByText('Asset to Send')).toBeInTheDocument();
-    });
-
-    it('should pay any asset invoice successfully', async () => {
-      const { findByText, getByText, getByLabelText, store, changeSelect } =
-        await renderComponent('bob');
-      expect(await findByText('From Node')).toBeInTheDocument();
-      fireEvent.change(getByLabelText('BOLT 11 Invoice'), { target: { value: 'lnbc1' } });
-      changeSelect('Asset to Send', 'test asset');
-      fireEvent.click(getByText('Pay Invoice'));
-      await waitFor(() => {
-        expect(store.getState().modals.payInvoice.visible).toBe(false);
-      });
-      const node = network.nodes.lightning[1];
-      const tapdNode = mapToTapd(node);
-      expect(tapServiceMock.sendPayment).toHaveBeenCalledWith(
-        tapdNode,
-        'abcd',
-        'lnbc1',
-        400000,
-        '',
-      );
     });
   });
 });

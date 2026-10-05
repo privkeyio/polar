@@ -19,7 +19,7 @@ describe('ManagedImagesTable Component', () => {
       managed: [
         ...testManagedImages,
         // add a dummy image
-        { implementation: 'eclair', version: 'test', command: 'test-lnd-command' },
+        { implementation: 'btcd', version: 'test', command: 'test-lnd-command' },
       ] as ManagedImage[],
     };
     const initialState = {
@@ -53,9 +53,9 @@ describe('ManagedImagesTable Component', () => {
   it('should display all managed images', () => {
     const { getAllByText } = renderComponent();
     // 1 is the number of each implementation in testManagedImages
-    expect(getAllByText('polarlightning/lnd')).toHaveLength(1);
-    expect(getAllByText('polarlightning/clightning')).toHaveLength(1);
-    expect(getAllByText('polarlightning/bitcoind')).toHaveLength(1);
+    expect(getAllByText('ghcr.io/privkeyio/polar/lnd')).toHaveLength(1);
+    expect(getAllByText('ghcr.io/privkeyio/polar/clightning')).toHaveLength(1);
+    expect(getAllByText('ghcr.io/privkeyio/polar/bitcoind')).toHaveLength(1);
   });
 
   it('should display the custom command', () => {
@@ -66,9 +66,9 @@ describe('ManagedImagesTable Component', () => {
   it('should not display images on unsupported platforms', () => {
     mockOS.platform.mockReturnValueOnce('aix' as any);
     const { queryAllByText } = renderComponent();
-    expect(queryAllByText('polarlightning/lnd')).toHaveLength(0);
-    expect(queryAllByText('polarlightning/clightning')).toHaveLength(0);
-    expect(queryAllByText('polarlightning/bitcoind')).toHaveLength(0);
+    expect(queryAllByText('ghcr.io/privkeyio/polar/lnd')).toHaveLength(0);
+    expect(queryAllByText('ghcr.io/privkeyio/polar/clightning')).toHaveLength(0);
+    expect(queryAllByText('ghcr.io/privkeyio/polar/bitcoind')).toHaveLength(0);
   });
 
   it('should show the Customize Managed Node modal', async () => {

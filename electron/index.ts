@@ -1,10 +1,14 @@
+import { app } from 'electron';
 import electronDebug from 'electron-debug';
 import { debug, error } from 'electron-log';
+import { join } from 'path';
 import { sync } from 'shell-env';
 import { initLogger } from '../src/shared/utils';
 import { IS_DEV } from './constants';
 import { initWindowsDarkHack } from './hacks/windows';
 import WindowManager from './windowManager';
+
+app.setPath('userData', join(app.getPath('appData'), 'polar-blake2b'));
 
 // set global configuration for logging
 initLogger();

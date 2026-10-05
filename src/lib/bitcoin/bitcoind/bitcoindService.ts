@@ -2,7 +2,7 @@ import logger from 'electron-log';
 import BitcoinCore from 'bitcoin-core';
 import { BitcoinNode } from 'shared/types';
 import { BitcoinService } from 'types';
-import { BitcoinCoreClient, WalletInfoCompat } from 'types/bitcoin-core';
+import { BitcoinCoreClient, ChainInfo, WalletInfoCompat } from 'types/bitcoin-core';
 import { delay, waitFor } from 'utils/async';
 import {
   bitcoinCredentials,
@@ -32,7 +32,13 @@ class BitcoindService implements BitcoinService {
   }
 
   async getBlockchainInfo(node: BitcoinNode) {
-    return await this.createClient(node).getBlockchainInfo();
+    // Knots reports difficulty_blake2b in place of difficulty past activation. Copy into
+    // a plain object, since the client's are null-prototype and the redux-logger diff
+    // throws on one when a key disappears
+    const { difficulty_blake2b, ...info } = (await this.createClient(
+      node,
+    ).getBlockchainInfo()) as ChainInfo & { difficulty_blake2b?: number };
+    return { ...info, difficulty: info.difficulty ?? difficulty_blake2b };
   }
 
   /** Returns true if the output is spent (mempool included) or does not exist */

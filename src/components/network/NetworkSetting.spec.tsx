@@ -20,12 +20,6 @@ describe('NetworkSetting Component', () => {
             'c-lightning': {
               grpc: 11001,
             },
-            eclair: {
-              rest: 8281,
-            },
-            tapd: {
-              grpc: 12029,
-            },
           },
         },
       },
@@ -65,12 +59,9 @@ describe('NetworkSetting Component', () => {
     const { getByLabelText, getAllByLabelText } = renderComponent();
     expect(getAllByLabelText('LND')[0]).toHaveValue('8081');
     expect(getAllByLabelText('Core Lightning')[0]).toHaveValue('8181');
-    expect(getAllByLabelText('Taproot Assets')[0]).toHaveValue('8289');
-    expect(getByLabelText('Eclair')).toHaveValue('8281');
-    expect(getByLabelText('Bitcoin Core')).toHaveValue('18443');
+    expect(getByLabelText('Bitcoin Knots')).toHaveValue('18443');
     expect(getAllByLabelText('LND')[1]).toHaveValue('10001');
     expect(getAllByLabelText('Core Lightning')[1]).toHaveValue('11001');
-    expect(getAllByLabelText('Taproot Assets')[1]).toHaveValue('12029');
   });
 
   it('should display an error if save fails', async () => {

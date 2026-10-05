@@ -6,14 +6,14 @@ import http from 'http';
 import https from 'https';
 
 /**
- * setup logging to store log files in ~/.polar/logs/ dir
+ * setup logging to store log files in ~/.polar-blake2b/logs/ dir
  */
 export const initLogger = () => {
   log.transports.file.resolvePath = (variables: log.PathVariables) => {
     const ap = app || remote.app;
     const home = ap.getPath('home');
-    const xdgPath = join(home, '.local', 'share', 'polar');
-    const dataPath = existsSync(xdgPath) ? xdgPath : join(home, '.polar');
+    const xdgPath = join(home, '.local', 'share', 'polar-blake2b');
+    const dataPath = existsSync(xdgPath) ? xdgPath : join(home, '.polar-blake2b');
     return join(dataPath, 'logs', variables.fileName as string);
   };
 };

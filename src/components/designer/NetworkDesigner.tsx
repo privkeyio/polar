@@ -19,14 +19,7 @@ import {
   OpenChannelModal,
   PayInvoiceModal,
 } from './lightning/actions';
-import LncAddSessionModal from './lightning/connect/LncAddSessionModal';
 import Sidebar from './Sidebar';
-import {
-  ChangeTapBackendModal,
-  MintAssetModal,
-  NewAddressModal,
-  SendAssetModal,
-} from './tap/actions';
 import AddSimulationModal from './default/AddSimulationModal';
 
 const Styled = {
@@ -56,19 +49,14 @@ const NetworkDesigner: React.FC<Props> = ({ network, updateStateDelay = 3000 }) 
   const { zoomIn, zoomOut, zoomReset, ...callbacks } = useStoreActions(s => s.designer);
   const {
     openChannel,
-    mintAsset,
-    sendAsset,
-    newAddress,
     createInvoice,
     payInvoice,
     changeBackend,
     sendOnChain,
     advancedOptions,
     balanceChannels,
-    changeTapBackend,
     renameNode,
     unlockNode,
-    addLncSession,
     addSimulation,
   } = useStoreState(s => s.modals);
 
@@ -114,13 +102,8 @@ const NetworkDesigner: React.FC<Props> = ({ network, updateStateDelay = 3000 }) 
       {sendOnChain.visible && <SendOnChainModal network={network} />}
       {advancedOptions.visible && <AdvancedOptionsModal network={network} />}
       {balanceChannels.visible && <BalanceChannelsModal network={network} />}
-      {mintAsset.visible && <MintAssetModal network={network} />}
-      {newAddress.visible && <NewAddressModal network={network} />}
-      {changeTapBackend.visible && <ChangeTapBackendModal network={network} />}
-      {sendAsset.visible && <SendAssetModal network={network} />}
       {renameNode.visible && <RenameNodeModal network={network} />}
       {unlockNode.visible && <UnlockNodeModal network={network} />}
-      {addLncSession.visible && <LncAddSessionModal network={network} />}
       {addSimulation.visible && <AddSimulationModal network={network} />}
     </Styled.Designer>
   );

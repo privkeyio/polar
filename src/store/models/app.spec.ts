@@ -49,11 +49,8 @@ describe('App model', () => {
       newNodeCounts: {
         LND: 1,
         'c-lightning': 1,
-        eclair: 1,
         bitcoind: 1,
         btcd: 0,
-        tapd: 0,
-        litd: 0,
       },
       basePorts: {
         LND: {
@@ -66,13 +63,6 @@ describe('App model', () => {
         'c-lightning': {
           rest: 8181,
           grpc: 11001,
-        },
-        eclair: {
-          rest: 8281,
-        },
-        tapd: {
-          rest: 8289,
-          grpc: 12029,
         },
       },
     });
@@ -104,12 +94,34 @@ describe('App model', () => {
     expect(store.getState().app.settings.newNodeCounts).toEqual({
       LND: 2,
       'c-lightning': 0,
-      eclair: 1,
       bitcoind: 1,
       btcd: 0,
-      tapd: 0,
-      litd: 0,
     });
+  });
+
+  it('should ignore unsupported implementations in saved settings and repo state', async () => {
+    mockSettingsService.load.mockResolvedValue({
+      lang: 'en-US',
+      theme: 'dark',
+      nodeImages: {
+        managed: [],
+        custom: [
+          { id: '1', name: 'a', implementation: 'eclair', dockerImage: 'a', command: '' },
+          { id: '2', name: 'b', implementation: 'LND', dockerImage: 'b', command: '' },
+        ],
+      },
+    } as any);
+    mockRepoService.load.mockResolvedValue({
+      ...defaultRepoState,
+      version: defaultRepoState.version + 1,
+      images: { ...defaultRepoState.images, eclair: { latest: '1', versions: ['1'] } },
+    } as any);
+    await store.getActions().app.initialize();
+    const { settings, dockerRepoState } = store.getState().app;
+    expect(settings.nodeImages.custom.map(i => i.id)).toEqual(['2']);
+    expect(Object.keys(dockerRepoState.images)).toEqual(
+      Object.keys(defaultRepoState.images),
+    );
   });
 
   it('should initialize with missing settings', async () => {
@@ -153,11 +165,8 @@ describe('App model', () => {
         newNodeCounts: {
           LND: 1,
           'c-lightning': 1,
-          eclair: 1,
           bitcoind: 1,
           btcd: 1,
-          tapd: 1,
-          litd: 0,
         },
         basePorts: {
           LND: {
@@ -170,13 +179,6 @@ describe('App model', () => {
           'c-lightning': {
             rest: 8181,
             grpc: 11001,
-          },
-          eclair: {
-            rest: 8281,
-          },
-          tapd: {
-            rest: 8289,
-            grpc: 12029,
           },
         },
       });
@@ -198,11 +200,8 @@ describe('App model', () => {
         updates: {
           LND: ['0.99.0-beta'], // a new version available for LND
           'c-lightning': [],
-          eclair: [],
-          litd: [],
           bitcoind: [],
           btcd: [],
-          tapd: [],
         },
       });
 

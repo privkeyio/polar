@@ -12,7 +12,6 @@ import {
   bitcoinServiceMock,
   renderWithProviders,
   suppressConsoleErrors,
-  tapServiceMock,
   testNodeDocker,
 } from 'utils/tests';
 import RemoveNode from './RemoveNode';
@@ -25,8 +24,8 @@ describe('RemoveNode', () => {
     nodeName = 'alice',
     nodeType?: CommonNode['type'],
   ) => {
-    const network = getNetwork(1, 'test network', status, 2);
-    // add an extra lightning node to the network without a connected tapd node
+    const network = getNetwork(1, 'test network', status);
+    // add an extra lightning node to the network
     const lnd = defaultRepoState.images.LND;
     network.nodes.lightning.push(
       createLndNetworkNode(network, lnd.latest, lnd.compatibility, testNodeDocker),
@@ -55,10 +54,8 @@ describe('RemoveNode', () => {
         },
       },
     };
-    const { lightning, bitcoin, tap } = network.nodes;
-    const node = [...lightning, ...bitcoin, ...tap].find(
-      n => n.name === nodeName,
-    ) as CommonNode;
+    const { lightning, bitcoin } = network.nodes;
+    const node = [...lightning, ...bitcoin].find(n => n.name === nodeName) as CommonNode;
     if (nodeType) node.type = nodeType;
     const cmp = <RemoveNode node={node} />;
     return renderWithProviders(cmp, { initialState, wrapForm: true });
@@ -137,7 +134,6 @@ describe('RemoveNode', () => {
       lightningServiceMock.getChannels.mockResolvedValue([]);
       lightningServiceMock.waitUntilOnline.mockResolvedValue(Promise.resolve());
       bitcoinServiceMock.waitUntilOnline.mockResolvedValue(Promise.resolve());
-      tapServiceMock.waitUntilOnline.mockResolvedValue(Promise.resolve());
     });
 
     it('should show the remove node modal', async () => {
@@ -191,70 +187,6 @@ describe('RemoveNode', () => {
         const { getByText, findByText, getByLabelText } = renderComponent(
           Status.Stopped,
           'backend1',
-        );
-        expect(getByText('Remove')).toBeInTheDocument();
-        fireEvent.click(getByText('Remove'));
-        fireEvent.click(await findByText('Yes'));
-        // wait for the error notification to be displayed
-        await waitFor(() => getByLabelText('close-circle'));
-        expect(getByText('Unable to remove the node')).toBeInTheDocument();
-        expect(getByText('test error')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('tap node', () => {
-    it('should show the remove node modal', async () => {
-      const { getByText, findByText } = renderComponent(Status.Started, 'alice-tap');
-      expect(getByText('Remove')).toBeInTheDocument();
-      fireEvent.click(getByText('Remove'));
-      expect(
-        await findByText('Are you sure you want to remove alice-tap from the network?'),
-      ).toBeInTheDocument();
-      expect(getByText('Yes')).toBeInTheDocument();
-      expect(getByText('Cancel')).toBeInTheDocument();
-    });
-
-    it('should remove the node with the network stopped', async () => {
-      const { getByText, findByText, getByLabelText } = renderComponent(
-        Status.Stopped,
-        'bob-tap',
-      );
-      expect(getByText('Remove')).toBeInTheDocument();
-      fireEvent.click(getByText('Remove'));
-      fireEvent.click(await findByText('Yes'));
-      // wait for the error notification to be displayed
-      await waitFor(() => getByLabelText('check-circle'));
-      expect(
-        getByText('The node bob-tap has been removed from the network'),
-      ).toBeInTheDocument();
-      expect(dockerServiceMock.removeNode).toBeCalledTimes(0);
-    });
-
-    it('should remove the node with the network started', async () => {
-      const { getByText, findByText, getByLabelText } = renderComponent(
-        Status.Started,
-        'alice-tap',
-      );
-      expect(getByText('Remove')).toBeInTheDocument();
-      fireEvent.click(getByText('Remove'));
-      fireEvent.click(await findByText('Yes'));
-      // wait for the error notification to be displayed
-      await waitFor(() => getByLabelText('check-circle'));
-      expect(
-        getByText('The node alice-tap has been removed from the network'),
-      ).toBeInTheDocument();
-      expect(dockerServiceMock.removeNode).toBeCalledTimes(1);
-    });
-
-    it('should display an error if removing the node fails', async () => {
-      // antd Modal.confirm logs a console error when onOk fails
-      // this suppresses those errors from being displayed in test runs
-      await suppressConsoleErrors(async () => {
-        dockerServiceMock.removeNode.mockRejectedValue(new Error('test error'));
-        const { getByText, findByText, getByLabelText } = renderComponent(
-          Status.Started,
-          'alice-tap',
         );
         expect(getByText('Remove')).toBeInTheDocument();
         fireEvent.click(getByText('Remove'));

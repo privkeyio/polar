@@ -6,7 +6,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import { StoreProvider } from 'easy-peasy';
 import { createMemoryHistory } from 'history';
 import { createReduxStore } from 'store';
-import { BitcoinService, LightningService, StoreInjections, TapService } from 'types';
+import { BitcoinService, LightningService, StoreInjections } from 'types';
 
 export const bitcoinServiceMock: jest.Mocked<BitcoinService> = {
   waitUntilOnline: jest.fn(),
@@ -35,21 +35,6 @@ export const lightningServiceMock: jest.Mocked<LightningService> = {
   addListenerToNode: jest.fn(),
   removeListener: jest.fn(),
   subscribeChannelEvents: jest.fn(),
-};
-export const tapServiceMock: jest.Mocked<TapService> = {
-  listAssets: jest.fn(),
-  listBalances: jest.fn(),
-  waitUntilOnline: jest.fn(),
-  mintAsset: jest.fn(),
-  finalizeBatch: jest.fn(),
-  newAddress: jest.fn(),
-  sendAsset: jest.fn(),
-  decodeAddress: jest.fn(),
-  assetRoots: jest.fn(),
-  syncUniverse: jest.fn(),
-  fundChannel: jest.fn(),
-  addInvoice: jest.fn(),
-  sendPayment: jest.fn(),
 };
 // injections allow you to mock the dependencies of redux store actions
 export const injections: StoreInjections = {
@@ -88,16 +73,6 @@ export const injections: StoreInjections = {
   lightningFactory: {
     getService: () => lightningServiceMock,
   },
-  tapFactory: {
-    getService: () => tapServiceMock,
-  },
-  litdService: {
-    status: jest.fn(),
-    listSessions: jest.fn(),
-    addSession: jest.fn(),
-    revokeSession: jest.fn(),
-    waitUntilOnline: jest.fn(),
-  },
   lndService: {
     getWalletState: jest.fn(),
     unlockWallet: jest.fn(),
@@ -106,9 +81,6 @@ export const injections: StoreInjections = {
     getRecoveredChannelPoints: jest.fn(),
   },
 };
-export const litdServiceMock = injections.litdService as jest.Mocked<
-  typeof injections.litdService
->;
 export const lndServiceMock = injections.lndService as jest.Mocked<
   typeof injections.lndService
 >;

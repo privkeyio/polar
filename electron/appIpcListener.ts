@@ -5,9 +5,7 @@ import { join } from 'path';
 import { ipcChannels } from '../src/shared';
 import { APP_ROOT, BASE_URL } from './constants';
 import { httpProxy } from './httpProxy';
-import { clearLitdProxyCache } from './litd/litdProxyServer';
 import { clearLndProxyCache } from './lnd/lndProxyServer';
-import { clearTapdProxyCache } from './tapd/tapdProxyServer';
 import { unzip, zip } from './utils/zip';
 
 const openWindow = async (args: { url: string }): Promise<boolean> => {
@@ -53,8 +51,6 @@ const openWindow = async (args: { url: string }): Promise<boolean> => {
  */
 const clearCache = (): Promise<{ success: boolean }> => {
   clearLndProxyCache();
-  clearTapdProxyCache();
-  clearLitdProxyCache();
   return Promise.resolve({ success: true });
 };
 

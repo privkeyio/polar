@@ -1,26 +1,17 @@
 import React, { ReactNode, useMemo, useState } from 'react';
 import { useAsync } from 'react-async-hook';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import { BookOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import * as LND from '@lightningpolar/lnd-api';
 import { Alert, Button, Radio, Tooltip } from 'antd';
 import { usePrefixedTranslation } from 'hooks';
-import {
-  CLightningNode,
-  EclairNode,
-  LightningNode,
-  LitdNode,
-  LndNode,
-  Status,
-} from 'shared/types';
+import { CLightningNode, LightningNode, LndNode, Status } from 'shared/types';
 import { useStoreActions, useStoreState } from 'store';
-import { eclairCredentials, litdCredentials } from 'utils/constants';
 import { ellipseInner } from 'utils/strings';
 import { Loader } from 'components/common';
 import CopyIcon from 'components/common/CopyIcon';
 import DetailsList, { DetailValues } from 'components/common/DetailsList';
-import { BasicAuth, EncodedStrings, FilePaths, LndConnect } from './connect';
-import LncSessionsList from './connect/LncSessionsList';
+import { EncodedStrings, FilePaths, LndConnect } from './connect';
 
 const Styled = {
   RadioGroup: styled(Radio.Group)`
@@ -40,22 +31,16 @@ const Styled = {
     margin-left: 5px;
     color: #aaa;
   `,
-  LinkIcon: styled(LinkOutlined)`
-    margin-left: 5px;
-    color: #aaa;
-  `,
   Alert: styled(Alert)`
     margin-bottom: 16px;
   `,
 };
 
 const authTypeLabelKeys: Record<string, string> = {
-  lnc: 'lnc',
   paths: 'filePaths',
   hex: 'hexStrings',
   base64: 'base64Strings',
   lndc: 'lndConnect',
-  basic: 'basicAuth',
 };
 
 export interface ConnectionInfo {
@@ -63,7 +48,6 @@ export interface ConnectionInfo {
   restDocsUrl: string;
   grpcUrl?: string;
   grpcDocsUrl?: string;
-  webUrl?: string;
   credentials: {
     // LND
     admin?: string;
@@ -74,11 +58,6 @@ export interface ConnectionInfo {
     clientCert?: string;
     clientKey?: string;
     rune?: string;
-    // Eclair
-    basicAuth?: string;
-    // litd macaroons
-    lit?: string;
-    tap?: string;
   };
   p2pUriExternal: string;
   authTypes: string[];
@@ -90,13 +69,7 @@ interface Props {
 
 const ConnectTab: React.FC<Props> = ({ node }) => {
   const { l } = usePrefixedTranslation('cmps.designer.lightning.ConnectTab');
-  const [authType, setAuthType] = useState<string>(
-    node.implementation === 'eclair'
-      ? 'basic'
-      : node.implementation === 'litd'
-      ? 'lnc'
-      : 'paths',
-  );
+  const [authType, setAuthType] = useState<string>('paths');
   const { openInBrowser } = useStoreActions(s => s.app);
   const { getWalletState } = useStoreActions(s => s.lightning);
   const nodeState = useStoreState(s => s.lightning.nodes[node.name]);
@@ -152,36 +125,6 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
           p2pUriExternal: `${pubkey}@127.0.0.1:${cln.ports.p2p}`,
           authTypes: ['paths', 'hex', 'base64'],
         };
-      } else if (node.implementation === 'eclair') {
-        const eln = node as EclairNode;
-        return {
-          restUrl: `http://127.0.0.1:${eln.ports.rest}`,
-          restDocsUrl: 'https://acinq.github.io/eclair',
-          credentials: {
-            basicAuth: eclairCredentials.pass,
-          },
-          p2pUriExternal: `${pubkey}@127.0.0.1:${eln.ports.p2p}`,
-          authTypes: ['basic'],
-        };
-      } else if (node.implementation === 'litd') {
-        const litd = node as LitdNode;
-        return {
-          restUrl: `https://127.0.0.1:${litd.ports.rest}`,
-          restDocsUrl: 'https://lightning.engineering/api-docs/api/lit/',
-          grpcUrl: `127.0.0.1:${litd.ports.web}`, // external grpc is on web port
-          grpcDocsUrl: 'https://lightning.engineering/api-docs/api/lit/',
-          webUrl: `https://127.0.0.1:${litd.ports.web}`,
-          credentials: {
-            admin: litd.paths.adminMacaroon,
-            readOnly: litd.paths.readonlyMacaroon,
-            invoice: litd.paths.invoiceMacaroon,
-            cert: litd.paths.litTlsCert,
-            lit: litd.paths.litMacaroon,
-            tap: litd.paths.tapMacaroon,
-          },
-          p2pUriExternal: `${pubkey}@127.0.0.1:${litd.ports.p2p}`,
-          authTypes: ['lnc', 'paths', 'hex', 'base64'],
-        };
       }
     }
 
@@ -227,7 +170,7 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
     return <>{l('notStarted')}</>;
   }
 
-  const { webUrl, restUrl, grpcUrl, credentials } = info;
+  const { restUrl, grpcUrl, credentials } = info;
   const hosts: DetailValues = [
     [l('grpcHost'), grpcUrl, grpcUrl],
     [l('restHost'), restUrl, restUrl],
@@ -244,33 +187,6 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
       value: <CopyIcon label={label} value={value as string} text={text} />,
     }));
 
-  if (node.implementation === 'litd') {
-    hosts.push(
-      {
-        label: l('webUrl'),
-        value: (
-          <>
-            <Tooltip title={l('webLabel')}>
-              <Styled.Link onClick={() => openInBrowser(webUrl as string)}>
-                {webUrl}
-              </Styled.Link>
-            </Tooltip>
-            <Styled.LinkIcon />
-          </>
-        ),
-      },
-      {
-        label: l('webPass'),
-        value: (
-          <CopyIcon
-            label={l('webPass')}
-            value={litdCredentials.pass}
-            text={litdCredentials.pass}
-          />
-        ),
-      },
-    );
-  }
   hosts.push({
     label: l('apiDocs'),
     value: (
@@ -291,12 +207,10 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
   });
 
   const authCmps: Record<string, ReactNode> = {
-    lnc: node.implementation === 'litd' && <LncSessionsList node={node as LitdNode} />,
     paths: <FilePaths credentials={credentials} />,
     hex: <EncodedStrings credentials={credentials} encoding="hex" />,
     base64: <EncodedStrings credentials={credentials} encoding="base64" />,
     lndc: node.implementation === 'LND' && <LndConnect node={node as LndNode} />,
-    basic: credentials.basicAuth && <BasicAuth password={credentials.basicAuth} />,
   };
 
   return (

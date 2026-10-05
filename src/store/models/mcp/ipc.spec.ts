@@ -3,15 +3,12 @@ import * as log from 'electron-log';
 import { createStore } from 'easy-peasy';
 import { ipcChannels } from 'shared';
 import { Status } from 'shared/types';
-import { initChartFromNetwork } from 'utils/chart';
 import {
   bitcoinServiceMock,
   createMockRootModel,
   getNetwork,
   injections,
   lightningServiceMock,
-  litdServiceMock,
-  tapServiceMock,
 } from 'utils/tests';
 import { AVAILABLE_TOOLS, tools } from './toolRegistry';
 
@@ -21,7 +18,7 @@ const logMock = log as jest.Mocked<typeof log>;
 describe('MCP model > IPC', () => {
   describe('AVAILABLE_TOOLS', () => {
     it('should have correct number of tools', () => {
-      expect(AVAILABLE_TOOLS).toHaveLength(48);
+      expect(AVAILABLE_TOOLS).toHaveLength(32);
     });
 
     it('should include all tool definitions', () => {
@@ -41,7 +38,6 @@ describe('MCP model > IPC', () => {
       expect(toolNames).toContain(tools.removeNode.name);
       expect(toolNames).toContain(tools.renameNode.name);
       expect(toolNames).toContain(tools.setLightningBackend.name);
-      expect(toolNames).toContain(tools.setTapBackend.name);
       expect(toolNames).toContain(tools.updateNodeCommand.name);
       expect(toolNames).toContain(tools.getDefaultNodeCommand.name);
       expect(toolNames).toContain(tools.listNodeVersions.name);
@@ -53,27 +49,12 @@ describe('MCP model > IPC', () => {
       expect(toolNames).toContain(tools.setAutoMineMode.name);
       expect(toolNames).toContain(tools.openChannel.name);
       expect(toolNames).toContain(tools.closeChannel.name);
-      expect(toolNames).toContain(tools.closeTapChannel.name);
-      expect(toolNames).toContain(tools.fundTapChannel.name);
       expect(toolNames).toContain(tools.listChannels.name);
       expect(toolNames).toContain(tools.getNodeInfo.name);
       expect(toolNames).toContain(tools.getWalletBalance.name);
       expect(toolNames).toContain(tools.depositFunds.name);
       expect(toolNames).toContain(tools.createInvoice.name);
       expect(toolNames).toContain(tools.payInvoice.name);
-      expect(toolNames).toContain(tools.mintTapAsset.name);
-      expect(toolNames).toContain(tools.listTapAssets.name);
-      expect(toolNames).toContain(tools.sendTapAsset.name);
-      expect(toolNames).toContain(tools.getTapBalances.name);
-      expect(toolNames).toContain(tools.getTapAddress.name);
-      expect(toolNames).toContain(tools.decodeTapAddress.name);
-      expect(toolNames).toContain(tools.syncTapUniverse.name);
-      expect(toolNames).toContain(tools.createAssetInvoice.name);
-      expect(toolNames).toContain(tools.payAssetInvoice.name);
-      expect(toolNames).toContain(tools.getAssetsInChannels.name);
-      expect(toolNames).toContain(tools.listLitdSessions.name);
-      expect(toolNames).toContain(tools.addLitdSession.name);
-      expect(toolNames).toContain(tools.revokeLitdSession.name);
     });
   });
 
@@ -91,7 +72,6 @@ describe('MCP model > IPC', () => {
       // Mock service wait methods
       lightningServiceMock.waitUntilOnline.mockResolvedValue();
       bitcoinServiceMock.waitUntilOnline.mockResolvedValue();
-      litdServiceMock.waitUntilOnline.mockResolvedValue();
       // Mock getBlockchainInfo to return chain info
       bitcoinServiceMock.getBlockchainInfo.mockResolvedValue({
         chain: 'regtest',
@@ -138,24 +118,6 @@ describe('MCP model > IPC', () => {
         confirmed: '4500000',
         unconfirmed: '500000',
       });
-      // Mock litd service methods
-      litdServiceMock.addSession.mockResolvedValue({
-        id: 'test-session-id',
-        label: 'Test Session',
-        pairingPhrase: 'test-pairing-phrase',
-        mailboxServerAddr: 'test.mailbox.com:8443',
-        state: 'Created',
-        type: 'Read Only',
-        accountId: 'test-account-id',
-        localPublicKey:
-          '02test1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab',
-        remotePublicKey:
-          '03test567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-        createdAt: Date.now() / 1000,
-        expiresAt: Date.now() / 1000 + 86400,
-      });
-      litdServiceMock.listSessions.mockResolvedValue([]);
-      litdServiceMock.revokeSession.mockResolvedValue();
     });
 
     describe('handleToolExecution', () => {
@@ -165,10 +127,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -220,7 +179,6 @@ describe('MCP model > IPC', () => {
             nodes: {
               bitcoin: [],
               lightning: [],
-              tap: [],
             },
             manualMineCount: 6,
           },
@@ -274,10 +232,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -309,10 +264,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -344,10 +296,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -379,10 +328,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -414,10 +360,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -446,10 +389,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -465,7 +405,7 @@ describe('MCP model > IPC', () => {
         expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
           data: expect.objectContaining({
             success: true,
-            message: expect.stringContaining('Bitcoin Core node'),
+            message: expect.stringContaining('Bitcoin Knots node'),
             node: expect.any(Object),
           }),
         });
@@ -499,10 +439,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -534,10 +471,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -573,11 +507,9 @@ describe('MCP model > IPC', () => {
             .getState()
             .network.networks.find(n => n.id === node.networkId);
           if (network) {
-            const foundNode = [
-              ...network.nodes.bitcoin,
-              ...network.nodes.lightning,
-              ...network.nodes.tap,
-            ].find(n => n.name === node.name);
+            const foundNode = [...network.nodes.bitcoin, ...network.nodes.lightning].find(
+              n => n.name === node.name,
+            );
             if (foundNode) {
               if (foundNode.status === Status.Started) {
                 foundNode.status = Status.Stopped;
@@ -596,10 +528,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -636,10 +565,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 2, // Need 2 bitcoin nodes to remove one
-          tapdNodes: 1,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -669,10 +595,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -706,10 +629,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -739,10 +659,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -772,10 +689,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -807,10 +721,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -849,10 +760,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 2,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -893,10 +801,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 2,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -934,10 +839,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -973,10 +875,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -1016,10 +915,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -1056,10 +952,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -1102,10 +995,7 @@ describe('MCP model > IPC', () => {
           description: '',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -1139,555 +1029,27 @@ describe('MCP model > IPC', () => {
         });
       });
 
-      it('should execute mint_tap_asset tool and send response', async () => {
-        // Create a network with tap nodes using getNetwork
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
-        store.getActions().network.setNetworks([network]);
-
-        tapServiceMock.mintAsset.mockResolvedValue({
-          pendingBatch: { batchKey: 'test-batch-key' },
-        } as any);
-
-        const responseChannel = 'test-response-mint';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.mintTapAsset.name,
-          arguments: {
-            networkId: network.id,
-            nodeName: network.nodes.tap[0].name,
-            assetType: 'normal',
-            name: 'TestAsset',
-            amount: 1000,
-            decimals: 2,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: expect.objectContaining({
-            success: true,
-            message: expect.stringContaining('Minted normal asset "TestAsset"'),
-            networkId: network.id,
-            nodeName: network.nodes.tap[0].name,
-            assetName: 'TestAsset',
-            assetType: 'normal',
-            amount: 1000,
-            batchKey: 'test-batch-key',
-          }),
-        });
-      });
-
-      it('should execute list_tap_assets tool and send response', async () => {
-        // Create a network with tap nodes using getNetwork
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
-        store.getActions().network.setNetworks([network]);
-
-        const mockAssets = [
-          {
-            id: 'asset1',
-            name: 'TestAsset1',
-            type: 'NORMAL',
-            amount: '1000',
-            genesisPoint: 'genesis1',
-            anchorOutpoint: 'anchor1',
-            groupKey: 'group1',
-            decimals: 2,
-          },
-        ];
-
-        const mockRoots = [{ id: 'asset1', name: 'TestAsset1', rootSum: 1000 }];
-
-        tapServiceMock.listAssets.mockResolvedValue(mockAssets);
-        tapServiceMock.assetRoots.mockResolvedValue(mockRoots);
-
-        // Mock getAssets to call setAssets and setAssetRoots
-        jest.spyOn(store.getActions().tap, 'getAssets').mockImplementation(async node => {
-          store.getActions().tap.setAssets({ node, assets: mockAssets });
-          store.getActions().tap.setAssetRoots({ node, roots: mockRoots });
-        });
-
-        const responseChannel = 'test-response-list';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.listTapAssets.name,
-          arguments: {
-            networkId: network.id,
-            nodeName: network.nodes.tap[0].name,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: expect.objectContaining({
-            networkId: network.id,
-            assets: expect.arrayContaining([
-              expect.objectContaining({
-                id: 'asset1',
-                name: 'TestAsset1',
-                type: 'NORMAL',
-                amount: '1000',
-                nodeName: network.nodes.tap[0].name,
-              }),
-            ]),
-            totalCount: 1,
-          }),
-        });
-      });
-
-      it('should execute send_tap_asset tool and send response', async () => {
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
-        store.getActions().network.setNetworks([network]);
-
-        jest.spyOn(store.getActions().tap, 'sendAsset').mockResolvedValue({
-          transferTxid: 'test-txid',
-        } as any);
-
-        const responseChannel = 'test-response-send-asset';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.sendTapAsset.name,
-          arguments: {
-            networkId: network.id,
-            fromNode: network.nodes.tap[0].name,
-            address: 'test-address',
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: expect.objectContaining({
-            success: true,
-            message: expect.stringContaining('Sent Taproot Asset'),
-            networkId: network.id,
-            fromNode: network.nodes.tap[0].name,
-            address: 'test-address',
-          }),
-        });
-      });
-
-      it('should execute get_tap_balances tool and send response', async () => {
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
-        store.getActions().network.setNetworks([network]);
-
-        const mockBalances = {
-          balances: [
-            {
-              id: 'asset1',
-              name: 'Asset One',
-              balance: '1000',
-              type: 'normal',
-              genesisPoint: 'gp1',
-            },
-          ],
-        };
-        store.getActions().tap.setBalances({
-          node: network.nodes.tap[0],
-          balances: mockBalances.balances,
-        });
-        jest
-          .spyOn(store.getActions().tap, 'getBalances')
-          .mockResolvedValue(mockBalances as any);
-
-        const responseChannel = 'test-response-get-balances';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.getTapBalances.name,
-          arguments: {
-            networkId: network.id,
-            nodeName: network.nodes.tap[0].name,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: mockBalances,
-        });
-      });
-
-      it('should execute get_tap_address tool and send response', async () => {
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
-        store.getActions().network.setNetworks([network]);
-
-        const mockAddress = {
-          encoded: 'test-address',
-          id: 'asset1',
-          amount: '100',
-          type: 'NORMAL',
-          family: 'default',
-        };
-        jest
-          .spyOn(store.getActions().tap, 'getNewAddress')
-          .mockResolvedValue(mockAddress as any);
-
-        const responseChannel = 'test-response-get-address';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.getTapAddress.name,
-          arguments: {
-            networkId: network.id,
-            nodeName: network.nodes.tap[0].name,
-            assetId: 'asset1',
-            amount: '100',
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: mockAddress,
-        });
-      });
-
-      it('should execute decode_tap_address tool and send response', async () => {
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
-        store.getActions().network.setNetworks([network]);
-
-        const mockDecoded = {
-          encoded: 'test-address',
-          id: 'asset1',
-          amount: '100',
-          type: 'NORMAL',
-          family: 'default',
-        };
-        jest
-          .spyOn(store.getActions().tap, 'decodeAddress')
-          .mockResolvedValue(mockDecoded as any);
-
-        const responseChannel = 'test-response-decode-address';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.decodeTapAddress.name,
-          arguments: {
-            networkId: network.id,
-            nodeName: network.nodes.tap[0].name,
-            address: 'test-address',
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: {
-            address: 'test-address',
-            assetId: 'asset1',
-            amount: '100',
-          },
-        });
-      });
-
-      it('should execute sync_tap_universe tool and send response', async () => {
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
-        store.getActions().network.setNetworks([network]);
-
-        jest.spyOn(store.getActions().tap, 'syncUniverse').mockResolvedValue(0);
-
-        const responseChannel = 'test-response-sync-universe';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.syncTapUniverse.name,
-          arguments: {
-            networkId: network.id,
-            nodeName: network.nodes.tap[0].name,
-            universeNodeName: network.nodes.tap[0].name,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: { syncedAssets: 0 },
-        });
-      });
-
-      it('should execute fund_tap_channel tool and send response', async () => {
-        // Create a network with litd nodes
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 2,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const fromNode = network.nodes.lightning[0].name;
-        const toNode = network.nodes.lightning[1].name;
-        const assetId = 'test-asset-id';
-
-        // Mock the tap store actions
-        jest.spyOn(store.getActions().tap, 'syncUniverse').mockResolvedValue(0);
-        jest.spyOn(store.getActions().bitcoin, 'mine').mockResolvedValue(undefined);
-        jest.spyOn(store.getActions().designer, 'syncChart').mockResolvedValue(undefined);
-
-        const responseChannel = 'test-response-fund-tap-channel';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.fundTapChannel.name,
-          arguments: {
-            networkId: network.id,
-            fromNode,
-            toNode,
-            assetId,
-            amount: 50000,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: {
-            success: true,
-            message: `Funded Tap channel from "${fromNode}" to "${toNode}" with 50000 units of asset ${assetId}`,
-            networkId: network.id,
-            fromNode,
-            toNode,
-            assetId,
-            amount: 50000,
-          },
-        });
-      });
-
-      it('should execute close_tap_channel tool and send response', async () => {
-        // Create a network with litd nodes
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 1,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const nodeName = network.nodes.lightning[0].name;
-        const channelPoint = 'test-channel-point:0';
-
-        const responseChannel = 'test-response-close-tap-channel';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.closeTapChannel.name,
-          arguments: {
-            networkId: network.id,
-            nodeName,
-            channelPoint,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: {
-            success: true,
-            message: `Closed Tap channel "${channelPoint}" on node "${nodeName}"`,
-            networkId: network.id,
-            nodeName,
-            channelPoint,
-          },
-        });
-      });
-
-      it('should execute create_asset_invoice tool and send response', async () => {
-        // Create a network with litd nodes
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 1,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const nodeName = network.nodes.lightning[0].name;
-
-        // Mock the lit store actions
-        jest.spyOn(store.getActions().lit, 'createAssetInvoice').mockResolvedValue({
-          invoice: 'lnbc123',
-          sats: 1000,
-        });
-
-        const responseChannel = 'test-response-create-asset-invoice';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.createAssetInvoice.name,
-          arguments: {
-            networkId: network.id,
-            nodeName,
-            assetId: 'test-asset-id',
-            amount: 500,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: {
-            success: true,
-            message: `Created asset invoice for 500 units of asset test-asset-id from node "${nodeName}"`,
-            networkId: network.id,
-            nodeName,
-            assetId: 'test-asset-id',
-            amount: 500,
-            invoice: 'lnbc123',
-            sats: 1000,
-          },
-        });
-      });
-
-      it('should execute pay_asset_invoice tool and send response', async () => {
-        // Create a network with litd nodes
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 1,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const nodeName = network.nodes.lightning[0].name;
-
-        // Mock the lit store actions
-        jest.spyOn(store.getActions().lit, 'payAssetInvoice').mockResolvedValue({
-          preimage: 'test-preimage',
-          amount: 500,
-          destination: 'test-destination',
-        });
-
-        const responseChannel = 'test-response-pay-asset-invoice';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.payAssetInvoice.name,
-          arguments: {
-            networkId: network.id,
-            fromNode: nodeName,
-            assetId: 'test-asset-id',
-            invoice: 'lnbc123',
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: {
-            success: true,
-            message: `Paid asset invoice using asset test-asset-id from node "${nodeName}"`,
-            networkId: network.id,
-            fromNode: nodeName,
-            assetId: 'test-asset-id',
-            invoice: 'lnbc123',
-            receipt: {
-              preimage: 'test-preimage',
-              amount: 500,
-              destination: 'test-destination',
-            },
-          },
-        });
-      });
-
-      it('should execute get_assets_in_channels tool and send response', async () => {
-        // Create a network with litd nodes
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 1,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const node = network.nodes.lightning[0];
-        const nodeName = node.name;
-
-        // Set up lightning state with channels containing assets
-        // getAssetsInChannels is now a computed that reads from lightning.nodes
-        store.getActions().lightning.setChannels({
-          node,
-          channels: [
-            {
-              pending: false,
-              uniqueId: 'chan1',
-              channelPoint: 'txid:0',
-              pubkey: 'peer123',
-              capacity: '1000000',
-              localBalance: '500000',
-              remoteBalance: '500000',
-              status: 'Open',
-              isPrivate: false,
-              assets: [
-                {
-                  id: 'asset123',
-                  name: 'Test Asset',
-                  capacity: '1000',
-                  localBalance: '500',
-                  remoteBalance: '500',
-                  decimals: 0,
-                },
-              ],
-            },
-          ],
-        });
-
-        const responseChannel = 'test-response-get-assets-in-channels';
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.getAssetsInChannels.name,
-          arguments: {
-            networkId: network.id,
-            nodeName,
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: {
-            success: true,
-            message: `Retrieved 1 assets in channels for node "${nodeName}"`,
-            networkId: network.id,
-            nodeName,
-            assetsInChannels: [
-              {
-                asset: {
-                  id: 'asset123',
-                  name: 'Test Asset',
-                  capacity: '1000',
-                  localBalance: '500',
-                  remoteBalance: '500',
-                  decimals: 0,
-                },
-                peerPubkey: 'peer123',
-              },
-            ],
-          },
-        });
-      });
-
       it('should handle tool execution failure', async () => {
-        const network = getNetwork(1, 'test-network', Status.Started, 1);
+        const network = getNetwork(1, 'test-network', Status.Started);
         store.getActions().network.setNetworks([network]);
 
         // Mock the tool to throw an error
         jest
-          .spyOn(store.getActions().mcp, 'sendTapAsset')
-          .mockRejectedValue(new Error('Send asset failed'));
+          .spyOn(store.getActions().mcp, 'getNodeInfo')
+          .mockRejectedValue(new Error('Get node info failed'));
 
         const responseChannel = 'test-response-failure';
         await store.getActions().mcp.handleToolExecution({
-          tool: tools.sendTapAsset.name,
+          tool: tools.getNodeInfo.name,
           arguments: {
             networkId: network.id,
-            fromNode: network.nodes.tap[0].name,
-            address: 'test-address',
+            nodeName: network.nodes.lightning[0].name,
           },
           responseChannel,
         });
 
         expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          error: 'Send asset failed',
+          error: 'Get node info failed',
         });
       });
 
@@ -1789,130 +1151,13 @@ describe('MCP model > IPC', () => {
         expect(handler).toBeDefined();
       });
 
-      it('should execute list_litd_sessions tool and send response', async () => {
-        // Create a network with 1 litd node
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 1,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const nodeName = network.nodes.lightning[0].name;
-        const responseChannel = 'test-response-list-litd-sessions';
-
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.listLitdSessions.name,
-          arguments: { networkId: network.id, nodeName },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: expect.objectContaining({
-            success: true,
-            networkId: network.id,
-            nodeName,
-            sessions: expect.any(Array),
-          }),
-        });
-      });
-
-      it('should execute add_litd_session tool and send response', async () => {
-        // Create a network with 1 litd node
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 1,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const nodeName = network.nodes.lightning[0].name;
-        const responseChannel = 'test-response-add-litd-session';
-
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.addLitdSession.name,
-          arguments: {
-            networkId: network.id,
-            nodeName,
-            label: 'Test Session',
-            type: 'read_only',
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: expect.objectContaining({
-            success: true,
-            networkId: network.id,
-            nodeName,
-            session: expect.any(Object),
-          }),
-        });
-      });
-
-      it('should execute revoke_litd_session tool and send response', async () => {
-        // Create a network with 1 litd node
-        await store.getActions().network.addNetwork({
-          name: 'test-network',
-          description: 'Test',
-          lndNodes: 0,
-          clightningNodes: 0,
-          eclairNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 1,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-
-        const network = store.getState().network.networks[0];
-        const nodeName = network.nodes.lightning[0].name;
-        const responseChannel = 'test-response-revoke-litd-session';
-
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.revokeLitdSession.name,
-          arguments: {
-            networkId: network.id,
-            nodeName,
-            localPublicKey:
-              '02abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab',
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: expect.objectContaining({
-            success: true,
-            networkId: network.id,
-            nodeName,
-          }),
-        });
-      });
-
       it('should execute send_bitcoin tool and send response', async () => {
         await store.getActions().network.addNetwork({
           name: 'test-network',
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -1953,10 +1198,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -1992,10 +1234,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -2028,10 +1267,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 2,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
@@ -2060,36 +1296,6 @@ describe('MCP model > IPC', () => {
         });
       });
 
-      it('should execute set_tap_backend tool and send response', async () => {
-        const network = getNetwork(1, 'test-network', Status.Stopped, 2);
-        store.getActions().network.setNetworks([network]);
-        const chart = initChartFromNetwork(network);
-        store.getActions().designer.setChart({ id: network.id, chart });
-        store.getActions().designer.setActiveId(network.id);
-
-        const responseChannel = 'test-response-set-tap-backend';
-
-        await store.getActions().mcp.handleToolExecution({
-          tool: tools.setTapBackend.name,
-          arguments: {
-            networkId: network.id,
-            tapNodeName: 'alice-tap',
-            lndNodeName: 'bob',
-          },
-          responseChannel,
-        });
-
-        expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
-          data: expect.objectContaining({
-            success: true,
-            message: expect.stringContaining('Successfully changed backend'),
-            networkId: network.id,
-            tapNodeName: 'alice-tap',
-            lndNodeName: 'bob',
-          }),
-        });
-      });
-
       it('should execute update_node_command tool and send response', async () => {
         // Create a network first
         await store.getActions().network.addNetwork({
@@ -2097,10 +1303,7 @@ describe('MCP model > IPC', () => {
           description: 'Test',
           lndNodes: 1,
           clightningNodes: 0,
-          eclairNodes: 0,
           bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 6,
         });
