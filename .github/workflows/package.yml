@@ -73,3 +73,27 @@ jobs:
             gh release upload "v${VERSION}" "${FILES[@]}" --clobber
           fi
 
+  checksums:
+    name: Publish SHA256SUMS
+    needs: package
+    # runs where a matrix arm failed too, and the manifest check below refuses a short set
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: generate and upload SHA256SUMS
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          mkdir assets
+          gh release download "v${VERSION}" --dir assets \
+            -p '*.dmg' -p '*.exe' -p '*.deb' -p '*.rpm' -p '*.AppImage'
+          ( cd assets && sha256sum * ) | LC_ALL=C sort -k 2 > SHA256SUMS
+          cat SHA256SUMS
+          ./.github/scripts/verify-manifest.sh SHA256SUMS
+          gh release upload "v${VERSION}" SHA256SUMS --clobber
