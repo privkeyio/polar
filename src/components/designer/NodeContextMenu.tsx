@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { INode } from '@mrblenny/react-flow-chart';
 import { Dropdown, MenuProps } from 'antd';
-import { BitcoinNode, LightningNode, Status, TapNode } from 'shared/types';
+import { BitcoinNode, LightningNode, Status } from 'shared/types';
 import { useStoreState } from 'store';
 import {
   AdvancedOptionsButton,
@@ -14,7 +14,6 @@ import { ViewLogsButton } from 'components/dockerLogs';
 import { OpenTerminalButton } from 'components/terminal';
 import SendOnChainButton from './bitcoin/actions/SendOnChainButton';
 import { OpenChannelButtons, PaymentButtons } from './lightning/actions';
-import { MintAssetButton, NewAddressButton, SendAssetButton } from './tap/actions';
 
 const addItemIf = (
   key: string,
@@ -39,12 +38,11 @@ const NodeContextMenu: React.FC<Props> = ({ node: { id }, children }) => {
   if (!network) return <>{children}</>;
 
   // find the network node by name
-  const { bitcoin, lightning, tap } = network.nodes;
-  const node = [...bitcoin, ...lightning, ...tap].find(n => n.name === id);
+  const { bitcoin, lightning } = network.nodes;
+  const node = [...bitcoin, ...lightning].find(n => n.name === id);
   // don't add a context menu if the node is not valid
   if (!node) return <>{children}</>;
 
-  const isTap = node.type === 'tap' || node.implementation === 'litd';
   const isLN = node.type === 'lightning';
   const isBackend = node.type === 'bitcoin';
   const isStarted = node.status === Status.Started;
@@ -70,21 +68,6 @@ const NodeContextMenu: React.FC<Props> = ({ node: { id }, children }) => {
       'incoming',
       <OpenChannelButtons menuType="incoming" node={node as LightningNode} />,
       isStarted && isLN,
-    ),
-    addItemIf(
-      'sendAsset',
-      <SendAssetButton type={'menu'} node={node as TapNode} />,
-      isStarted && isTap,
-    ),
-    addItemIf(
-      'newAddress',
-      <NewAddressButton type={'menu'} node={node as TapNode} />,
-      isStarted && isTap,
-    ),
-    addItemIf(
-      'mintAsset',
-      <MintAssetButton type={'menu'} node={node as TapNode} />,
-      isStarted && isTap,
     ),
     addItemIf(
       'sendonchain',

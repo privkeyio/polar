@@ -3,14 +3,12 @@ import appModel from 'store/models/app';
 import bitcoinModel from 'store/models/bitcoin';
 import designerModel from 'store/models/designer';
 import lightningModel from 'store/models/lightning';
-import litModel from 'store/models/lit';
 import mcpModel from 'store/models/mcp';
 import modalsModel from 'store/models/modals';
 import networkModel from 'store/models/network';
-import tapModel from 'store/models/tap';
 import { CustomImage, DockerRepoState, ManagedImage, Network } from 'types';
 import { defaultRepoState } from 'utils/constants';
-import { createLndNetworkNode, createNetwork, createTapdNetworkNode } from '../network';
+import { createNetwork } from '../network';
 
 export const testNodeDocker: CommonNode['docker'] = { image: '', command: '' };
 
@@ -24,16 +22,6 @@ export const testManagedImages: ManagedImage[] = [
   {
     implementation: 'bitcoind',
     version: defaultRepoState.images.bitcoind.latest,
-    command: '',
-  },
-  {
-    implementation: 'tapd',
-    version: defaultRepoState.images.tapd.latest,
-    command: '',
-  },
-  {
-    implementation: 'litd',
-    version: defaultRepoState.images.litd.latest,
     command: '',
   },
 ];
@@ -178,38 +166,6 @@ export const testRepoState: DockerRepoState = {
       latest: '',
       versions: [],
     },
-    tapd: {
-      latest: '0.6.1-alpha',
-      versions: [
-        '0.6.1-alpha',
-        '0.6.0-alpha',
-        '0.5.1-alpha',
-        '0.5.0-alpha',
-        '0.4.1-alpha',
-        '0.4.0-alpha',
-        '0.3.3-alpha',
-        '0.3.2-alpha',
-      ],
-      // Not all tapd versions are compatible with all LND versions.
-      // This mapping specifies the minimum compatible LND for each tapd version
-      compatibility: {
-        '0.6.1-alpha': '0.19.0-beta',
-        '0.6.0-alpha': '0.19.0-beta',
-        '0.5.1-alpha': '0.18.5-beta',
-        '0.5.0-alpha': '0.18.4-beta',
-        '0.4.1-alpha': '0.18.0-beta',
-        '0.4.0-alpha': '0.18.0-beta',
-        '0.3.3-alpha': '0.16.0-beta',
-        '0.3.2-alpha': '0.16.0-beta',
-      },
-    },
-    litd: {
-      latest: '0.14.0-alpha',
-      versions: ['0.14.0-alpha'],
-      compatibility: {
-        '0.14.0-alpha': '30.0',
-      },
-    },
   },
 };
 
@@ -217,7 +173,6 @@ export const getNetwork = (
   networkId = 1,
   name?: string,
   status?: Status,
-  tapNodeCount = 0,
   description?: string,
 ): Network => {
   const config = {
@@ -227,40 +182,13 @@ export const getNetwork = (
     lndNodes: 3,
     clightningNodes: 1,
     bitcoindNodes: 1,
-    tapdNodes: 0,
-    litdNodes: 0,
     status,
     repoState: defaultRepoState,
     managedImages: testManagedImages,
     customImages: [],
     manualMineCount: 6,
   };
-  if (tapNodeCount > 0) {
-    config.lndNodes = 0;
-    config.clightningNodes = 0;
-  }
   const network = createNetwork(config);
-
-  for (let i = 0; i < tapNodeCount; i++) {
-    network.nodes.lightning.push(
-      createLndNetworkNode(
-        network,
-        testRepoState.images.LND.latest,
-        testRepoState.images.LND.compatibility,
-        testNodeDocker,
-        status,
-      ),
-    );
-    network.nodes.tap.push(
-      createTapdNetworkNode(
-        network,
-        testRepoState.images.tapd.latest,
-        testRepoState.images.tapd.compatibility,
-        testNodeDocker,
-        status,
-      ),
-    );
-  }
 
   return network;
 };
@@ -306,7 +234,5 @@ export const createMockRootModel = () => ({
   bitcoin: bitcoinModel,
   designer: designerModel,
   modals: modalsModel,
-  tap: tapModel,
-  lit: litModel,
   mcp: mcpModel,
 });

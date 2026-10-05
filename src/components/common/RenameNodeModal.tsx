@@ -30,8 +30,8 @@ const RenameNodeModal: React.FC<Props> = ({ network }) => {
     }
   });
 
-  const { lightning, bitcoin, tap } = network.nodes;
-  const nodes: AnyNode[] = [...lightning, ...bitcoin, ...tap];
+  const { lightning, bitcoin } = network.nodes;
+  const nodes: AnyNode[] = [...lightning, ...bitcoin];
   const node = nodes.find(n => n.name === oldNodeName);
   const handleSubmit = (values: any) => {
     if (!node) return;

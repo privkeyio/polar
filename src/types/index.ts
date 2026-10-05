@@ -1,6 +1,4 @@
-import * as LITD from '@lightningpolar/litd-api';
 import * as LND from '@lightningpolar/lnd-api';
-import * as TAP from '@lightningpolar/tapd-api';
 import { IChart } from '@mrblenny/react-flow-chart';
 import {
   AnyNode,
@@ -8,17 +6,13 @@ import {
   CLightningNode,
   CommonNode,
   LightningNode,
-  LitdNode,
   LndNode,
   NodeImplementation,
   OpenChannelOptions,
   Status,
-  TapNode,
 } from 'shared/types';
 import { IpcSender } from 'lib/ipc/ipcService';
 import * as PLN from 'lib/lightning/types';
-import * as PLIT from 'lib/litd/types';
-import * as PTAP from 'lib/tap/types';
 import { PolarPlatform } from 'utils/system';
 import { ChainInfo, WalletInfoCompat } from './bitcoin-core';
 
@@ -32,7 +26,6 @@ export interface Network {
   nodes: {
     bitcoin: BitcoinNode[];
     lightning: LightningNode[];
-    tap: TapNode[];
   };
   manualMineCount: number;
   simulation?: Simulation;
@@ -67,7 +60,6 @@ export interface NodeBasePorts {
   LND: { rest: number; grpc: number };
   'c-lightning': { rest: number; grpc: number };
   bitcoind: { rest: number };
-  tapd: { rest: number; grpc: number };
 }
 
 export interface AppSettings {
@@ -185,7 +177,6 @@ export interface LightningService {
     amount: number,
     memo?: string,
     expiry?: number,
-    assetInfo?: { nodeId: string; scid: string; msats: string },
   ) => Promise<string>;
   payInvoice: (
     node: LightningNode,
@@ -213,66 +204,6 @@ export interface LightningFactoryInjection {
   getService: (node: LightningNode) => LightningService;
 }
 
-export interface TapService {
-  waitUntilOnline: (node: TapNode) => Promise<void>;
-  listAssets: (node: TapNode) => Promise<PTAP.TapAsset[]>;
-  listBalances: (node: TapNode) => Promise<PTAP.TapBalance[]>;
-  mintAsset: (
-    node: TapNode,
-    req: TAP.MintAssetRequestPartial,
-  ) => Promise<TAP.MintAssetResponse>;
-  finalizeBatch: (node: TapNode) => Promise<TAP.FinalizeBatchResponse>;
-  newAddress: (node: TapNode, assetId: string, amt: string) => Promise<PTAP.TapAddress>;
-  sendAsset: (
-    from: TapNode,
-    req: TAP.SendAssetRequestPartial,
-  ) => Promise<PTAP.TapSendAssetReceipt>;
-  decodeAddress: (
-    node: TapNode,
-    req: TAP.DecodeAddrRequestPartial,
-  ) => Promise<PTAP.TapAddress>;
-  assetRoots: (node: TapNode) => Promise<PTAP.TapAssetRoot[]>;
-  syncUniverse: (node: TapNode, universeHost: string) => Promise<TAP.SyncResponse>;
-  fundChannel: (
-    node: TapNode,
-    peerPubkey: string,
-    assetId: string,
-    amount: number,
-  ) => Promise<string>;
-  addInvoice: (
-    node: TapNode,
-    assetId: string,
-    amount: number,
-    memo: string,
-    expiry: number,
-  ) => Promise<string>;
-  sendPayment: (
-    node: TapNode,
-    assetId: string,
-    invoice: string,
-    feeLimitMsat: number,
-    peerPubkey?: string,
-  ) => Promise<PLN.LightningNodePayReceipt>;
-}
-
-export interface TapFactoryInjection {
-  getService: (node: TapNode) => TapService;
-}
-
-export interface LitdLibrary {
-  waitUntilOnline: (node: LitdNode) => Promise<void>;
-  status: (node: LitdNode) => Promise<LITD.SubServerStatusResp>;
-  listSessions: (node: LitdNode) => Promise<PLIT.Session[]>;
-  addSession: (
-    node: LitdNode,
-    label: string,
-    type: PLIT.Session['type'],
-    expiresAt: number,
-    mailboxServerAddr?: string,
-  ) => Promise<PLIT.Session>;
-  revokeSession: (node: LitdNode, localPublicKey: string) => Promise<void>;
-}
-
 export interface InitWalletOptions {
   channelBackup?: Buffer;
   recoveryWindow?: number;
@@ -298,8 +229,6 @@ export interface StoreInjections {
   repoService: RepoServiceInjection;
   bitcoinFactory: BitcoinFactoryInjection;
   lightningFactory: LightningFactoryInjection;
-  tapFactory: TapFactoryInjection;
-  litdService: LitdLibrary;
   lndService: LndWalletLibrary;
 }
 

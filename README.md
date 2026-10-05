@@ -31,8 +31,6 @@ With Polar you can:
 - View streaming logs from each node
 - Manually mine new blocks
 - Deposit regtest coins into each Lightning node
-- Mint, Send & Receive Taproot Assets
-- Create & Pay Taproot Asset invoices
 - Export and import networks, for sharing with other Lightning developers
 - Create you own docker images to use as [custom nodes](https://github.com/jamaljsr/polar/blob/master/docs/custom-nodes.md) (ex: master branch, local fork)
 
@@ -41,8 +39,6 @@ Supported Network Node Versions:
 - [LND](https://github.com/lightningnetwork/lnd) - v0.20.0, v0.19.3, v0.19.2, v0.19.1, v0.18.5, v0.18.4, v0.18.3, v0.17.5, v0.16.4
 - [Core Lightning](https://github.com/ElementsProject/lightning) - v25.12, v25.09.3, v25.05, v25.02, v24.11.1, v24.08.1
 - [Bitcoin Core](https://github.com/bitcoin/bitcoin) - v30.0, v29.0, v28.0, v27.0, v26.0
-- [Taproot Assets](https://github.com/lightninglabs/taproot-assets) - v0.7.0, v0.6.1, v0.6.0, v0.5.1, v0.5.0, v0.4.1, v0.3.3
-- [Terminal](https://github.com/lightninglabs/lightning-terminal) - v0.16.0, v0.15.3, v0.15.1, v0.15.0, v0.14.1,
 
 ### MCP (Model Context Protocol)
 

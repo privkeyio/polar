@@ -28,8 +28,6 @@ describe('MCP model > startNetwork', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });

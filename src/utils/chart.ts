@@ -1,12 +1,12 @@
 import { IChart, IConfig, ILink, INode, IPosition } from '@mrblenny/react-flow-chart';
-import { BitcoinNode, LightningNode, TapdNode, TapNode } from 'shared/types';
+import { BitcoinNode, LightningNode } from 'shared/types';
 import { LightningNodeChannel } from 'lib/lightning/types';
 import { LightningNodeMapping } from 'store/models/lightning';
 import { Network } from 'types';
 import { dockerConfigs } from './constants';
 
 export interface LinkProperties {
-  type: 'backend' | 'pending-channel' | 'open-channel' | 'btcpeer' | 'lndbackend';
+  type: 'backend' | 'pending-channel' | 'open-channel' | 'btcpeer';
   channelPoint: string;
   capacity: string;
   fromBalance: string;
@@ -14,7 +14,6 @@ export interface LinkProperties {
   direction: 'ltr' | 'rtl';
   status: string;
   isPrivate: boolean;
-  assets?: LightningNodeChannel['assets'];
 }
 
 export const rotate = (
@@ -69,10 +68,6 @@ export const createLightningChartNode = (ln: LightningNode, yOffset = 0) => {
     },
   };
 
-  if (ln.implementation === 'LND') {
-    node.ports['lndbackend'] = { id: 'lndbackend', type: 'top' };
-  }
-
   const link: ILink = {
     id: `${ln.name}-${ln.backendName}`,
     from: { nodeId: ln.name, portId: 'backend' },
@@ -81,49 +76,6 @@ export const createLightningChartNode = (ln: LightningNode, yOffset = 0) => {
       type: 'backend',
     },
   };
-
-  return { node, link };
-};
-
-export const createTapdChartNode = (tap: TapNode, chart?: IChart) => {
-  const position: IPosition = {
-    x: tap.id * space.x + baseline.x,
-    y: baseline.y + (tap.id % 2 === 0 ? 0 : stagger.y),
-  };
-  const node: INode = {
-    id: tap.name,
-    type: 'tap',
-    position,
-    ports: {
-      lndbackend: { id: 'lndbackend', type: 'bottom' },
-    },
-    size: { width: 200, height: 36 },
-    properties: {
-      status: tap.status,
-      icon: dockerConfigs[tap.implementation].logo,
-    },
-  };
-
-  let link: ILink | undefined = undefined;
-  if (tap.implementation === 'tapd') {
-    const tapd = tap as TapdNode;
-    link = {
-      id: `${tapd.name}-${tapd.lndName}`,
-      from: { nodeId: tapd.name, portId: 'lndbackend' },
-      to: { nodeId: tapd.lndName, portId: 'lndbackend' },
-      properties: {
-        type: 'lndbackend',
-      },
-    };
-
-    if (chart?.nodes[tapd.lndName]) {
-      const lndNode = chart.nodes[tapd.lndName];
-      node.position = {
-        x: lndNode.position.x + stagger.x,
-        y: lndNode.position.y - space.y,
-      };
-    }
-  }
 
   return { node, link };
 };
@@ -178,26 +130,16 @@ export const initChartFromNetwork = (network: Network): IChart => {
     scale: 1,
   };
 
-  // determines if the LN and BTC nodes should start on the second or third row based on
-  // if there are TAP nodes present
-  const yOffset = network.nodes.tap.length > 0 ? space.y : 0;
-
   network.nodes.bitcoin.forEach(n => {
-    const { node, link } = createBitcoinChartNode(n, yOffset);
+    const { node, link } = createBitcoinChartNode(n);
     chart.nodes[node.id] = node;
     if (link) chart.links[link.id] = link;
   });
 
   network.nodes.lightning.forEach(n => {
-    const { node, link } = createLightningChartNode(n, yOffset);
+    const { node, link } = createLightningChartNode(n);
     chart.nodes[node.id] = node;
     chart.links[link.id] = link;
-  });
-
-  network.nodes.tap.forEach(n => {
-    const { node, link } = createTapdChartNode(n, chart);
-    chart.nodes[node.id] = node;
-    if (link) chart.links[link.id] = link;
   });
 
   return chart;
@@ -236,7 +178,6 @@ const updateLinksAndPorts = (
     properties: {
       nodeId: fromNode.id,
       initiator: true,
-      hasAssets: !!chan.assets?.length,
     },
   };
 
@@ -245,7 +186,7 @@ const updateLinksAndPorts = (
     ...(toNode.ports[chanId] || {}),
     id: chanId,
     type: fromOnLeftSide ? 'left' : 'right',
-    properties: { nodeId: toNode.id, initiator: false, hasAssets: !!chan.assets?.length },
+    properties: { nodeId: toNode.id, initiator: false },
   };
 
   const properties: LinkProperties = {
@@ -257,7 +198,6 @@ const updateLinksAndPorts = (
     direction: fromOnLeftSide ? 'ltr' : 'rtl',
     status: chan.status,
     isPrivate: chan.isPrivate,
-    assets: chan.assets,
   };
 
   // create or update the link
@@ -345,23 +285,6 @@ export const updateChartFromNodes = (
     linksToKeep.push(id);
   });
 
-  // ensure all tapd -> lnd backend links exists
-  network.nodes.tap.forEach(tap => {
-    const tapd = tap as TapdNode;
-    const id = `${tapd.name}-${tapd.lndName}`;
-    if (!links[id]) {
-      links[id] = {
-        id,
-        from: { nodeId: tapd.name, portId: 'lndbackend' },
-        to: { nodeId: tapd.lndName, portId: 'lndbackend' },
-        properties: {
-          type: 'lndbackend',
-        },
-      };
-    }
-    linksToKeep.push(id);
-  });
-
   // remove links for channels that no longer exist
   Object.keys(links).forEach(linkId => {
     // don't remove links for existing channels
@@ -374,14 +297,7 @@ export const updateChartFromNodes = (
   Object.values(nodes).forEach(node => {
     Object.keys(node.ports).forEach(portId => {
       // don't remove special ports
-      const special = [
-        'empty-left',
-        'empty-right',
-        'backend',
-        'peer-left',
-        'peer-right',
-        'lndbackend',
-      ];
+      const special = ['empty-left', 'empty-right', 'backend', 'peer-left', 'peer-right'];
       if (special.includes(portId)) return;
       // don't remove ports for existing channels
       if (linksToKeep.includes(portId)) return;

@@ -1,7 +1,5 @@
 import { Action, action, Thunk, thunk } from 'easy-peasy';
-import * as PLIT from 'lib/litd/types';
 import { StoreInjections } from 'types';
-import { getTapBackendNode } from 'utils/network';
 import { RootModel } from './';
 
 interface OpenChannelModel {
@@ -24,7 +22,6 @@ interface CreateInvoiceModel {
   amount?: number;
   // displayed after the invoice is created
   invoice?: string;
-  assetName?: string;
 }
 
 interface PayInvoiceModel {
@@ -54,39 +51,6 @@ interface SendOnChainModel {
   amount?: number;
 }
 
-interface AssetInfoModel {
-  visible: boolean;
-  nodeName?: string;
-  assetId?: string;
-}
-
-interface MintAssetModel {
-  visible: boolean;
-  nodeName?: string;
-  networkId?: number;
-  lndName?: string;
-}
-
-interface NewAddressModel {
-  visible: boolean;
-  nodeName?: string;
-  networkId?: number;
-}
-
-interface SendAssetModel {
-  visible: boolean;
-  nodeName?: string;
-  networkId?: number;
-  lndName?: string;
-}
-
-interface ChangeTapBackendModel {
-  visible: boolean;
-  tapName?: string;
-  lndName?: string;
-  linkId?: string;
-}
-
 interface RenameNodeModel {
   visible: boolean;
   oldNodeName?: string;
@@ -95,24 +59,6 @@ interface RenameNodeModel {
 interface UnlockNodeModel {
   visible: boolean;
   nodeName?: string;
-}
-
-interface LncSessionInfoModel {
-  visible: boolean;
-  sessionId?: string;
-  nodeName?: string;
-}
-
-interface AddLncSessionModel {
-  visible: boolean;
-  nodeName?: string;
-  // form values entered by the user
-  label?: string;
-  type?: PLIT.Session['type'];
-  mailboxServerAddr?: string;
-  expiresAt?: number;
-  // success values returned by the API
-  pairingPhrase?: string;
 }
 
 interface AddSimulationModel {
@@ -133,15 +79,8 @@ export interface ModalsModel {
   balanceChannels: BalanceChannelsModel;
   imageUpdates: ImageUpdatesModel;
   sendOnChain: SendOnChainModel;
-  assetInfo: AssetInfoModel;
-  mintAsset: MintAssetModel;
-  newAddress: NewAddressModel;
-  sendAsset: SendAssetModel;
   renameNode: RenameNodeModel;
   unlockNode: UnlockNodeModel;
-  lncSessionInfo: LncSessionInfoModel;
-  addLncSession: AddLncSessionModel;
-  changeTapBackend: ChangeTapBackendModel;
   addSimulation: AddSimulationModel;
   setOpenChannel: Action<ModalsModel, OpenChannelModel>;
   showOpenChannel: Thunk<ModalsModel, Partial<OpenChannelModel>, StoreInjections>;
@@ -167,42 +106,12 @@ export interface ModalsModel {
   setSendOnChain: Action<ModalsModel, SendOnChainModel>;
   showSendOnChain: Thunk<ModalsModel, Partial<SendOnChainModel>, StoreInjections>;
   hideSendOnChain: Thunk<ModalsModel, void, StoreInjections, RootModel>;
-  setAssetInfo: Action<ModalsModel, AssetInfoModel>;
-  showAssetInfo: Thunk<ModalsModel, Partial<AssetInfoModel>, StoreInjections>;
-  hideAssetInfo: Thunk<ModalsModel, void, StoreInjections, RootModel>;
-  setMintAsset: Action<ModalsModel, Partial<MintAssetModel>>;
-  showMintAsset: Thunk<ModalsModel, Partial<MintAssetModel>, StoreInjections, RootModel>;
-  hideMintAsset: Thunk<ModalsModel>;
-  showNewAddress: Thunk<
-    ModalsModel,
-    Partial<NewAddressModel>,
-    StoreInjections,
-    RootModel
-  >;
-  hideNewAddress: Thunk<ModalsModel>;
-  setNewAddress: Action<ModalsModel, Partial<NewAddressModel>>;
-  setSendAsset: Action<ModalsModel, SendAssetModel>;
-  hideSendAsset: Thunk<ModalsModel>;
-  showSendAsset: Thunk<ModalsModel, Partial<SendAssetModel>, StoreInjections, RootModel>;
-  showChangeTapBackend: Thunk<
-    ModalsModel,
-    Partial<ChangeTapBackendModel>,
-    StoreInjections
-  >;
-  hideChangeTapBackend: Thunk<ModalsModel, void, StoreInjections, RootModel>;
-  setChangeTapBackend: Action<ModalsModel, Partial<ChangeTapBackendModel>>;
   setRenameNode: Action<ModalsModel, RenameNodeModel>;
   showRenameNode: Thunk<ModalsModel, Partial<RenameNodeModel>, StoreInjections>;
   hideRenameNode: Thunk<ModalsModel, void, StoreInjections, RootModel>;
   setUnlockNode: Action<ModalsModel, UnlockNodeModel>;
   showUnlockNode: Thunk<ModalsModel, Partial<UnlockNodeModel>, StoreInjections>;
   hideUnlockNode: Thunk<ModalsModel, void, StoreInjections, RootModel>;
-  setLncSessionInfo: Action<ModalsModel, LncSessionInfoModel>;
-  showLncSessionInfo: Thunk<ModalsModel, Partial<LncSessionInfoModel>, StoreInjections>;
-  hideLncSessionInfo: Thunk<ModalsModel, void, StoreInjections, RootModel>;
-  setAddLncSession: Action<ModalsModel, AddLncSessionModel>;
-  showAddLncSession: Thunk<ModalsModel, Partial<AddLncSessionModel>, StoreInjections>;
-  hideAddLncSession: Thunk<ModalsModel, void, StoreInjections, RootModel>;
   setAddSimulation: Action<ModalsModel, AddSimulationModel>;
   showAddSimulation: Thunk<ModalsModel, Partial<AddSimulationModel>, StoreInjections>;
   hideAddSimulation: Thunk<ModalsModel, void, StoreInjections, RootModel>;
@@ -211,9 +120,6 @@ export interface ModalsModel {
 const modalsModel: ModalsModel = {
   // state properties
   openChannel: { visible: false },
-  mintAsset: { visible: false },
-  sendAsset: { visible: false },
-  newAddress: { visible: false },
   changeBackend: { visible: false },
   createInvoice: { visible: false },
   payInvoice: { visible: false },
@@ -221,12 +127,8 @@ const modalsModel: ModalsModel = {
   balanceChannels: { visible: false },
   imageUpdates: { visible: false },
   sendOnChain: { visible: false },
-  assetInfo: { visible: false },
-  changeTapBackend: { visible: false },
   renameNode: { visible: false },
   unlockNode: { visible: false },
-  lncSessionInfo: { visible: false },
-  addLncSession: { visible: false },
   addSimulation: { visible: false },
   // reducer actions (mutations allowed thx to immer)
   setOpenChannel: action((state, payload) => {
@@ -279,8 +181,8 @@ const modalsModel: ModalsModel = {
       ...payload,
     };
   }),
-  showCreateInvoice: thunk((actions, { nodeName, invoice, amount, assetName }) => {
-    actions.setCreateInvoice({ visible: true, nodeName, invoice, amount, assetName });
+  showCreateInvoice: thunk((actions, { nodeName, invoice, amount }) => {
+    actions.setCreateInvoice({ visible: true, nodeName, invoice, amount });
   }),
   hideCreateInvoice: thunk(actions => {
     actions.setCreateInvoice({
@@ -364,112 +266,6 @@ const modalsModel: ModalsModel = {
       amount: undefined,
     });
   }),
-  setAssetInfo: action((state, payload) => {
-    state.assetInfo = {
-      ...state.assetInfo,
-      ...payload,
-    };
-  }),
-  showAssetInfo: thunk((actions, { assetId, nodeName }) => {
-    actions.setAssetInfo({ visible: true, assetId, nodeName });
-  }),
-  hideAssetInfo: thunk(actions => {
-    actions.setAssetInfo({
-      visible: false,
-      assetId: undefined,
-      nodeName: undefined,
-    });
-  }),
-  showMintAsset: thunk(
-    async (actions, { nodeName, networkId }, { getStoreState, getStoreActions }) => {
-      actions.setMintAsset({ visible: true, nodeName });
-
-      // get the wallet balance for the associated LND node when we show the modal
-      const network = getStoreState().network.networks.find(n => n.id === networkId);
-      if (nodeName && network) {
-        const lndNode = getTapBackendNode(nodeName, network);
-        if (lndNode) {
-          await getStoreActions().lightning.getWalletBalance(lndNode);
-          actions.setMintAsset({ lndName: lndNode.name });
-        }
-      }
-    },
-  ),
-  hideMintAsset: thunk(actions => {
-    actions.setMintAsset({
-      visible: false,
-      nodeName: undefined,
-      networkId: undefined,
-      lndName: undefined,
-    });
-  }),
-  setMintAsset: action((state, payload) => {
-    state.mintAsset = {
-      ...state.mintAsset,
-      ...payload,
-    };
-  }),
-  showNewAddress: thunk(
-    (actions, { nodeName, networkId }, { getStoreState, getStoreActions }) => {
-      actions.setNewAddress({ visible: true, nodeName, networkId });
-
-      // get the wallet balance for the associated LND node when we show the modal
-      const network = getStoreState().network.networks.find(n => n.id === networkId);
-      if (network) {
-        getStoreActions().designer.syncChart(network);
-      }
-    },
-  ),
-  hideNewAddress: thunk(actions => {
-    actions.setNewAddress({ visible: false });
-  }),
-  setNewAddress: action((state, payload) => {
-    state.newAddress = {
-      ...state.newAddress,
-      ...payload,
-    };
-  }),
-  showSendAsset: thunk(
-    async (actions, { nodeName, networkId }, { getStoreState, getStoreActions }) => {
-      actions.setSendAsset({ visible: true, nodeName });
-
-      // get the wallet balance for the associated LND node when we show the modal
-      const network = getStoreState().network.networks.find(n => n.id === networkId);
-      if (nodeName && network) {
-        const lndNode = getTapBackendNode(nodeName, network);
-        if (lndNode) {
-          await getStoreActions().lightning.getWalletBalance(lndNode);
-          actions.setSendAsset({ visible: true, lndName: lndNode.name });
-        }
-      }
-    },
-  ),
-  hideSendAsset: thunk(actions => {
-    actions.setSendAsset({ visible: false });
-  }),
-  setSendAsset: action((state, payload) => {
-    state.sendAsset = {
-      ...state.sendAsset,
-      ...payload,
-    };
-  }),
-  showChangeTapBackend: thunk((actions, { tapName, lndName, linkId }) => {
-    actions.setChangeTapBackend({ visible: true, tapName, lndName, linkId });
-  }),
-  hideChangeTapBackend: thunk((actions, payload, { getStoreActions, getState }) => {
-    const { linkId } = getState().changeTapBackend;
-    if (linkId) {
-      // remove the link on the chart if the backend wasn't changed
-      getStoreActions().designer.removeLink(linkId);
-    }
-    actions.setChangeTapBackend({ visible: false });
-  }),
-  setChangeTapBackend: action((state, payload) => {
-    state.changeTapBackend = {
-      ...state.changeTapBackend,
-      ...payload,
-    };
-  }),
   setRenameNode: action((state, payload) => {
     state.renameNode = {
       ...state.renameNode,
@@ -496,37 +292,6 @@ const modalsModel: ModalsModel = {
   }),
   hideUnlockNode: thunk(actions => {
     actions.setUnlockNode({
-      visible: false,
-      nodeName: undefined,
-    });
-  }),
-  setLncSessionInfo: action((state, payload) => {
-    state.lncSessionInfo = {
-      ...state.lncSessionInfo,
-      ...payload,
-    };
-  }),
-  showLncSessionInfo: thunk((actions, { sessionId, nodeName }) => {
-    actions.setLncSessionInfo({ visible: true, sessionId, nodeName });
-  }),
-  hideLncSessionInfo: thunk(actions => {
-    actions.setLncSessionInfo({
-      visible: false,
-      sessionId: undefined,
-      nodeName: undefined,
-    });
-  }),
-  setAddLncSession: action((state, payload) => {
-    state.addLncSession = {
-      ...state.addLncSession,
-      ...payload,
-    };
-  }),
-  showAddLncSession: thunk((actions, { nodeName, pairingPhrase }) => {
-    actions.setAddLncSession({ visible: true, nodeName, pairingPhrase });
-  }),
-  hideAddLncSession: thunk(actions => {
-    actions.setAddLncSession({
       visible: false,
       nodeName: undefined,
     });

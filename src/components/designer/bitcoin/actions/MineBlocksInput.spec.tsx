@@ -5,14 +5,13 @@ import {
   getNetwork,
   lightningServiceMock,
   renderWithProviders,
-  tapServiceMock,
   bitcoinServiceMock,
 } from 'utils/tests';
 import MineBlocksInput from './MineBlocksInput';
 
 describe('MineBlocksInput', () => {
   const renderComponent = (status?: Status) => {
-    const network = getNetwork(1, 'test network', status, 2);
+    const network = getNetwork(1, 'test network', status);
     const initialState = {
       network: {
         networks: [network],
@@ -96,17 +95,6 @@ describe('MineBlocksInput', () => {
     const mineMock = bitcoinServiceMock.mine as jest.Mock;
     mineMock.mockResolvedValue(true);
     lightningServiceMock.getInfo.mockRejectedValueOnce(new Error('info-error'));
-    const { input, btn, findByText } = renderComponent(Status.Started);
-    const numBlocks = 5;
-    fireEvent.change(input, { target: { value: numBlocks } });
-    fireEvent.click(btn);
-    expect(await findByText('info-error')).toBeInTheDocument();
-  });
-
-  it('should display an error if tap nodes cannot update after mining', async () => {
-    const mineMock = bitcoinServiceMock.mine as jest.Mock;
-    mineMock.mockResolvedValue(true);
-    tapServiceMock.listAssets.mockRejectedValueOnce(new Error('info-error'));
     const { input, btn, findByText } = renderComponent(Status.Started);
     const numBlocks = 5;
     fireEvent.change(input, { target: { value: numBlocks } });

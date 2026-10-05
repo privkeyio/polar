@@ -9,7 +9,6 @@ import {
   getNetwork,
   lndServiceMock,
   renderWithProviders,
-  suppressConsoleErrors,
   testRepoState,
 } from 'utils/tests';
 import NetworkDesigner from './NetworkDesigner';
@@ -26,7 +25,7 @@ describe('NetworkDesigner Component', () => {
   });
 
   const renderComponent = (charts?: Record<number, IChart>, theme = 'dark') => {
-    const network = getNetwork(1, 'test network', Status.Stopped, 2);
+    const network = getNetwork(1, 'test network', Status.Stopped);
     const allCharts = charts || {
       1: initChartFromNetwork(network),
     };
@@ -46,11 +45,6 @@ describe('NetworkDesigner Component', () => {
       lightning: {
         nodes: {
           alice: {},
-        },
-      },
-      tap: {
-        nodes: {
-          'alice-tap': {},
         },
       },
     };
@@ -153,15 +147,6 @@ describe('NetworkDesigner Component', () => {
     expect(await findByText('BOLT 11 Invoice')).toBeInTheDocument();
     fireEvent.click(getByText('Cancel'));
   });
-  it('should display the ChangeTapBackend modal', async () => {
-    const { findAllByText, findByText, getAllByText, store } = renderComponent();
-    expect(await findByText('backend1')).toBeInTheDocument();
-    act(() => {
-      store.getActions().modals.showChangeTapBackend({});
-    });
-    expect(await findAllByText('Change TAP Node Backend')).toHaveLength(1);
-    fireEvent.click(getAllByText('Cancel')[0]);
-  });
 
   it('should display the ChangeBackend modal', async () => {
     const { getByText, findByText, store } = renderComponent();
@@ -180,38 +165,6 @@ describe('NetworkDesigner Component', () => {
       store.getActions().modals.showSendOnChain({});
     });
     expect(await findByText('Send To Onchain Address')).toBeInTheDocument();
-    fireEvent.click(getByText('Cancel'));
-  });
-
-  it('should display the Mint Asset modal', async () => {
-    const { getByText, findByText, store } = renderComponent();
-    expect(await findByText('backend1')).toBeInTheDocument();
-    act(() => {
-      store.getActions().modals.showMintAsset({ nodeName: 'alice-tap' });
-    });
-    expect(await findByText('Mint an asset for alice-tap')).toBeInTheDocument();
-    fireEvent.click(getByText('Cancel'));
-  });
-
-  it('should display the New Address modal', async () => {
-    const { getByText, findByText, store } = renderComponent();
-    expect(await findByText('backend1')).toBeInTheDocument();
-    act(() => {
-      store.getActions().modals.showNewAddress({ nodeName: 'alice-tap' });
-    });
-    expect(
-      await findByText('Generate new TAP address for alice-tap'),
-    ).toBeInTheDocument();
-    fireEvent.click(getByText('Cancel'));
-  });
-
-  it('should display the Send Address modal', async () => {
-    const { getByText, findByText, store } = renderComponent();
-    expect(await findByText('backend1')).toBeInTheDocument();
-    act(() => {
-      store.getActions().modals.showSendAsset({ nodeName: 'alice-tap' });
-    });
-    expect(await findByText('Send Asset from alice-tap')).toBeInTheDocument();
     fireEvent.click(getByText('Cancel'));
   });
 
@@ -256,21 +209,6 @@ describe('NetworkDesigner Component', () => {
     fireEvent.click(getByText('Close'));
   });
 
-  it('should display the LncAddSession modal', async () => {
-    const { getByText, findByText, store } = renderComponent();
-    store.getActions().designer.onCanvasDrop({
-      data: { type: 'litd', version: testRepoState.images.litd.latest },
-      position: { x: 584, y: 343 },
-      id: 'test-id',
-    });
-    expect(await findByText('carol')).toBeInTheDocument();
-    act(() => {
-      store.getActions().modals.showAddLncSession({ nodeName: 'carol' });
-    });
-    expect(await findByText('Add new LNC Session')).toBeInTheDocument();
-    fireEvent.click(getByText('Cancel'));
-  });
-
   it('should display the Add Simulation modal', async () => {
     const { getByText, findByText, store } = renderComponent();
     act(() => {
@@ -282,7 +220,7 @@ describe('NetworkDesigner Component', () => {
 
   it('should remove a node from the network', async () => {
     const { getByText, findByText, queryByText, store } = renderComponent();
-    // add a new LN node that doesn't have a tap node connected
+    // add a new LN node
     store.getActions().designer.onCanvasDrop({
       config: { snapToGrid: true },
       data: { type: 'LND', version: testRepoState.images.LND.latest },
@@ -299,38 +237,6 @@ describe('NetworkDesigner Component', () => {
     fireEvent.click(await findByText('Yes'));
     await waitForElementToBeRemoved(() => queryByText('Yes'));
     expect(queryByText('carol')).toBeNull();
-  });
-
-  it('should not remove an LND node with a connected tapd node', async () => {
-    const { getByText, findByText } = renderComponent();
-    expect(await findByText('alice')).toBeInTheDocument();
-    act(() => {
-      fireEvent.click(getByText('alice'));
-    });
-    fireEvent.click(await findByText('Actions'));
-    fireEvent.click(await findByText('Remove'));
-    fireEvent.click(await findByText('Yes'));
-
-    await suppressConsoleErrors(async () => {
-      expect(
-        await findByText(
-          'Cannot remove a Lightning node that has a Taproot Assets node connected to it.',
-        ),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it('should remove a TAP node from the network', async () => {
-    const { getByText, findByText, queryByText } = renderComponent();
-    expect(await findByText('alice-tap')).toBeInTheDocument();
-    act(() => {
-      fireEvent.click(getByText('alice-tap'));
-    });
-    fireEvent.click(await findByText('Actions'));
-    fireEvent.click(await findByText('Remove'));
-    fireEvent.click(await findByText('Yes'));
-    await waitForElementToBeRemoved(() => queryByText('Yes'));
-    expect(queryByText('alice-tap')).toBeNull();
   });
 
   it('should render the dark links', async () => {

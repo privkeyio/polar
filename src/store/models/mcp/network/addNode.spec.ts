@@ -81,17 +81,6 @@ describe('MCP model > addNode', () => {
       expect(result.node).toBeDefined();
     });
 
-    it('should add a litd node to network', async () => {
-      const result = await store.getActions().mcp.addNode({
-        networkId: 1,
-        implementation: 'litd',
-      });
-
-      expect(result.success).toBe(true);
-      expect(result.message).toContain('litd node');
-      expect(result.node).toBeDefined();
-    });
-
     it('should add a Lightning node with specific version', async () => {
       const result = await store.getActions().mcp.addNode({
         networkId: 1,

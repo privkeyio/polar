@@ -46,18 +46,6 @@ describe('MCP model > removeNode', () => {
         networkId: 1,
       } as any,
     ];
-    network.nodes.tap = [
-      {
-        id: 4,
-        name: 'tap-1',
-        type: 'tap',
-        implementation: 'tapd',
-        version: '0.3.0',
-        status: Status.Stopped,
-        networkId: 1,
-        lndName: 'bob-lnd', // Different LND to avoid conflicts
-      } as any,
-    ];
     store.getActions().network.setNetworks([network]);
   });
 
@@ -117,31 +105,6 @@ describe('MCP model > removeNode', () => {
     });
   });
 
-  describe('Taproot Asset nodes', () => {
-    it('should remove a Taproot Asset node from network', async () => {
-      const removeTapNodeSpy = jest.spyOn(store.getActions().network, 'removeTapNode');
-      removeTapNodeSpy.mockResolvedValue(undefined);
-
-      const result = await store.getActions().mcp.removeNode({
-        networkId: 1,
-        nodeName: 'tap-1',
-      });
-
-      expect(result.success).toBe(true);
-      expect(result.message).toContain('Taproot Asset node "tap-1" removed from network');
-      expect(result.message).toContain('successfully');
-      expect(removeTapNodeSpy).toHaveBeenCalledWith({
-        node: expect.objectContaining({
-          name: 'tap-1',
-          type: 'tap',
-          implementation: 'tapd',
-        }),
-      });
-
-      removeTapNodeSpy.mockRestore();
-    });
-  });
-
   it('should throw error when networkId is missing', async () => {
     await expect(
       store.getActions().mcp.removeNode({
@@ -191,7 +154,7 @@ describe('MCP model > removeNode', () => {
         networkId: 1,
         nodeName: 'nonexistent-node',
       }),
-    ).rejects.toThrow('alice-lnd, bitcoin-1, bitcoin-2, tap-1');
+    ).rejects.toThrow('alice-lnd, bitcoin-1, bitcoin-2');
   });
 
   it('should throw error for unsupported node type', async () => {

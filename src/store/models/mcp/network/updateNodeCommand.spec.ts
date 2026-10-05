@@ -21,8 +21,6 @@ describe('MCP model > updateNodeCommand', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -53,8 +51,6 @@ describe('MCP model > updateNodeCommand', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -85,8 +81,6 @@ describe('MCP model > updateNodeCommand', () => {
       lndNodes: 1,
       clightningNodes: 1,
       bitcoindNodes: 1,
-      tapdNodes: 1,
-      litdNodes: 1,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -112,20 +106,6 @@ describe('MCP model > updateNodeCommand', () => {
 
     expect(lightningResult.success).toBe(true);
     expect(lightningResult.nodeName).toBe('bob');
-
-    // Test with tap node - use the correct name
-    const tapNodeNames = network.nodes.tap.map(n => n.name);
-    expect(tapNodeNames.length).toBeGreaterThan(0);
-    const tapNodeName = tapNodeNames[0];
-
-    const tapResult = await store.getActions().mcp.updateNodeCommand({
-      networkId: network.id,
-      nodeName: tapNodeName,
-      command: 'tapd --custom-flag',
-    });
-
-    expect(tapResult.success).toBe(true);
-    expect(tapResult.nodeName).toBe(tapNodeName);
   });
 
   it('should throw error when networkId is missing', async () => {
@@ -172,8 +152,6 @@ describe('MCP model > updateNodeCommand', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });

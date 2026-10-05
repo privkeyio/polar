@@ -1,10 +1,5 @@
 import React, { useCallback } from 'react';
-import {
-  DollarOutlined,
-  LinkOutlined,
-  ThunderboltOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons';
+import { LinkOutlined, ThunderboltOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import styled from '@emotion/styled';
 import { Card, Col, Row, Statistic, Tooltip } from 'antd';
 import { usePrefixedTranslation } from 'hooks';
@@ -55,13 +50,6 @@ const NetworkCard: React.FC<{ network: Network }> = ({ network }) => {
             title={l('bitcoinNodes')}
             value={network.nodes.bitcoin.length}
             suffix={<LinkOutlined />}
-          />
-        </Col>
-        <Col span={8}>
-          <Statistic
-            title={l('tapNodes')}
-            value={network.nodes.tap.length}
-            suffix={<DollarOutlined />}
           />
         </Col>
       </Row>

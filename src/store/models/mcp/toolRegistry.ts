@@ -5,11 +5,6 @@ import { getNewBitcoinAddressDefinition } from './bitcoin/getNewBitcoinAddress';
 import { mineBlocksDefinition } from './bitcoin/mineBlocks';
 import { sendBitcoinDefinition } from './bitcoin/sendBitcoin';
 import { setAutoMineModeDefinition } from './bitcoin/setAutoMineMode';
-import { closeTapChannelDefinition } from './lightning/asset-channels/closeTapChannel';
-import { fundTapChannelDefinition } from './lightning/asset-channels/fundTapChannel';
-import { createAssetInvoiceDefinition } from './lightning/asset-payments/createAssetInvoice';
-import { getAssetsInChannelsDefinition } from './lightning/asset-payments/getAssetsInChannels';
-import { payAssetInvoiceDefinition } from './lightning/asset-payments/payAssetInvoice';
 import { closeChannelDefinition } from './lightning/channels/closeChannel';
 import { listChannelsDefinition } from './lightning/channels/listChannels';
 import { openChannelDefinition } from './lightning/channels/openChannel';
@@ -18,9 +13,6 @@ import { createInvoiceDefinition } from './lightning/payments/createInvoice';
 import { payInvoiceDefinition } from './lightning/payments/payInvoice';
 import { depositFundsDefinition } from './lightning/wallet/depositFunds';
 import { getWalletBalanceDefinition } from './lightning/wallet/getWalletBalance';
-import { addLitdSessionDefinition } from './litd/addLitdSession';
-import { listLitdSessionsDefinition } from './litd/listLitdSessions';
-import { revokeLitdSessionDefinition } from './litd/revokeLitdSession';
 import { addNodeDefinition } from './network/addNode';
 import { createNetworkDefinition } from './network/createNetwork';
 import { deleteNetworkDefinition } from './network/deleteNetwork';
@@ -34,19 +26,11 @@ import { renameNetworkDefinition } from './network/renameNetwork';
 import { renameNodeDefinition } from './network/renameNode';
 import { restartNodeDefinition } from './network/restartNode';
 import { setLightningBackendDefinition } from './network/setLightningBackend';
-import { setTapBackendDefinition } from './network/setTapBackend';
 import { startNetworkDefinition } from './network/startNetwork';
 import { startNodeDefinition } from './network/startNode';
 import { stopNetworkDefinition } from './network/stopNetwork';
 import { stopNodeDefinition } from './network/stopNode';
 import { updateNodeCommandDefinition } from './network/updateNodeCommand';
-import { decodeTapAddressDefinition } from './tap/decodeTapAddress';
-import { getTapAddressDefinition } from './tap/getTapAddress';
-import { getTapBalancesDefinition } from './tap/getTapBalances';
-import { listTapAssetsDefinition } from './tap/listTapAssets';
-import { mintTapAssetDefinition } from './tap/mintTapAsset';
-import { sendTapAssetDefinition } from './tap/sendTapAsset';
-import { syncTapUniverseDefinition } from './tap/syncTapUniverse';
 import { McpToolDefinition } from './types';
 
 import type { RootModel } from 'store/models';
@@ -122,10 +106,6 @@ export const TOOL_REGISTRY = {
     definition: setLightningBackendDefinition,
     executor: callAction('setLightningBackend'),
   },
-  [setTapBackendDefinition.name]: {
-    definition: setTapBackendDefinition,
-    executor: callAction('setTapBackend'),
-  },
   [updateNodeCommandDefinition.name]: {
     definition: updateNodeCommandDefinition,
     executor: callAction('updateNodeCommand'),
@@ -189,7 +169,7 @@ export const TOOL_REGISTRY = {
     executor: callAction('setAutoMineMode'),
   },
 
-  // Lightning tools (10)
+  // Lightning tools (8)
   [openChannelDefinition.name]: {
     definition: openChannelDefinition,
     executor: callAction('openChannel'),
@@ -197,14 +177,6 @@ export const TOOL_REGISTRY = {
   [closeChannelDefinition.name]: {
     definition: closeChannelDefinition,
     executor: callAction('closeChannel'),
-  },
-  [closeTapChannelDefinition.name]: {
-    definition: closeTapChannelDefinition,
-    executor: callAction('closeTapChannel'),
-  },
-  [fundTapChannelDefinition.name]: {
-    definition: fundTapChannelDefinition,
-    executor: callAction('fundTapChannel'),
   },
   [listChannelsDefinition.name]: {
     definition: listChannelsDefinition,
@@ -229,62 +201,6 @@ export const TOOL_REGISTRY = {
   [payInvoiceDefinition.name]: {
     definition: payInvoiceDefinition,
     executor: callAction('payInvoice'),
-  },
-
-  // Taproot Assets tools (9)
-  [mintTapAssetDefinition.name]: {
-    definition: mintTapAssetDefinition,
-    executor: callAction('mintTapAsset'),
-  },
-  [listTapAssetsDefinition.name]: {
-    definition: listTapAssetsDefinition,
-    executor: callAction('listTapAssets'),
-  },
-  [sendTapAssetDefinition.name]: {
-    definition: sendTapAssetDefinition,
-    executor: callAction('sendTapAsset'),
-  },
-  [getTapBalancesDefinition.name]: {
-    definition: getTapBalancesDefinition,
-    executor: callAction('getTapBalances'),
-  },
-  [getTapAddressDefinition.name]: {
-    definition: getTapAddressDefinition,
-    executor: callAction('getTapAddress'),
-  },
-  [decodeTapAddressDefinition.name]: {
-    definition: decodeTapAddressDefinition,
-    executor: callAction('decodeTapAddress'),
-  },
-  [syncTapUniverseDefinition.name]: {
-    definition: syncTapUniverseDefinition,
-    executor: callAction('syncTapUniverse'),
-  },
-  [createAssetInvoiceDefinition.name]: {
-    definition: createAssetInvoiceDefinition,
-    executor: callAction('createAssetInvoice'),
-  },
-  [payAssetInvoiceDefinition.name]: {
-    definition: payAssetInvoiceDefinition,
-    executor: callAction('payAssetInvoice'),
-  },
-  [getAssetsInChannelsDefinition.name]: {
-    definition: getAssetsInChannelsDefinition,
-    executor: callAction('getAssetsInChannels'),
-  },
-
-  // LitD tools (3)
-  [listLitdSessionsDefinition.name]: {
-    definition: listLitdSessionsDefinition,
-    executor: callAction('listLitdSessions'),
-  },
-  [addLitdSessionDefinition.name]: {
-    definition: addLitdSessionDefinition,
-    executor: callAction('addLitdSession'),
-  },
-  [revokeLitdSessionDefinition.name]: {
-    definition: revokeLitdSessionDefinition,
-    executor: callAction('revokeLitdSession'),
   },
 } as const satisfies Record<string, ToolRegistryEntryDefinition>;
 
@@ -329,7 +245,6 @@ export const tools = {
   removeNode: removeNodeDefinition,
   renameNode: renameNodeDefinition,
   setLightningBackend: setLightningBackendDefinition,
-  setTapBackend: setTapBackendDefinition,
   updateNodeCommand: updateNodeCommandDefinition,
   getDefaultNodeCommand: getDefaultNodeCommandDefinition,
   listNodeVersions: listNodeVersionsDefinition,
@@ -341,25 +256,10 @@ export const tools = {
   setAutoMineMode: setAutoMineModeDefinition,
   openChannel: openChannelDefinition,
   closeChannel: closeChannelDefinition,
-  closeTapChannel: closeTapChannelDefinition,
-  fundTapChannel: fundTapChannelDefinition,
   listChannels: listChannelsDefinition,
   getNodeInfo: getNodeInfoDefinition,
   getWalletBalance: getWalletBalanceDefinition,
   depositFunds: depositFundsDefinition,
   createInvoice: createInvoiceDefinition,
   payInvoice: payInvoiceDefinition,
-  mintTapAsset: mintTapAssetDefinition,
-  listTapAssets: listTapAssetsDefinition,
-  sendTapAsset: sendTapAssetDefinition,
-  getTapBalances: getTapBalancesDefinition,
-  getTapAddress: getTapAddressDefinition,
-  decodeTapAddress: decodeTapAddressDefinition,
-  syncTapUniverse: syncTapUniverseDefinition,
-  createAssetInvoice: createAssetInvoiceDefinition,
-  payAssetInvoice: payAssetInvoiceDefinition,
-  getAssetsInChannels: getAssetsInChannelsDefinition,
-  listLitdSessions: listLitdSessionsDefinition,
-  addLitdSession: addLitdSessionDefinition,
-  revokeLitdSession: revokeLitdSessionDefinition,
 };

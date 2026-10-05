@@ -66,18 +66,6 @@ const nodeConfig: Record<string, { user: string; commands: string[] }> = {
     user: 'bitcoin',
     commands: ['alias bitcoin-cli="bitcoin-cli -regtest"'],
   },
-  tapd: {
-    user: 'tap',
-    commands: ['alias tapcli="tapcli --network regtest --tapddir=~/.tapd"'],
-  },
-  litd: {
-    user: 'litd',
-    commands: [
-      'alias litcli="litcli --network regtest"',
-      'alias lncli="lncli --network regtest --rpcserver localhost:8443 --tlscertpath ~/.lit/tls.cert"',
-      'alias tapcli="tapcli --network regtest --rpcserver localhost:8443 --tlscertpath ~/.lit/tls.cert"',
-    ],
-  },
 };
 
 /**

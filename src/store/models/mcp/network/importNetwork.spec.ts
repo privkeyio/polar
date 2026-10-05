@@ -30,7 +30,6 @@ describe('MCP model > importNetworkFromZip', () => {
       nodes: {
         bitcoin: [],
         lightning: [],
-        tap: [],
       },
     };
 

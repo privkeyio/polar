@@ -56,23 +56,16 @@ const CustomLink: React.FC<ILinkDefaultProps> = ({
     let dashed = false;
     let opacity = 1;
     if (link.properties) {
-      const { type, direction, toBalance, capacity, isPrivate, assets } =
+      const { type, direction, toBalance, capacity, isPrivate } =
         link.properties as LinkProperties;
 
-      if (isPrivate && !assets) opacity = 0.5;
+      if (isPrivate) opacity = 0.5;
 
       if (type === 'open-channel' || type === 'pending-channel') {
-        let primaryColor = theme.channel.bitcoin.local;
-        let secondaryColor = theme.channel.bitcoin.remote;
-        let to = BigInt(toBalance);
-        let total = BigInt(capacity);
-        // use the first asset if available
-        if (assets?.length) {
-          to = BigInt(assets[0].remoteBalance);
-          total = BigInt(assets[0].capacity);
-          primaryColor = theme.channel.asset.local;
-          secondaryColor = theme.channel.asset.remote;
-        }
+        const primaryColor = theme.channel.bitcoin.local;
+        const secondaryColor = theme.channel.bitcoin.remote;
+        const to = BigInt(toBalance);
+        const total = BigInt(capacity);
         // calculate the pct of the channel on the remote side
         const split = Number((to * BigInt(100)) / total);
         // swap colors and stops if the visual direction of the chanel is right to left

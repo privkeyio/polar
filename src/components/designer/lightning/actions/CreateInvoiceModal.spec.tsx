@@ -1,19 +1,12 @@
 import React from 'react';
 import { fireEvent, waitFor } from '@testing-library/react';
-import { Status } from 'shared/types';
-import { LightningNodeChannelAsset } from 'lib/lightning/types';
 import { Network } from 'types';
 import { initChartFromNetwork } from 'utils/chart';
-import { defaultRepoState } from 'utils/constants';
-import { createNetwork, mapToTapd } from 'utils/network';
 import {
-  defaultStateChannel,
   getNetwork,
   lightningServiceMock,
   renderWithProviders,
   suppressConsoleErrors,
-  tapServiceMock,
-  testManagedImages,
 } from 'utils/tests';
 import CreateInvoiceModal from './CreateInvoiceModal';
 
@@ -159,99 +152,6 @@ describe('CreateInvoiceModal', () => {
       fireEvent.click(getByText('Create Invoice'));
       expect(await findByText('Unable to create the Invoice')).toBeInTheDocument();
       expect(await findByText('error-msg')).toBeInTheDocument();
-    });
-  });
-
-  describe('with assets', () => {
-    beforeEach(() => {
-      network = createNetwork({
-        id: 1,
-        name: 'test network',
-        description: 'network description',
-        lndNodes: 0,
-        clightningNodes: 0,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 3,
-        status: Status.Started,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      const asset: LightningNodeChannelAsset = {
-        id: 'abcd',
-        name: 'test asset',
-        capacity: '1000',
-        localBalance: '600',
-        remoteBalance: '400',
-        decimals: 0,
-      };
-      lightningServiceMock.getChannels.mockResolvedValue([
-        defaultStateChannel({ assets: [asset] }),
-      ]);
-      lightningServiceMock.decodeInvoice.mockResolvedValue({
-        amountMsat: '20000',
-        expiry: '3600',
-        paymentHash: 'payment-hash',
-      });
-      tapServiceMock.assetRoots.mockResolvedValue([
-        { id: 'abcd', name: 'test asset', rootSum: 100 },
-      ]);
-      tapServiceMock.addInvoice.mockResolvedValue('lnbc1invoice');
-    });
-
-    it('should display the asset dropdown', async () => {
-      const { findByText, getByText } = await renderComponent();
-      expect(await findByText('Node')).toBeInTheDocument();
-      expect(getByText('Amount')).toBeInTheDocument();
-      expect(getByText('Asset to Receive')).toBeInTheDocument();
-    });
-
-    it('should update amount when an asset is selected', async () => {
-      const { findByText, getByLabelText, changeSelect } = await renderComponent();
-      expect(await findByText('Node')).toBeInTheDocument();
-      expect(getByLabelText('Amount')).toHaveValue('1,000,000');
-      expect(await findByText('Asset to Receive')).toBeInTheDocument();
-      // select the asset
-      changeSelect('Asset to Receive', 'test asset');
-      expect(getByLabelText('Amount')).toHaveValue('200'); // half of the remote balance
-      // select sats
-      changeSelect('Asset to Receive', 'Bitcoin (sats)');
-      expect(getByLabelText('Amount')).toHaveValue('1,000,000');
-    });
-
-    it('should create an asset invoice successfully', async () => {
-      const { getByText, getByDisplayValue, findByText, changeSelect } =
-        await renderComponent();
-      expect(await findByText('Node')).toBeInTheDocument();
-      changeSelect('Asset to Receive', 'test asset');
-      fireEvent.click(getByText('Create Invoice'));
-      expect(await findByText('Successfully Created the Invoice')).toBeInTheDocument();
-      expect(getByDisplayValue('lnbc1invoice')).toBeInTheDocument();
-      const node = network.nodes.lightning[0];
-      const tapNode = mapToTapd(node);
-      expect(tapServiceMock.addInvoice).toHaveBeenCalledWith(
-        tapNode,
-        'abcd',
-        200,
-        '',
-        3600,
-      );
-    });
-
-    it('should display an error when creating an asset invoice with a high balance', async () => {
-      const { getByText, getByLabelText, findByText, changeSelect } =
-        await renderComponent();
-      expect(await findByText('Node')).toBeInTheDocument();
-      changeSelect('Asset to Receive', 'test asset');
-      fireEvent.change(getByLabelText('Amount'), { target: { value: '5000' } });
-      fireEvent.click(getByText('Create Invoice'));
-
-      expect(
-        await findByText('Not enough assets in a channel to create the invoice'),
-      ).toBeInTheDocument();
-      expect(lightningServiceMock.createInvoice).not.toHaveBeenCalled();
     });
   });
 });

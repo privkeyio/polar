@@ -11,7 +11,7 @@ describe('Sidebar Component', () => {
     selectedId?: string,
     status?: Status,
   ) => {
-    const network = getNetwork(1, 'test network', status, 2);
+    const network = getNetwork(1, 'test network', status);
     const chart = initChartFromNetwork(network);
     if (selectedType && selectedId) {
       chart.selected = { type: selectedType, id: selectedId };
@@ -52,12 +52,6 @@ describe('Sidebar Component', () => {
     const { findByText } = renderComponent('node', 'alice');
     expect(await findByText('lightning')).toBeInTheDocument();
     expect(await findByText('LND')).toBeInTheDocument();
-  });
-
-  it('should display tapd details', async () => {
-    const { findByText } = renderComponent('node', 'alice-tap');
-    expect(await findByText('tap')).toBeInTheDocument();
-    expect(await findByText('Taproot Assets')).toBeInTheDocument();
   });
 
   it('should not display details of a selected invalid node', () => {

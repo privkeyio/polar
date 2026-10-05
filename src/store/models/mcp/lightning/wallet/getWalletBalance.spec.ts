@@ -39,8 +39,6 @@ describe('MCP model > getWalletBalance', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -77,8 +75,6 @@ describe('MCP model > getWalletBalance', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -111,8 +107,6 @@ describe('MCP model > getWalletBalance', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -163,8 +157,6 @@ describe('MCP model > getWalletBalance', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -186,33 +178,6 @@ describe('MCP model > getWalletBalance', () => {
       lndNodes: 0,
       clightningNodes: 1,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
-      customNodes: {},
-      manualMineCount: 6,
-    });
-
-    const network = store.getState().network.networks[0];
-    const nodeName = network.nodes.lightning[0].name;
-
-    const result = await store.getActions().mcp.getWalletBalance({
-      networkId: network.id,
-      nodeName,
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.balance.total).toBe('5000000');
-  });
-
-  it('should work with litd nodes', async () => {
-    await store.getActions().network.addNetwork({
-      name: 'test-network',
-      description: 'Test',
-      lndNodes: 0,
-      clightningNodes: 0,
-      bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 1,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -238,8 +203,6 @@ describe('MCP model > getWalletBalance', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });

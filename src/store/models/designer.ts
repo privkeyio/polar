@@ -11,19 +11,16 @@ import {
   ThunkOn,
   thunkOn,
 } from 'easy-peasy';
-import { AnyNode, LndNode, Status, TapdNode } from 'shared/types';
+import { AnyNode, Status } from 'shared/types';
 import { Network, StoreInjections } from 'types';
 import {
   createBitcoinChartNode,
   createLightningChartNode,
-  createTapdChartNode,
   rotate,
   snap,
   updateChartFromNodes,
 } from 'utils/chart';
 import { LOADING_NODE_ID } from 'utils/constants';
-import { exists } from 'utils/files';
-import { getTapdNodes } from 'utils/network';
 import { prefixTranslation } from 'utils/translate';
 import { RootModel } from './';
 
@@ -46,7 +43,6 @@ export interface DesignerModel {
   onNetworkSetStatus: ActionOn<DesignerModel, RootModel>;
   removeLink: Action<DesignerModel, string>;
   updateBackendLink: Action<DesignerModel, { lnName: string; backendName: string }>;
-  updateTapBackendLink: Action<DesignerModel, { tapName: string; lndName: string }>;
   removeNode: Action<DesignerModel, string>;
   addNode: Action<DesignerModel, { newNode: AnyNode; position: IPosition }>;
   renameNode: Action<DesignerModel, { nodeId: string; name: string }>;
@@ -143,11 +139,6 @@ const designerModel: DesignerModel = {
           .filter(n => n.status === Status.Started)
           .map(getStoreActions().lightning.getAllInfo),
       );
-      await Promise.all(
-        getTapdNodes(network)
-          .filter(n => n.status === Status.Started)
-          .map(getStoreActions().tap.getAllInfo),
-      );
 
       const nodesData = getStoreState().lightning.nodes;
       const { allCharts } = getState();
@@ -200,24 +191,6 @@ const designerModel: DesignerModel = {
       },
     };
   }),
-  updateTapBackendLink: action((state, { tapName, lndName }) => {
-    const chart = state.allCharts[state.activeId];
-    // remove the old tap -> ln link
-    const prevLink = Object.values(chart.links).find(
-      l => l.from.nodeId === tapName && l.from.portId === 'lndbackend',
-    );
-    if (prevLink) delete chart.links[prevLink.id];
-    // create a new link using the standard naming convention
-    const newId = `${tapName}-${lndName}`;
-    chart.links[newId] = {
-      id: newId,
-      from: { nodeId: tapName, portId: 'lndbackend' },
-      to: { nodeId: lndName, portId: 'lndbackend' },
-      properties: {
-        type: 'lndbackend',
-      },
-    };
-  }),
   removeNode: action((state, nodeId) => {
     const chart = state.allCharts[state.activeId];
     if (chart.selected && chart.selected.id === nodeId) {
@@ -235,9 +208,7 @@ const designerModel: DesignerModel = {
     const { node, link } =
       newNode.type === 'lightning'
         ? createLightningChartNode(newNode)
-        : newNode.type === 'bitcoin'
-        ? createBitcoinChartNode(newNode)
-        : createTapdChartNode(newNode);
+        : createBitcoinChartNode(newNode);
     node.position = position;
     chart.nodes[node.id] = node;
     if (link) chart.links[link.id] = link;
@@ -327,31 +298,6 @@ const designerModel: DesignerModel = {
       } else if (fromNode.type === 'bitcoin' && toNode.type === 'bitcoin') {
         // connecting bitcoin to bitcoin isn't supported
         return showError(l('linkErrBitcoin'));
-      } else if (fromNode.type === 'tap' || toNode.type === 'tap') {
-        if (fromNode.type === 'tap' && toNode.type === 'tap') {
-          // connecting tap to tap isn't supported
-          return showError(l('linkErrTapd'));
-        }
-        const tapName = fromNode.type === 'tap' ? fromNodeId : toNodeId;
-        const lndName = fromNode.type === 'tap' ? toNodeId : fromNodeId;
-        const lnNetworkNode = network.nodes.lightning.find(
-          n => n.name === lndName && n.implementation === 'LND',
-        ) as LndNode;
-        if (!lnNetworkNode) {
-          return showError(l('linkErrLNDImplementation', { nodeName: lndName }));
-        }
-        const tapNode = network.nodes.tap.find(n => n.name === tapName) as TapdNode;
-        // Cannot change the backend if the node was already started once
-        const macaroonPresent = await exists(tapNode.paths.adminMacaroon);
-        if (!macaroonPresent) {
-          getStoreActions().modals.showChangeTapBackend({
-            lndName,
-            tapName,
-            linkId,
-          });
-        } else {
-          return showError(l('tapdBackendError'));
-        }
       } else {
         // connecting an LN node to a bitcoin node
         if (fromPortId !== 'backend' || toPortId !== 'backend') {
@@ -377,7 +323,7 @@ const designerModel: DesignerModel = {
         });
         // remove the loading node added in onCanvasDrop
         actions.removeNode(LOADING_NODE_ID);
-      } else if (['LND', 'c-lightning', 'litd', 'bitcoind', 'tapd'].includes(data.type)) {
+      } else if (['LND', 'c-lightning', 'bitcoind'].includes(data.type)) {
         const { addNode, toggleNode } = getStoreActions().network;
         try {
           const newNode = await addNode({

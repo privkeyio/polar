@@ -2,7 +2,6 @@ import React from 'react';
 import { Alert, Tooltip } from 'antd';
 import { usePrefixedTranslation } from 'hooks';
 import { LightningNode, Status } from 'shared/types';
-import { TapBalance } from 'lib/tap/types';
 import { useStoreState } from 'store';
 import { dockerConfigs } from 'utils/constants';
 import { ellipseInner } from 'utils/strings';
@@ -10,7 +9,6 @@ import { format } from 'utils/units';
 import { StatusBadge } from 'components/common';
 import CopyIcon from 'components/common/CopyIcon';
 import DetailsList, { DetailValues } from 'components/common/DetailsList';
-import AssetsList from '../tap/info/AssetsList';
 
 interface Props {
   node: LightningNode;
@@ -19,7 +17,6 @@ interface Props {
 const InfoTab: React.FC<Props> = ({ node }) => {
   const { l } = usePrefixedTranslation('cmps.designer.lightning.InfoTab');
   const { nodes } = useStoreState(s => s.lightning);
-  const { nodes: tapNodes } = useStoreState(s => s.tap);
   const details: DetailValues = [
     { label: l('nodeType'), value: node.type },
     { label: l('implementation'), value: dockerConfigs[node.implementation]?.name },
@@ -85,15 +82,6 @@ const InfoTab: React.FC<Props> = ({ node }) => {
     }
   }
 
-  let balances: TapBalance[] | undefined = undefined;
-  const tapState = tapNodes[node.name];
-  const isLitd = node.implementation === 'litd';
-  if (node.status === Status.Started && isLitd && tapState) {
-    if (tapState.balances) {
-      balances = tapState.balances;
-    }
-  }
-
   return (
     <>
       {showSyncWarning && (
@@ -109,7 +97,6 @@ const InfoTab: React.FC<Props> = ({ node }) => {
         />
       )}
       <DetailsList details={details} />
-      {balances && <AssetsList balances={balances} nodeName={node.name} />}
     </>
   );
 };

@@ -1,6 +1,5 @@
-import { BitcoinNode, LightningNode, LitdNode, Status, TapNode } from 'shared/types';
+import { BitcoinNode, LightningNode, Status } from 'shared/types';
 import { Network } from 'types';
-import { mapToTapd } from 'utils/network';
 
 const STATUS_KEYS = new Set(['status', 'nodeStatus']);
 
@@ -65,8 +64,6 @@ export function findNode(
   nodeName: string,
   type: 'lightning',
 ): LightningNode;
-export function findNode(network: Network, nodeName: string, type: 'litd'): LitdNode;
-export function findNode(network: Network, nodeName: string, type: 'tap'): TapNode;
 export function findNode(
   network: Network,
   nodeName: string | undefined,
@@ -80,7 +77,7 @@ export function findNode(
 export function findNode(
   network: Network,
   nodeName?: string,
-): BitcoinNode | LightningNode | TapNode;
+): BitcoinNode | LightningNode;
 
 /**
  * Finds a node in the network by name and type.
@@ -88,8 +85,6 @@ export function findNode(
  * This function provides type-safe node lookup with the following capabilities:
  * - When `type` is 'bitcoin', returns a BitcoinNode
  * - When `type` is 'lightning', returns a LightningNode
- * - When `type` is 'litd', returns a LitdNode (lightning node with litd implementation)
- * - When `type` is 'tap', returns a TapNode
  * - When `type` is 'bitcoin' and `nodeName` is undefined, returns the first BitcoinNode
  * - When `type` is 'lightning' and `nodeName` is undefined, returns the first LightningNode
  * - When `type` is omitted, searches all node types and returns a CommonNode
@@ -117,18 +112,14 @@ export function findNode(
  * const lnNode = findNode(network, 'alice', 'lightning');
  *
  * @example
- * // Find a litd node
- * const litdNode = findNode(network, 'litd1', 'litd');
- *
- * @example
  * // Find any node type
  * const anyNode = findNode(network, 'some-node');
  */
 export function findNode(
   network: Network,
   nodeName?: string,
-  type?: 'bitcoin' | 'lightning' | 'litd' | 'tap',
-): BitcoinNode | LightningNode | LitdNode | TapNode {
+  type?: 'bitcoin' | 'lightning',
+): BitcoinNode | LightningNode {
   // Helper to find a node by name in an array
   const findByName = <T extends { name: string }>(
     nodes: T[],
@@ -151,12 +142,9 @@ export function findNode(
   };
 
   // Helper to require nodeName parameter
-  const requireNodeName = (name: string | undefined, type?: string): string => {
+  const requireNodeName = (name: string | undefined): string => {
     if (!name) {
-      const errorMessage = type
-        ? `Node name is required for ${type} nodes`
-        : 'Node name is required when type is not specified';
-      throw new Error(errorMessage);
+      throw new Error('Node name is required when type is not specified');
     }
     return name;
   };
@@ -173,40 +161,9 @@ export function findNode(
       : getFirstNode(network.nodes.lightning, 'Lightning');
   }
 
-  if (type === 'litd') {
-    const name = requireNodeName(nodeName, type);
-    const node = findByName(network.nodes.lightning, name, 'Lightning');
-    if (node.implementation !== 'litd') {
-      throw new Error(
-        `Node "${name}" is not a litd node (implementation: ${node.implementation})`,
-      );
-    }
-    return node as LitdNode;
-  }
-
-  if (type === 'tap') {
-    const name = requireNodeName(nodeName, type);
-    // Find the tap node (can be tapd or litd)
-    let node = network.nodes.tap.find(n => n.name === name);
-    if (!node) {
-      const litdNode = network.nodes.lightning.find(n => n.name === name);
-      if (litdNode) {
-        node = mapToTapd(litdNode);
-      }
-    }
-    if (!node) {
-      throw new Error(`Tap node "${name}" not found in network`);
-    }
-    return node;
-  }
-
   // No type specified - search all node types
-  const name = requireNodeName(nodeName, type);
-  const allNodes = [
-    ...network.nodes.bitcoin,
-    ...network.nodes.lightning,
-    ...network.nodes.tap,
-  ];
+  const name = requireNodeName(nodeName);
+  const allNodes = [...network.nodes.bitcoin, ...network.nodes.lightning];
   const node = allNodes.find(n => n.name === name);
 
   if (!node) {

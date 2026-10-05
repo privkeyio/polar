@@ -1,15 +1,8 @@
-import {
-  BitcoinNode,
-  CLightningNode,
-  CommonNode,
-  LitdNode,
-  LndNode,
-  TapdNode,
-} from 'shared/types';
-import { bitcoinCredentials, dockerConfigs, litdCredentials } from 'utils/constants';
+import { BitcoinNode, CLightningNode, CommonNode, LndNode } from 'shared/types';
+import { bitcoinCredentials, dockerConfigs } from 'utils/constants';
 import { getContainerName, getDefaultCommand } from 'utils/network';
 import { isWindows } from 'utils/system';
-import { bitcoind, clightning, litd, lnd, simln, tapd } from './nodeTemplates';
+import { bitcoind, clightning, lnd, simln } from './nodeTemplates';
 
 export interface ComposeService {
   image: string;
@@ -140,52 +133,6 @@ class ComposeFile {
       command,
       namedVolumeName,
     );
-    this.addService(svc);
-  }
-
-  addLitd(node: LitdNode, backend: CommonNode, proofCourier: CommonNode) {
-    const { name, version, ports } = node;
-    const { rest, grpc, p2p, web } = ports;
-    const container = getContainerName(node);
-    // define the variable substitutions
-    const variables = {
-      name: node.name,
-      containerName: container,
-      backendName: getContainerName(backend),
-      rpcUser: bitcoinCredentials.user,
-      rpcPass: bitcoinCredentials.pass,
-      litdPass: litdCredentials.pass,
-      proofCourier: getContainerName(proofCourier),
-    };
-    // use the node's custom image or the default for the implementation
-    const image = node.docker.image || `${dockerConfigs.litd.imageName}:${version}`;
-    // use the node's custom command or the default for the implementation
-    const nodeCommand = node.docker.command || getDefaultCommand('litd', version);
-    // replace the variables in the command
-    const command = this.mergeCommand(nodeCommand, variables);
-    // add the docker service
-    const svc = litd(name, container, image, rest, grpc, p2p, web, command);
-    this.addService(svc);
-  }
-
-  addTapd(node: TapdNode, lndBackend: LndNode) {
-    const { name, version, ports } = node;
-    const { rest, grpc } = ports;
-    const container = getContainerName(node);
-    // define the variable substitutions
-    const variables = {
-      name: node.name,
-      containerName: container,
-      lndName: getContainerName(lndBackend),
-    };
-    // use the node's custom image or the default for the implementation
-    const image = node.docker.image || `${dockerConfigs.tapd.imageName}:${version}`;
-    // use the node's custom command or the default for the implementation
-    const nodeCommand = node.docker.command || getDefaultCommand('tapd', version);
-    // replace the variables in the command
-    const command = this.mergeCommand(nodeCommand, variables);
-    // add the docker service
-    const svc = tapd(name, container, image, rest, grpc, lndBackend.name, command);
     this.addService(svc);
   }
 

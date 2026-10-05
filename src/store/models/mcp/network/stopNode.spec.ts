@@ -22,11 +22,9 @@ describe('MCP model > stopNode', () => {
         .getState()
         .network.networks.find(n => n.id === node.networkId);
       if (network) {
-        const foundNode = [
-          ...network.nodes.bitcoin,
-          ...network.nodes.lightning,
-          ...network.nodes.tap,
-        ].find(n => n.name === node.name);
+        const foundNode = [...network.nodes.bitcoin, ...network.nodes.lightning].find(
+          n => n.name === node.name,
+        );
         if (foundNode && foundNode.status === Status.Started) {
           foundNode.status = Status.Stopped;
         }
@@ -40,8 +38,6 @@ describe('MCP model > stopNode', () => {
       lndNodes: 0,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -74,11 +70,9 @@ describe('MCP model > stopNode', () => {
         .getState()
         .network.networks.find(n => n.id === node.networkId);
       if (network) {
-        const foundNode = [
-          ...network.nodes.bitcoin,
-          ...network.nodes.lightning,
-          ...network.nodes.tap,
-        ].find(n => n.name === node.name);
+        const foundNode = [...network.nodes.bitcoin, ...network.nodes.lightning].find(
+          n => n.name === node.name,
+        );
         if (foundNode && foundNode.status === Status.Started) {
           foundNode.status = Status.Stopped;
         }
@@ -92,66 +86,12 @@ describe('MCP model > stopNode', () => {
       lndNodes: 1,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
 
     const network = store.getState().network.networks[0];
     const node = network.nodes.lightning[0];
-    // Change status to Started so it can be stopped
-    node.status = Status.Started;
-
-    const result = await store.getActions().mcp.stopNode({
-      networkId: network.id,
-      nodeName: node.name,
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.message).toBe(`Node "${node.name}" stopped successfully`);
-    expect(result.networkId).toBe(network.id);
-    expect(result.nodeName).toBe(node.name);
-    expect(result.nodeStatus).toBe(Status.Stopped);
-    expect(toggleNodeSpy).toHaveBeenCalledTimes(1);
-
-    toggleNodeSpy.mockRestore();
-  });
-
-  it('should stop a Tap node', async () => {
-    const toggleNodeSpy = jest.spyOn(store.getActions().network, 'toggleNode');
-    toggleNodeSpy.mockImplementation(async node => {
-      // Simulate the toggleNode behavior by changing the node status
-      const network = store
-        .getState()
-        .network.networks.find(n => n.id === node.networkId);
-      if (network) {
-        const foundNode = [
-          ...network.nodes.bitcoin,
-          ...network.nodes.lightning,
-          ...network.nodes.tap,
-        ].find(n => n.name === node.name);
-        if (foundNode && foundNode.status === Status.Started) {
-          foundNode.status = Status.Stopped;
-        }
-      }
-    });
-
-    // Create a network with 1 Tap node (requires LND node too)
-    await store.getActions().network.addNetwork({
-      name: 'test-network',
-      description: 'Test',
-      lndNodes: 1,
-      clightningNodes: 0,
-      bitcoindNodes: 1,
-      tapdNodes: 1,
-      litdNodes: 0,
-      customNodes: {},
-      manualMineCount: 6,
-    });
-
-    const network = store.getState().network.networks[0];
-    const node = network.nodes.tap[0];
     // Change status to Started so it can be stopped
     node.status = Status.Started;
 
@@ -201,8 +141,6 @@ describe('MCP model > stopNode', () => {
       lndNodes: 0,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -225,8 +163,6 @@ describe('MCP model > stopNode', () => {
       lndNodes: 0,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -253,8 +189,6 @@ describe('MCP model > stopNode', () => {
       lndNodes: 0,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -281,8 +215,6 @@ describe('MCP model > stopNode', () => {
       lndNodes: 0,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -309,8 +241,6 @@ describe('MCP model > stopNode', () => {
       lndNodes: 0,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });

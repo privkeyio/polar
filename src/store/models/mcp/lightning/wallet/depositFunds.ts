@@ -33,7 +33,7 @@ export const depositFundsDefinition: McpToolDefinition = {
     'Deposit Bitcoin from the network to a Lightning node on-chain wallet. ' +
     'This sends funds from the Bitcoin Core node to the Lightning node, then mines blocks to confirm the transaction. ' +
     'The deposited funds will be available in the Lightning node wallet for opening channels or on-chain transactions. ' +
-    'Works with LND, c-lightning, and litd nodes.',
+    'Works with LND and c-lightning nodes.',
   inputSchema: {
     type: 'object',
     properties: {

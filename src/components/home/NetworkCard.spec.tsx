@@ -7,7 +7,7 @@ import { NETWORK_VIEW } from 'components/routing';
 import NetworkCard from './NetworkCard';
 
 describe('NetworkCard component', () => {
-  const network = getNetwork(1, 'my network 1', Status.Stopped, 4, 'network description');
+  const network = getNetwork(1, 'my network 1', Status.Stopped, 'network description');
   const renderComponent = () => {
     const initialState = {
       network: {
@@ -35,9 +35,9 @@ describe('NetworkCard component', () => {
     expect(tooltipElement).toBeInTheDocument();
   });
 
-  it('should display the number of lightning and tap nodes', () => {
-    const { getAllByText } = renderComponent();
-    expect(getAllByText('4')).toHaveLength(2);
+  it('should display the number of lightning nodes', () => {
+    const { getByText } = renderComponent();
+    expect(getByText('4')).toBeInTheDocument();
   });
 
   it('should display the number of bitcoin nodes', () => {

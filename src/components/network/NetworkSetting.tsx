@@ -58,10 +58,6 @@ const NetworkSetting: React.FC = () => {
         bitcoind: {
           rest: values.bitcoind,
         },
-        tapd: {
-          rest: values.tapd,
-          grpc: values.grpcTapd,
-        },
       };
 
       await updateSettings({ basePorts: { ...updatedPorts } });
@@ -87,10 +83,8 @@ const NetworkSetting: React.FC = () => {
             LND: settings.basePorts.LND.rest,
             'c-lightning': settings.basePorts['c-lightning'].rest,
             bitcoind: settings.basePorts.bitcoind.rest,
-            tapd: settings.basePorts.tapd.rest,
             grpcLND: settings.basePorts.LND.grpc,
             'grpcC-lightning': settings.basePorts['c-lightning'].grpc,
-            grpcTapd: settings.basePorts.tapd.grpc,
           }}
           onFinish={saveSettingsAsync.execute}
         >
@@ -112,11 +106,6 @@ const NetworkSetting: React.FC = () => {
                 <InputNumber />
               </Form.Item>
             </Col>
-            <Col span={6}>
-              <Form.Item name="tapd" label={dockerConfigs.tapd.name}>
-                <InputNumber />
-              </Form.Item>
-            </Col>
           </Row>
           <Styled.Divider orientation="left">{l('grpcPorts')}</Styled.Divider>
           <Row gutter={16}>
@@ -127,11 +116,6 @@ const NetworkSetting: React.FC = () => {
             </Col>
             <Col span={6}>
               <Form.Item name="grpcC-lightning" label={dockerConfigs['c-lightning'].name}>
-                <InputNumber />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="grpcTapd" label={dockerConfigs.tapd.name}>
                 <InputNumber />
               </Form.Item>
             </Col>

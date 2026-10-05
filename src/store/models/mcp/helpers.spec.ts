@@ -1,4 +1,4 @@
-import { Status, TapdNode } from 'shared/types';
+import { Status } from 'shared/types';
 import { Network } from 'types';
 import { getNetwork } from 'utils/tests';
 import { findNode, serializeStatusesForMcp } from './helpers';
@@ -51,7 +51,7 @@ describe('MCP Helpers', () => {
         const node = findNode(network, 'alice', 'lightning');
         expect(node).toBeDefined();
         expect(node.name).toBe('alice');
-        expect(['LND', 'c-lightning', 'litd']).toContain(node.implementation);
+        expect(['LND', 'c-lightning']).toContain(node.implementation);
       });
 
       it('should throw error if lightning node not found', () => {
@@ -76,63 +76,6 @@ describe('MCP Helpers', () => {
         };
         expect(() => findNode(emptyNetwork, undefined, 'lightning')).toThrow(
           'Network has no Lightning nodes',
-        );
-      });
-    });
-
-    describe('TAP nodes', () => {
-      it('should find a tap node by name', () => {
-        // Add a tapd node to the network
-        const tapdNode: TapdNode = {
-          id: 1,
-          networkId: network.id,
-          name: 'tap1',
-          type: 'tap',
-          implementation: 'tapd',
-          version: '0.3.0',
-          status: Status.Started,
-          errorMsg: '',
-          ports: { rest: 8289, grpc: 10029 },
-          docker: {
-            image: 'polarlightning/tapd:0.3.0',
-            command: '',
-          },
-          lndName: 'alice',
-          paths: {
-            tlsCert: '/path/to/tls.cert',
-            adminMacaroon: '/path/to/admin.macaroon',
-          },
-        };
-        network.nodes.tap.push(tapdNode);
-
-        const node = findNode(network, 'tap1', 'tap');
-        expect(node).toBeDefined();
-        expect(node.name).toBe('tap1');
-        expect(node.implementation).toBe('tapd');
-      });
-
-      it('should throw error if tap node not found', () => {
-        expect(() => findNode(network, 'nonexistent', 'tap')).toThrow(
-          'Tap node "nonexistent" not found in network',
-        );
-      });
-
-      it('should throw error if nodeName is required for tap nodes', () => {
-        // We need to call with explicit type to test this path
-        // Since TypeScript won't allow undefined with 'tap' in the overload,
-        // we cast to test the runtime behavior
-        expect(() => findNode(network, undefined as any, 'tap')).toThrow(
-          'Node name is required for tap nodes',
-        );
-      });
-    });
-
-    describe('LITD nodes', () => {
-      it('should throw error if nodeName is required for litd nodes', () => {
-        // Since TypeScript won't allow undefined with 'litd' in the overload,
-        // we cast to test the runtime behavior
-        expect(() => findNode(network, undefined as any, 'litd')).toThrow(
-          'Node name is required for litd nodes',
         );
       });
     });

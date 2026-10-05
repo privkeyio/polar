@@ -1,5 +1,5 @@
 import os from 'os';
-import { CLightningNode, LitdNode, LndNode, TapdNode } from 'shared/types';
+import { CLightningNode, LndNode } from 'shared/types';
 import { bitcoinCredentials, defaultRepoState } from 'utils/constants';
 import { createNetwork } from 'utils/network';
 import { testManagedImages } from 'utils/tests';
@@ -18,8 +18,6 @@ describe('ComposeFile', () => {
     lndNodes: 1,
     clightningNodes: 1,
     bitcoindNodes: 1,
-    tapdNodes: 1,
-    litdNodes: 1,
     repoState: defaultRepoState,
     managedImages: testManagedImages,
     customImages: [],
@@ -28,8 +26,6 @@ describe('ComposeFile', () => {
   const btcNode = network.nodes.bitcoin[0];
   const lndNode = network.nodes.lightning[0] as LndNode;
   const clnNode = network.nodes.lightning[1] as CLightningNode;
-  const litdNode = network.nodes.lightning[2] as LitdNode;
-  const tapNode = network.nodes.tap[0] as TapdNode;
 
   beforeEach(() => {
     composeFile = new ComposeFile(1);
@@ -139,73 +135,6 @@ describe('ComposeFile', () => {
     clnNode.docker = { image: 'my-image', command: 'my-command' };
     composeFile.addClightning(clnNode, btcNode);
     const service = composeFile.content.services['bob'];
-    expect(service.image).toBe('my-image');
-    expect(service.command).toBe('my-command');
-  });
-
-  it('should add an tap config', () => {
-    composeFile.addTapd(tapNode, lndNode);
-    expect(composeFile.content.services['alice-tap']).not.toBeUndefined();
-  });
-
-  it('should create the correct tapd docker compose values', () => {
-    composeFile.addTapd(tapNode, lndNode);
-    const service = composeFile.content.services['alice-tap'];
-    expect(service.image).toContain('tapd');
-    expect(service.container_name).toEqual('polar-n1-alice-tap');
-    expect(service.command).toContain('lnd.host=polar-n1-alice');
-    expect(service.volumes[0]).toContain('/alice:');
-    expect(service.volumes[1]).toContain('/alice-tap:');
-  });
-
-  it('should use the tapd nodes custom docker data', () => {
-    const tap = {
-      ...tapNode,
-      docker: { image: 'my-image', command: 'my-command' },
-    };
-    composeFile.addTapd(tap, lndNode);
-    const service = composeFile.content.services['alice-tap'];
-    expect(service.image).toBe('my-image');
-    expect(service.command).toBe('my-command');
-  });
-
-  it('should use the correct command for tapd v3', () => {
-    const tap = { ...tapNode, version: '0.3.3' };
-    composeFile.addTapd(tap, lndNode);
-    const service = composeFile.content.services['alice-tap'];
-    expect(service.command).toContain('--universe.public-access');
-    expect(service.command).not.toContain('--universe.public-access=rw');
-    expect(service.command).not.toContain('--universe.sync-all-assets');
-  });
-
-  it('should use the correct command for tapd v4+', () => {
-    const tap = { ...tapNode, version: '0.4.0' };
-    composeFile.addTapd(tap, lndNode);
-    const service = composeFile.content.services['alice-tap'];
-    expect(service.command).toContain('--universe.public-access=rw');
-    expect(service.command).toContain('--universe.sync-all-assets');
-  });
-
-  it('should add an litd config', () => {
-    composeFile.addLitd(litdNode, btcNode, litdNode);
-    expect(composeFile.content.services['carol']).not.toBeUndefined();
-  });
-
-  it('should create the correct litd docker compose values', () => {
-    composeFile.addLitd(litdNode, btcNode, litdNode);
-    const service = composeFile.content.services['carol'];
-    expect(service.image).toContain('litd');
-    expect(service.container_name).toEqual('polar-n1-carol');
-    expect(service.command).toContain('lnd.bitcoind.rpchost=polar-n1-backend1');
-    expect(service.volumes[0]).toContain('/carol/lit:');
-    expect(service.volumes[1]).toContain('/carol/lnd:');
-    expect(service.volumes[2]).toContain('/carol/tapd:');
-  });
-
-  it('should use the tapd nodes custom docker data', () => {
-    litdNode.docker = { image: 'my-image', command: 'my-command' };
-    composeFile.addLitd(litdNode, btcNode, litdNode);
-    const service = composeFile.content.services['carol'];
     expect(service.image).toBe('my-image');
     expect(service.command).toBe('my-command');
   });

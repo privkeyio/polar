@@ -24,8 +24,6 @@ describe('SettingsService', () => {
         'c-lightning': 1,
         bitcoind: 1,
         btcd: 0,
-        tapd: 0,
-        litd: 0,
       },
       basePorts: {
         LND: {
@@ -38,10 +36,6 @@ describe('SettingsService', () => {
         'c-lightning': {
           rest: 8181,
           grpc: 11001,
-        },
-        tapd: {
-          rest: 8289,
-          grpc: 12029,
         },
       },
     };

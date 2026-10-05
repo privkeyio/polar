@@ -27,7 +27,7 @@ export const restartNodeDefinition: McpToolDefinition = {
   description:
     'Restarts a specific node in a Polar network. The node must be in Started or Error state. ' +
     'This operation stops the node first, then starts it again. ' +
-    'Supports Bitcoin Core, Lightning Network, and Taproot Assets daemon nodes.',
+    'Supports Bitcoin Core and Lightning Network nodes.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -66,7 +66,7 @@ export const restartNodeTool = thunk<
     // Find the network (networkById throws if not found)
     const network = getStoreState().network.networkById(args.networkId);
 
-    // Find the node by name in any node type (bitcoin, lightning, tap)
+    // Find the node by name in any node type (bitcoin, lightning)
     const node = findNode(network, args.nodeName);
 
     // Check if node can be restarted

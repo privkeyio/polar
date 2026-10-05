@@ -6,8 +6,11 @@ import { Status } from 'shared/types';
 import { DockerLibrary } from 'types';
 import { initChartFromNetwork } from 'utils/chart';
 import { defaultRepoState, LOADING_NODE_ID } from 'utils/constants';
-import * as files from 'utils/files';
-import { createBitcoindNetworkNode, createCLightningNetworkNode } from 'utils/network';
+import {
+  createBitcoindNetworkNode,
+  createCLightningNetworkNode,
+  createLndNetworkNode,
+} from 'utils/network';
 import {
   bitcoinServiceMock,
   getNetwork,
@@ -22,7 +25,6 @@ import designerModel from './designer';
 import lightningModel from './lightning';
 import modalsModel from './modals';
 import networkModel from './network';
-import tapModel from './tap';
 
 jest.mock('antd', () => ({
   ...(jest.requireActual('antd') as any),
@@ -31,11 +33,6 @@ jest.mock('antd', () => ({
     error: jest.fn(),
   },
 }));
-
-jest.mock('utils/files', () => ({
-  exists: jest.fn(),
-}));
-const filesMock = files as jest.Mocked<typeof files>;
 
 const mockNotification = notification as jest.Mocked<typeof notification>;
 
@@ -47,7 +44,6 @@ describe('Designer model', () => {
     bitcoin: bitcoinModel,
     designer: designerModel,
     modals: modalsModel,
-    tap: tapModel,
   };
   // initialize store for type inference
   let store = createStore(rootModel, { injections });
@@ -77,7 +73,19 @@ describe('Designer model', () => {
     const firstChart = () => store.getState().designer.allCharts[firstNetwork().id];
 
     beforeEach(async () => {
-      const network = getNetwork(2, 'test network', Status.Stopped, 2);
+      const network = getNetwork(2, 'test network', Status.Stopped);
+      network.nodes.lightning = [];
+      for (let i = 0; i < 2; i++) {
+        network.nodes.lightning.push(
+          createLndNetworkNode(
+            network,
+            testRepoState.images.LND.latest,
+            testRepoState.images.LND.compatibility,
+            testNodeDocker,
+            Status.Stopped,
+          ),
+        );
+      }
       const clnNode = createCLightningNetworkNode(
         network,
         testRepoState.images['c-lightning'].latest,
@@ -101,7 +109,7 @@ describe('Designer model', () => {
       const { allCharts } = store.getState().designer;
       const chart = allCharts[firstNetwork().id];
       expect(chart).not.toBeUndefined();
-      expect(Object.keys(chart.nodes)).toHaveLength(7);
+      expect(Object.keys(chart.nodes)).toHaveLength(5);
     });
 
     it('should set the active chart', () => {
@@ -109,7 +117,7 @@ describe('Designer model', () => {
       const { activeId, activeChart } = store.getState().designer;
       expect(activeId).toBe(firstNetwork().id);
       expect(activeChart).toBeDefined();
-      expect(Object.keys(activeChart.nodes)).toHaveLength(7);
+      expect(Object.keys(activeChart.nodes)).toHaveLength(5);
     });
 
     it('should remove the active chart', () => {
@@ -129,8 +137,6 @@ describe('Designer model', () => {
         lndNodes: 2,
         clightningNodes: 0,
         bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 0,
         customNodes: {},
         manualMineCount: 6,
       });
@@ -182,7 +188,6 @@ describe('Designer model', () => {
       const { syncChart } = store.getActions().designer;
 
       const lnSpy = jest.spyOn(store.getActions().lightning, 'getAllInfo');
-      const tapSpy = jest.spyOn(store.getActions().tap, 'getAllInfo');
 
       store
         .getActions()
@@ -190,12 +195,10 @@ describe('Designer model', () => {
       await syncChart(firstNetwork());
 
       expect(lnSpy).toHaveBeenCalledTimes(3);
-      expect(tapSpy).toHaveBeenCalledTimes(2);
 
       await syncChart(firstNetwork());
       // should not call the actions again
       expect(lnSpy).toHaveBeenCalledTimes(3);
-      expect(tapSpy).toHaveBeenCalledTimes(2);
     });
 
     describe('renameNode', () => {
@@ -225,20 +228,6 @@ describe('Designer model', () => {
 
         expect(firstChart().links['test-backend2']).toBeDefined();
         expect(firstChart().links['backend1-backend2']).toBeUndefined();
-      });
-
-      it('should update chart when renaming a TAP node', () => {
-        expect(firstChart().nodes['alice-tap']).toBeDefined();
-        expect(firstChart().links['alice-tap-alice']).toBeDefined();
-
-        const { renameNode } = store.getActions().designer;
-        renameNode({ nodeId: 'alice-tap', name: 'test' });
-
-        expect(firstChart().nodes['test']).toBeDefined();
-        expect(firstChart().nodes['alice-tap']).toBeUndefined();
-
-        expect(firstChart().links['test-alice']).toBeDefined();
-        expect(firstChart().links['alice-tap-alice']).toBeUndefined();
       });
 
       it('should update channel links when renaming a lightning node', () => {
@@ -433,102 +422,12 @@ describe('Designer model', () => {
         onLinkComplete(data);
         expect(store.getState().modals.changeBackend.visible).toBe(true);
       });
-      it('should show the ChangeBackend modal when dragging from LND -> tap', async () => {
-        filesMock.exists.mockResolvedValue(Promise.resolve(false));
-        const { onLinkStart, onLinkComplete } = store.getActions().designer;
-        const data = {
-          ...payload,
-          fromNodeId: 'alice',
-          fromPortId: 'lndbackend',
-          toNodeId: 'alice-tap',
-          toPortId: 'lndbackend',
-        };
-        expect(store.getState().modals.changeTapBackend.visible).toBe(false);
-        onLinkStart(data);
-        onLinkComplete(data);
-        await waitFor(() => {
-          expect(store.getState().modals.changeTapBackend.visible).toBe(true);
-        });
-      });
-      it('should show the ChangeBackend modal when dragging from tap -> LND', async () => {
-        filesMock.exists.mockResolvedValue(Promise.resolve(false));
-        const { onLinkStart, onLinkComplete } = store.getActions().designer;
-        const data = {
-          ...payload,
-          fromNodeId: 'alice-tap',
-          fromPortId: 'lndbackend',
-          toNodeId: 'alice',
-          toPortId: 'lndbackend',
-        };
-        expect(store.getState().modals.changeTapBackend.visible).toBe(false);
-        onLinkStart(data);
-        onLinkComplete(data);
-        await waitFor(() => {
-          expect(store.getState().modals.changeTapBackend.visible).toBe(true);
-        });
-      });
-      it('should not display modal when dragging from tap -> LND', async () => {
-        filesMock.exists.mockResolvedValue(Promise.resolve(true));
-        const { onLinkStart, onLinkComplete } = store.getActions().designer;
-        const data = {
-          ...payload,
-          fromNodeId: 'alice-tap',
-          fromPortId: 'lndbackend',
-          toNodeId: 'alice',
-          toPortId: 'lndbackend',
-        };
-        expect(store.getState().modals.changeTapBackend.visible).toBe(false);
-        onLinkStart(data);
-        onLinkComplete(data);
-        await waitFor(() => {
-          expect(store.getState().modals.changeTapBackend.visible).toBe(false);
-        });
-      });
-      it('should show an error when dragging from tap -> tap', () => {
-        const { onLinkStart, onLinkComplete } = store.getActions().designer;
-        const data = {
-          ...payload,
-          fromNodeId: 'alice-tap',
-          fromPortId: 'lndbackend',
-          toNodeId: 'bob-tap',
-          toPortId: 'lndbackend',
-        };
-        const spy = jest.spyOn(store.getActions().app, 'notify');
-        onLinkStart(data);
-        onLinkComplete(data);
-        expect(spy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: 'Cannot connect nodes',
-            error: new Error('tapd nodes cannot connect to each other.'),
-          }),
-        );
-      });
-      it('should show an error when dragging from tap -> non LND node', () => {
-        const { onLinkStart, onLinkComplete } = store.getActions().designer;
-        const data = {
-          ...payload,
-          fromNodeId: 'alice-tap',
-          fromPortId: 'lndbackend',
-          toNodeId: 'carol',
-          toPortId: 'lndbackend',
-        };
-        const spy = jest.spyOn(store.getActions().app, 'notify');
-        onLinkStart(data);
-        onLinkComplete(data);
-        expect(spy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            message: 'Cannot connect nodes',
-            error: new Error('carol is not an LND implementation'),
-          }),
-        );
-      });
     });
 
     describe('onCanvasDrop', () => {
       const mockDockerService = injections.dockerService as jest.Mocked<DockerLibrary>;
       const lndLatest = defaultRepoState.images.LND.latest;
       const btcLatest = defaultRepoState.images.bitcoind.latest;
-      const tapdLatest = defaultRepoState.images.tapd.latest;
       const id = 'nodeId';
       const data = { type: 'LND', version: lndLatest };
       const position = { x: 10, y: 10 };
@@ -549,88 +448,22 @@ describe('Designer model', () => {
 
       it('should add a new LN node to the chart', async () => {
         const { onCanvasDrop } = store.getActions().designer;
-        expect(Object.keys(firstChart().nodes)).toHaveLength(7);
+        expect(Object.keys(firstChart().nodes)).toHaveLength(5);
         onCanvasDrop({ id, data, position });
         await waitFor(() => {
-          expect(Object.keys(firstChart().nodes)).toHaveLength(8);
+          expect(Object.keys(firstChart().nodes)).toHaveLength(6);
           expect(firstChart().nodes['dave']).toBeDefined();
         });
       });
 
       it('should add a new bitcoin node to the chart', async () => {
         const { onCanvasDrop } = store.getActions().designer;
-        expect(Object.keys(firstChart().nodes)).toHaveLength(7);
+        expect(Object.keys(firstChart().nodes)).toHaveLength(5);
         const bitcoinData = { type: 'bitcoind', version: btcLatest };
         onCanvasDrop({ id, data: bitcoinData, position });
         await waitFor(() => {
-          expect(Object.keys(firstChart().nodes)).toHaveLength(8);
+          expect(Object.keys(firstChart().nodes)).toHaveLength(6);
           expect(firstChart().nodes['backend2']).toBeDefined();
-        });
-      });
-
-      it('should add a new tapd node to the chart', async () => {
-        const { addNetwork } = store.getActions().network;
-        const { onCanvasDrop, setActiveId } = store.getActions().designer;
-        await addNetwork({
-          name: 'test 3',
-          description: 'network description',
-          lndNodes: 0,
-          clightningNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-        const newId = store.getState().network.networks[1].id;
-        setActiveId(newId);
-        const getChart = () => store.getState().designer.allCharts[newId];
-        expect(Object.keys(getChart().nodes)).toHaveLength(1);
-        const lndData = { type: 'LND', version: testRepoState.images.LND.versions[0] };
-        onCanvasDrop({ id, data: lndData, position });
-        const tapdData = { type: 'tapd', version: tapdLatest };
-        onCanvasDrop({ id, data: tapdData, position });
-        await waitFor(() => {
-          expect(Object.keys(getChart().nodes)).toHaveLength(3);
-          expect(getChart().nodes['alice-tap']).toBeDefined();
-        });
-      });
-
-      it('should throw an error when adding an incompatible TAP node', async () => {
-        store.getActions().app.setRepoState(testRepoState);
-        const { addNetwork } = store.getActions().network;
-        const { onCanvasDrop, setActiveId } = store.getActions().designer;
-        await addNetwork({
-          name: 'test 3',
-          description: 'network description',
-          lndNodes: 0,
-          clightningNodes: 0,
-          bitcoindNodes: 1,
-          tapdNodes: 0,
-          litdNodes: 0,
-          customNodes: {},
-          manualMineCount: 6,
-        });
-        const newId = store.getState().network.networks[1].id;
-        setActiveId(newId);
-        const getChart = () => store.getState().designer.allCharts[newId];
-        expect(Object.keys(getChart().nodes)).toHaveLength(1);
-        const lndData = { type: 'LND', version: '0.7.1-beta' };
-        onCanvasDrop({ id, data: lndData, position });
-
-        const spy = jest.spyOn(store.getActions().app, 'notify');
-        const tapdData = { type: 'tapd', version: '0.6.1-alpha' };
-        onCanvasDrop({ id, data: tapdData, position });
-        await waitFor(() => {
-          expect(spy).toHaveBeenCalledWith(
-            expect.objectContaining({
-              message: 'Failed to add node',
-              error: new Error(
-                'This network does not contain a LND v0.19.0-beta (or higher) ' +
-                  `node which is required for tapd v0.6.1-alpha`,
-              ),
-            }),
-          );
         });
       });
 
@@ -643,8 +476,6 @@ describe('Designer model', () => {
           lndNodes: 0,
           clightningNodes: 0,
           bitcoindNodes: 0,
-          tapdNodes: 0,
-          litdNodes: 0,
           customNodes: {},
           manualMineCount: 0,
         });

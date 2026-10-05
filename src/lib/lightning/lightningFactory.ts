@@ -17,7 +17,6 @@ class LightningFactory {
     this._services = {
       LND: lndService,
       'c-lightning': clightningService,
-      litd: lndService,
     };
   }
 

@@ -26,8 +26,6 @@ describe('MCP model > listNetworks', () => {
       lndNodes: 2,
       clightningNodes: 0,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
@@ -38,8 +36,6 @@ describe('MCP model > listNetworks', () => {
       lndNodes: 1,
       clightningNodes: 1,
       bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
       customNodes: {},
       manualMineCount: 6,
     });
