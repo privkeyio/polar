@@ -90,10 +90,10 @@ jobs:
         run: |
           set -euo pipefail
           VERSION=$(node -p "require('./package.json').version")
-          mkdir assets
-          gh release download "v${VERSION}" --dir assets \
+          dir=$(mktemp -d)
+          gh release download "v${VERSION}" --dir "$dir" \
             -p '*.dmg' -p '*.exe' -p '*.deb' -p '*.rpm' -p '*.AppImage'
-          ( cd assets && sha256sum * ) | LC_ALL=C sort -k 2 > SHA256SUMS
+          ( cd "$dir" && sha256sum * ) | LC_ALL=C sort -k 2 > SHA256SUMS
           cat SHA256SUMS
           ./.github/scripts/verify-manifest.sh SHA256SUMS
           gh release upload "v${VERSION}" SHA256SUMS --clobber
