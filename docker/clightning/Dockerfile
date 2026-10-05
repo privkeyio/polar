@@ -1,7 +1,9 @@
 FROM ubuntu:24.04
 
 ARG CLN_VERSION
+ARG CLN_SHA256SUMS
 ARG BITCOIN_VERSION
+ARG BITCOIN_SHA256SUMS
 
 RUN userdel -r ubuntu \
   && apt-get update -y \
@@ -12,6 +14,7 @@ RUN userdel -r ubuntu \
 RUN SYS_ARCH="$(dpkg --print-architecture)" \
   && curl -SLO https://github.com/privkeyio/lightning/releases/download/v${CLN_VERSION}/clightning-v${CLN_VERSION}-Ubuntu-24.04-${SYS_ARCH}.tar.xz \
   && curl -SLO https://github.com/privkeyio/lightning/releases/download/v${CLN_VERSION}/SHA256SUMS-v${CLN_VERSION} \
+  && echo "${CLN_SHA256SUMS}  SHA256SUMS-v${CLN_VERSION}" | sha256sum -c \
   && sha256sum --ignore-missing -c SHA256SUMS-v${CLN_VERSION} \
   && tar -xJf clightning-*.tar.xz -C / \
   && rm clightning-*.tar.xz SHA256SUMS-*
@@ -19,6 +22,7 @@ RUN SYS_ARCH="$(dpkg --print-architecture)" \
 RUN SYS_ARCH="$(uname -m)" \
   && curl -SLO https://github.com/bitcoinknots/bitcoin/releases/download/v${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-${SYS_ARCH}-linux-gnu.tar.gz \
   && curl -SLO https://github.com/bitcoinknots/bitcoin/releases/download/v${BITCOIN_VERSION}/SHA256SUMS \
+  && echo "${BITCOIN_SHA256SUMS}  SHA256SUMS" | sha256sum -c \
   && sha256sum --ignore-missing -c SHA256SUMS \
   && tar -xzf *.tar.gz \
   && install -m 755 bitcoin-${BITCOIN_VERSION}/bin/bitcoin-cli /usr/bin/bitcoin-cli \

@@ -1,6 +1,7 @@
 FROM debian:stable-slim
 
 ARG BITCOIN_VERSION
+ARG BITCOIN_SHA256SUMS
 ENV PATH=/opt/bitcoin-${BITCOIN_VERSION}/bin:$PATH
 
 RUN apt-get update -y \
@@ -11,6 +12,7 @@ RUN apt-get update -y \
 RUN SYS_ARCH="$(uname -m)" \
   && curl -SLO https://github.com/bitcoinknots/bitcoin/releases/download/v${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-${SYS_ARCH}-linux-gnu.tar.gz \
   && curl -SLO https://github.com/bitcoinknots/bitcoin/releases/download/v${BITCOIN_VERSION}/SHA256SUMS \
+  && echo "${BITCOIN_SHA256SUMS}  SHA256SUMS" | sha256sum -c \
   && sha256sum --ignore-missing -c SHA256SUMS \
   && tar -xzf *.tar.gz -C /opt \
   && rm *.tar.gz SHA256SUMS

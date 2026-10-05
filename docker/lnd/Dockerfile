@@ -1,10 +1,12 @@
 FROM --platform=$BUILDPLATFORM golang:1.25-bookworm AS builder
 
 ARG LND_VERSION
+ARG LND_COMMIT
 ARG TARGETARCH
 
 RUN git clone --depth 1 --branch v${LND_VERSION} https://github.com/paulscode/lightning-fork /src \
   && cd /src \
+  && test "$(git rev-parse HEAD)" = "${LND_COMMIT}" \
   && GOOS=linux GOARCH=${TARGETARCH} make release-install \
   && mkdir /out \
   && find /go/bin -type f \( -name lnd -o -name lncli \) -exec cp {} /out/ \;

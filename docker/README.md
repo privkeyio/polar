@@ -27,10 +27,10 @@ $ docker buildx inspect --bootstrap
 
 ```sh
 $ cd bitcoind
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg BITCOIN_VERSION=<version> -t ghcr.io/privkeyio/polar/bitcoind:<tag> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg BITCOIN_VERSION=<version> --build-arg BITCOIN_SHA256SUMS=<sums> -t ghcr.io/privkeyio/polar/bitcoind:<tag> --push .
 ```
 
-Replace `<version>` with the Bitcoin Knots release (ex: `29.4.2.knots20260508`) and `<tag>` with its version number (ex: `29.4.2`)
+Replace `<version>` with the Bitcoin Knots release (ex: `29.4.2.knots20260508`), `<tag>` with its version number (ex: `29.4.2`), and `<sums>` with the sha256 of that release's `SHA256SUMS` once you have checked its `SHA256SUMS.asc` against Luke Dashjr's key `1A3E 761F 19D2 CC77 85C5 502E A291 A2C4 5D0C 504A` (for `29.4.2.knots20260508`: `90bd17505d37b92b7ac3c55a6d7109b9415c96711d04b9041e37b3fc67557f67`).
 
 ## LND
 
@@ -42,10 +42,10 @@ Replace `<version>` with the Bitcoin Knots release (ex: `29.4.2.knots20260508`) 
 
 ```sh
 $ cd lnd
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg LND_VERSION=<version> -t ghcr.io/privkeyio/polar/lnd:<version> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg LND_VERSION=<version> --build-arg LND_COMMIT=<commit> -t ghcr.io/privkeyio/polar/lnd:<version> --push .
 ```
 
-Replace `<version>` with a tag of [paulscode/lightning-fork](https://github.com/paulscode/lightning-fork) without the leading `v` (ex: `0.21.3-beta-blake2b.17`). It is built from source, since the fork publishes no binaries.
+Replace `<version>` with a tag of [paulscode/lightning-fork](https://github.com/paulscode/lightning-fork) without the leading `v` (ex: `0.21.3-beta-blake2b.17`) and `<commit>` with the commit that tag points at (for `0.21.3-beta-blake2b.17`: `cebc10fe01e811a38c2830c0396bd3c9182e5d62`). It is built from source, since the fork publishes no binaries, and the build fails if the tag has moved.
 
 ## Core Lightning
 
@@ -57,12 +57,12 @@ Replace `<version>` with a tag of [paulscode/lightning-fork](https://github.com/
 
 ```sh
 $ cd clightning
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> --build-arg BITCOIN_VERSION=<knots> -t ghcr.io/privkeyio/polar/clightning:<version> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> --build-arg CLN_SHA256SUMS=<sums> --build-arg BITCOIN_VERSION=<knots> --build-arg BITCOIN_SHA256SUMS=<knots-sums> -t ghcr.io/privkeyio/polar/clightning:<version> --push .
 ```
 
-Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.8-blake2b.6`) and `<knots>` with the Bitcoin Knots release whose `bitcoin-cli` it uses (ex: `29.4.2.knots20260508`).
+Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.8-blake2b.6`) `<sums>` with the sha256 of its `SHA256SUMS-v<version>` once you have checked the `.asc` against the privkeyio key `A47D 99B6 DB0D 715D 40C5 9A20 23AE 8A8E A7E2 4E38` (for `26.06.8-blake2b.6`: `00de890637f5476a65de70bf52943d62173a5633b1c76b799bb2938b84bbd6bb`), and `<knots>` and `<knots-sums>` as for Bitcoin Knots above, whose `bitcoin-cli` it uses.
 
-The images can also be built and pushed from the `Images` workflow in GitHub Actions.
+The images can also be built and pushed from master with the `Images` workflow in GitHub Actions, passing the same build args one per line.
 
 ## SimLN
 
