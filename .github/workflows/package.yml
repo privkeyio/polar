@@ -64,7 +64,7 @@ jobs:
       - name: publish assets to github release
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
         run: |
           shopt -s nullglob
           VERSION=$(node -p "require('./package.json').version")
