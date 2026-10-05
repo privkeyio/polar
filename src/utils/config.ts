@@ -8,14 +8,19 @@ import { dockerConfigs } from './constants';
 /**
  * XDG-compliant path where application data is stored
  */
-export const xdgDataPath = join(remote.app.getPath('home'), '.local', 'share', 'polar');
+export const xdgDataPath = join(
+  remote.app.getPath('home'),
+  '.local',
+  'share',
+  'polar-blake2b',
+);
 
 /**
  * root path where application data is stored
  */
 export const dataPath = existsSync(xdgDataPath)
   ? xdgDataPath
-  : join(remote.app.getPath('home'), '.polar');
+  : join(remote.app.getPath('home'), '.polar-blake2b');
 
 /**
  * legacy path where application data was stored in v0.1.0
