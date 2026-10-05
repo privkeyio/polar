@@ -25,7 +25,6 @@ describe('SimulationDesignerTab', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 0,
-      eclairNodes: 0,
       litdNodes: 0,
       bitcoindNodes: 2,
       tapdNodes: 0,

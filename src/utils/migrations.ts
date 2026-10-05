@@ -187,6 +187,32 @@ const v200 = (file: NetworksFile): NetworksFile => {
   return file;
 };
 
+export const removeUnsupportedNodes = (file: NetworksFile): NetworksFile => {
+  file.networks.forEach(network => {
+    const removed = network.nodes.lightning
+      .filter(n => !dockerConfigs[n.implementation])
+      .map(n => n.name);
+    if (!removed.length) return;
+    debug(`[${network.id}] ${network.name}: removing unsupported nodes ${removed}`);
+    network.nodes.lightning = network.nodes.lightning.filter(
+      n => !removed.includes(n.name),
+    );
+    if (network.simulation) {
+      network.simulation.activity = network.simulation.activity.filter(
+        a => !removed.includes(a.source) && !removed.includes(a.destination),
+      );
+    }
+    const chart = file.charts[network.id];
+    removed.forEach(name => delete chart.nodes[name]);
+    Object.entries(chart.links).forEach(([id, { from, to }]) => {
+      if (removed.includes(from.nodeId) || removed.includes(to.nodeId as string)) {
+        delete chart.links[id];
+      }
+    });
+  });
+  return file;
+};
+
 /**
  * The list of migration functions to execute
  */

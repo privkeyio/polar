@@ -38,7 +38,6 @@ describe('MCP model > getNodeInfo', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,
@@ -83,7 +82,6 @@ describe('MCP model > getNodeInfo', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,
@@ -118,7 +116,6 @@ describe('MCP model > getNodeInfo', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,
@@ -171,7 +168,6 @@ describe('MCP model > getNodeInfo', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,
@@ -195,34 +191,6 @@ describe('MCP model > getNodeInfo', () => {
       description: 'Test',
       lndNodes: 0,
       clightningNodes: 1,
-      eclairNodes: 0,
-      bitcoindNodes: 1,
-      tapdNodes: 0,
-      litdNodes: 0,
-      customNodes: {},
-      manualMineCount: 6,
-    });
-
-    const network = store.getState().network.networks[0];
-    const nodeName = network.nodes.lightning[0].name;
-
-    const result = await store.getActions().mcp.getNodeInfo({
-      networkId: network.id,
-      nodeName,
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.info.pubkey).toBe(mockNodeInfo.pubkey);
-    expect(result.info.alias).toBe(mockNodeInfo.alias);
-  });
-
-  it('should work with eclair nodes', async () => {
-    await store.getActions().network.addNetwork({
-      name: 'test-network',
-      description: 'Test',
-      lndNodes: 0,
-      clightningNodes: 0,
-      eclairNodes: 1,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,
@@ -249,7 +217,6 @@ describe('MCP model > getNodeInfo', () => {
       description: 'Test',
       lndNodes: 0,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 1,
@@ -279,7 +246,6 @@ describe('MCP model > getNodeInfo', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,

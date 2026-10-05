@@ -147,33 +147,6 @@ $ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION
 
 Replace `<version>` with the desired c-lightning version (ex: `0.8.0`).
 
-## Eclair
-
-### Tags
-
-- `0.13.1` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.12.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.11.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.10.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.9.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.8.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.7.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.6.2` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.6.1` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.6.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.5.0` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.4.2` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-- `0.3.3` ([eclair/Dockerfile](https://github.com/jamaljsr/polar/blob/master/docker/eclair/Dockerfile))
-
-**Building the image**
-
-```sh
-$ cd eclair
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg ECLAIR_VERSION=<version> -t polarlightning/eclair:<version> --push .
-```
-
-Replace `<version>` with the desired Eclair version (ex: `0.3.3`).
-
 ## Taproot Assets Protocol
 
 ### Tags

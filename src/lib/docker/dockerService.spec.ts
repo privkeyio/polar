@@ -186,7 +186,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 1,
         clightningNodes: 0,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 0,
@@ -212,33 +211,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 0,
         clightningNodes: 1,
-        eclairNodes: 0,
-        bitcoindNodes: 1,
-        tapdNodes: 0,
-        litdNodes: 0,
-        repoState: defaultRepoState,
-        managedImages: testManagedImages,
-        customImages: [],
-        manualMineCount: 6,
-      });
-      net.nodes.lightning[0].backendName = 'invalid';
-      dockerService.saveComposeFile(net);
-      expect(filesMock.write).toHaveBeenCalledWith(
-        expect.stringContaining('docker-compose.yml'),
-        expect.stringContaining(
-          `container_name: polar-n1-${network.nodes.lightning[0].name}`,
-        ),
-      );
-    });
-
-    it('should save the eclair node with the first bitcoin node as backend', () => {
-      const net = createNetwork({
-        id: 1,
-        name: 'my network',
-        description: 'network description',
-        lndNodes: 0,
-        clightningNodes: 0,
-        eclairNodes: 1,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 0,
@@ -305,7 +277,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 0,
         clightningNodes: 0,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 1,
@@ -329,7 +300,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 0,
         clightningNodes: 0,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 1,
@@ -356,7 +326,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 0,
         clightningNodes: 0,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 1,
@@ -392,7 +361,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 2,
         clightningNodes: 1,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 0,
@@ -523,7 +491,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 2,
         clightningNodes: 1,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 0,
@@ -718,7 +685,6 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 1,
         clightningNodes: 1,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 1,
@@ -896,7 +862,6 @@ describe('DockerService', () => {
       description: 'network description',
       lndNodes: 1,
       clightningNodes: 1,
-      eclairNodes: 1,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 1,
@@ -907,9 +872,6 @@ describe('DockerService', () => {
     });
     const mockResult = { err: '', out: '', exitCode: 0 };
     const lndNodes = network.nodes.lightning.filter(n => n.implementation === 'LND');
-    const eclairNodes = network.nodes.lightning.filter(
-      n => n.implementation === 'eclair',
-    );
     const clightningNodes = network.nodes.lightning.filter(
       n => n.implementation === 'c-lightning',
     );
@@ -921,7 +883,7 @@ describe('DockerService', () => {
           {
             id: 0,
             source: lndNodes[0].name,
-            destination: eclairNodes[0].name,
+            destination: clightningNodes[0].name,
             intervalSecs: 60,
             amountMsat: 1000,
           },
@@ -1059,7 +1021,7 @@ describe('DockerService', () => {
           {
             id: 0,
             source: lndNodes[0].name,
-            destination: eclairNodes[0].name,
+            destination: clightningNodes[0].name,
             intervalSecs: 60,
             amountMsat: 1000,
           },

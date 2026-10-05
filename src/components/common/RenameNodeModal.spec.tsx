@@ -33,7 +33,6 @@ describe('RenameNodeModal', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 1,
-      eclairNodes: 1,
       litdNodes: 1,
       bitcoindNodes: 3,
       tapdNodes: 1,

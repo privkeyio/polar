@@ -36,7 +36,7 @@ export const getDefaultNodeCommandDefinition: McpToolDefinition = {
     properties: {
       implementation: {
         type: 'string',
-        enum: ['bitcoind', 'btcd', 'LND', 'c-lightning', 'eclair', 'litd', 'tapd'],
+        enum: ['bitcoind', 'btcd', 'LND', 'c-lightning', 'litd', 'tapd'],
         description: 'The node implementation to get the default command for',
       },
       version: {

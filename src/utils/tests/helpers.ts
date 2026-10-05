@@ -22,11 +22,6 @@ export const testManagedImages: ManagedImage[] = [
     command: '',
   },
   {
-    implementation: 'eclair',
-    version: defaultRepoState.images.eclair.latest,
-    command: '',
-  },
-  {
     implementation: 'bitcoind',
     version: defaultRepoState.images.bitcoind.latest,
     command: '',
@@ -56,13 +51,6 @@ export const testCustomImages: CustomImage[] = [
     name: 'Another Custom Image',
     implementation: 'c-lightning',
     dockerImage: 'my-clightning:latest',
-    command: 'another-command',
-  },
-  {
-    id: '789',
-    name: 'One More Custom Image',
-    implementation: 'eclair',
-    dockerImage: 'my-eclair:latest',
     command: 'another-command',
   },
 ];
@@ -168,10 +156,6 @@ export const testRepoState: DockerRepoState = {
       latest: '24.08',
       versions: ['24.08', '24.05', '24.02.2', '23.11.2'],
     },
-    eclair: {
-      latest: '0.10.0',
-      versions: ['0.10.0', '0.9.0', '0.8.0', '0.7.0', '0.6.2', '0.5.0'],
-    },
     bitcoind: {
       latest: '30.0',
       versions: [
@@ -240,9 +224,8 @@ export const getNetwork = (
     id: networkId,
     name: name || 'my-test',
     description: description || 'my-test-description',
-    lndNodes: 2,
+    lndNodes: 3,
     clightningNodes: 1,
-    eclairNodes: 1,
     bitcoindNodes: 1,
     tapdNodes: 0,
     litdNodes: 0,
@@ -255,7 +238,6 @@ export const getNetwork = (
   if (tapNodeCount > 0) {
     config.lndNodes = 0;
     config.clightningNodes = 0;
-    config.eclairNodes = 0;
   }
   const network = createNetwork(config);
 

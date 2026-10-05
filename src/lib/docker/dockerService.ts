@@ -11,7 +11,6 @@ import {
   BitcoinNode,
   CLightningNode,
   CommonNode,
-  EclairNode,
   LightningNode,
   LitdNode,
   LndNode,
@@ -27,7 +26,7 @@ import {
   SimulationNodeConfig,
 } from 'types';
 import { legacyDataPath, networksPath, nodePath } from 'utils/config';
-import { APP_VERSION, dockerConfigs, eclairCredentials } from 'utils/constants';
+import { APP_VERSION, dockerConfigs } from 'utils/constants';
 import { exists, read, renameFile, rm, write } from 'utils/files';
 import { migrateNetworksFile } from 'utils/migrations';
 import { getContainerName } from 'utils/network';
@@ -146,11 +145,6 @@ class DockerService implements DockerLibrary {
         const cln = node as CLightningNode;
         const backend = bitcoin.find(n => n.name === cln.backendName) || bitcoin[0];
         file.addClightning(cln, backend);
-      }
-      if (node.implementation === 'eclair') {
-        const eclair = node as EclairNode;
-        const backend = bitcoin.find(n => n.name === eclair.backendName) || bitcoin[0];
-        file.addEclair(eclair, backend);
       }
       if (node.implementation === 'litd') {
         const litd = node as LitdNode;
@@ -468,16 +462,6 @@ class DockerService implements DockerLibrary {
               macaroon: `/home/simln/.${getPosixPath(lnd.paths.adminMacaroon)}`,
               address: `https://${getContainerName(node)}:10009`,
               cert: `/home/simln/.${getPosixPath(lnd.paths.tlsCert)}`,
-            };
-            break;
-
-          case 'eclair':
-            const eclair = node as EclairNode;
-            simNode = {
-              id: eclair.name,
-              base_url: `http://${getContainerName(node)}:8080`,
-              api_username: '',
-              api_password: eclairCredentials.pass,
             };
             break;
 

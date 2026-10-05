@@ -81,17 +81,6 @@ describe('MCP model > addNode', () => {
       expect(result.node).toBeDefined();
     });
 
-    it('should add an eclair node to network', async () => {
-      const result = await store.getActions().mcp.addNode({
-        networkId: 1,
-        implementation: 'eclair',
-      });
-
-      expect(result.success).toBe(true);
-      expect(result.message).toContain('eclair node');
-      expect(result.node).toBeDefined();
-    });
-
     it('should add a litd node to network', async () => {
       const result = await store.getActions().mcp.addNode({
         networkId: 1,

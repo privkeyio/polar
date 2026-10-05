@@ -97,14 +97,14 @@ describe('NodeImagesView Component', () => {
 
   it('should add a new Custom Image', async () => {
     const { getByText, getByLabelText, findByText, store } = renderComponent();
-    expect(store.getState().app.settings.nodeImages.custom).toHaveLength(3);
+    expect(store.getState().app.settings.nodeImages.custom).toHaveLength(2);
     fireEvent.click(getByText('Add a Custom Node'));
     expect(await findByText('Custom Node Details')).toBeInTheDocument();
     fireEvent.change(getByLabelText('Name'), { target: { value: 'My Image' } });
     fireEvent.change(getByLabelText('Docker Image'), { target: { value: 'test-image' } });
     fireEvent.click(getByText('Save'));
     await waitForElementToBeRemoved(() => getByText('Custom Node Details'));
-    expect(store.getState().app.settings.nodeImages.custom).toHaveLength(4);
+    expect(store.getState().app.settings.nodeImages.custom).toHaveLength(3);
     // confirm the new image was added at the start of the list
     expect(store.getState().app.settings.nodeImages.custom[0].name).toBe('My Image');
   });

@@ -69,19 +69,6 @@ describe('MCP model > getDefaultNodeCommand', () => {
     expect(result.message).toContain('Retrieved default command for tapd');
   });
 
-  it('should get default command for eclair', async () => {
-    const result = await store.getActions().mcp.getDefaultNodeCommand({
-      implementation: 'eclair',
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.implementation).toBe('eclair');
-    expect(result.version).toBeDefined();
-    expect(result.command).toBeDefined();
-    expect(result.command).toContain('eclair');
-    expect(result.message).toContain('Retrieved default command for eclair');
-  });
-
   it('should get default command for litd', async () => {
     const result = await store.getActions().mcp.getDefaultNodeCommand({
       implementation: 'litd',
@@ -163,7 +150,6 @@ describe('MCP model > getDefaultNodeCommand', () => {
   it.each([
     'LND' as NodeImplementation,
     'c-lightning' as NodeImplementation,
-    'eclair' as NodeImplementation,
     'bitcoind' as NodeImplementation,
     'tapd' as NodeImplementation,
     'litd' as NodeImplementation,

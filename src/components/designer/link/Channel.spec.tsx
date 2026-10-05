@@ -99,12 +99,6 @@ describe('Channel component', () => {
       expect(getByText('884b...e56150')).toBeInTheDocument();
     });
 
-    it('should display "Channel ID" when source node is Eclair (carol)', () => {
-      const { getByText } = renderComponent(Status.Stopped, 'carol', 'bob');
-      expect(getByText('Channel ID')).toBeInTheDocument();
-      expect(getByText('884b...e56150')).toBeInTheDocument();
-    });
-
     it('should display isPrivate', () => {
       const { getByText } = renderComponent();
       expect(getByText('Is Private')).toBeInTheDocument();

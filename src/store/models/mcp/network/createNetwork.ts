@@ -37,7 +37,6 @@ interface NetworkPlan {
   baseCounts: {
     lndNodes: number;
     clightningNodes: number;
-    eclairNodes: number;
     bitcoindNodes: number;
     tapdNodes: number;
     litdNodes: number;
@@ -55,7 +54,6 @@ const SUPPORTED_IMPLEMENTATIONS: NodeImplementation[] = [
   'bitcoind',
   'LND',
   'c-lightning',
-  'eclair',
   'litd',
   'tapd',
 ];
@@ -64,7 +62,6 @@ const ADDITION_PRIORITY: readonly NodeImplementation[] = [
   'bitcoind',
   'LND',
   'c-lightning',
-  'eclair',
   'litd',
   'tapd',
 ];
@@ -72,7 +69,6 @@ const ADDITION_PRIORITY: readonly NodeImplementation[] = [
 const LIGHTNING_IMPLEMENTATIONS = new Set<NodeImplementation>([
   'LND',
   'c-lightning',
-  'eclair',
   'litd',
 ]);
 
@@ -177,7 +173,6 @@ const buildPlanContext = (
   const baseCounts = {
     lndNodes: 0,
     clightningNodes: 0,
-    eclairNodes: 0,
     bitcoindNodes: 0,
     tapdNodes: 0,
     litdNodes: 0,
@@ -202,9 +197,6 @@ const buildPlanContext = (
           return;
         case 'c-lightning':
           baseCounts.clightningNodes += 1;
-          return;
-        case 'eclair':
-          baseCounts.eclairNodes += 1;
           return;
         case 'litd':
           baseCounts.litdNodes += 1;
@@ -265,14 +257,13 @@ const validateNetworkDependencies = ({
   additionalNodes,
   bitcoindVersions,
 }: PlanContext) => {
-  // Lightning nodes (LND, CLN, eclair, litd) cannot run without at least one bitcoind backend
+  // Lightning nodes (LND, CLN, litd) cannot run without at least one bitcoind backend
   const additionalLightningCount = additionalNodes.filter(node =>
     LIGHTNING_IMPLEMENTATIONS.has(node.implementation),
   ).length;
   const totalLightningNodes =
     baseCounts.lndNodes +
     baseCounts.clightningNodes +
-    baseCounts.eclairNodes +
     baseCounts.litdNodes +
     additionalLightningCount;
 
@@ -415,7 +406,7 @@ export const createNetworkDefinition: McpToolDefinition = {
           properties: {
             implementation: {
               type: 'string',
-              enum: ['bitcoind', 'LND', 'c-lightning', 'eclair', 'litd', 'tapd'],
+              enum: ['bitcoind', 'LND', 'c-lightning', 'litd', 'tapd'],
               description: 'Node implementation to add to the network',
             },
             version: {
@@ -461,7 +452,6 @@ export const createNetworkTool = thunk<
     description: args.description || '',
     lndNodes: baseCounts.lndNodes,
     clightningNodes: baseCounts.clightningNodes,
-    eclairNodes: baseCounts.eclairNodes,
     bitcoindNodes: baseCounts.bitcoindNodes,
     tapdNodes: baseCounts.tapdNodes,
     litdNodes: baseCounts.litdNodes,

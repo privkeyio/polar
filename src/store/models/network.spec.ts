@@ -78,9 +78,8 @@ describe('Network model', () => {
   const addNetworkArgs = {
     name: 'test',
     description: 'test description',
-    lndNodes: 2,
+    lndNodes: 3,
     clightningNodes: 1,
-    eclairNodes: 1,
     bitcoindNodes: 1,
     tapdNodes: 0,
     litdNodes: 1,
@@ -111,6 +110,45 @@ describe('Network model', () => {
     const [net1, net2] = store.getState().network.networks;
     expect(net1.name).toBe('test 1');
     expect(net2.name).toBe('test 2');
+  });
+
+  it('should remove unsupported nodes when loading networks', async () => {
+    const mockNetworks = [
+      getNetwork(1, 'test 1'),
+      getNetwork(2, 'test 2'),
+      getNetwork(3, 'test 3'),
+    ];
+    const mockCharts = Object.fromEntries(
+      mockNetworks.map(n => [n.id, initChartFromNetwork(n)]),
+    );
+    mockNetworks[0].nodes.lightning[2].implementation = 'eclair' as any;
+    mockNetworks[0].simulation = {
+      activity: [
+        { id: 0, source: 'alice', destination: 'carol', intervalSecs: 60, amountMsat: 1 },
+        { id: 1, source: 'carol', destination: 'bob', intervalSecs: 60, amountMsat: 1 },
+        { id: 2, source: 'alice', destination: 'bob', intervalSecs: 60, amountMsat: 1 },
+      ],
+      status: Status.Stopped,
+    };
+    mockNetworks[1].nodes.lightning[3].implementation = 'eclair' as any;
+    const mockedLoad = injections.dockerService.loadNetworks as jest.Mock;
+    mockedLoad.mockResolvedValue({ networks: mockNetworks, charts: mockCharts });
+    await store.getActions().network.load();
+    const [net1, net2, net3] = store.getState().network.networks;
+    const names = (n: Network) => n.nodes.lightning.map(ln => ln.name);
+    expect(names(net1)).toEqual(['alice', 'bob', 'dave']);
+    expect(net1.simulation?.activity.map(a => a.id)).toEqual([2]);
+    expect(names(net2)).toEqual(['alice', 'bob', 'carol']);
+    expect(names(net3)).toEqual(['alice', 'bob', 'carol', 'dave']);
+    const chart = store.getState().designer.allCharts[1];
+    expect(chart.nodes['carol']).toBeUndefined();
+    expect(chart.nodes['alice']).toBeDefined();
+    const linkNodes = Object.values(chart.links).flatMap(l => [
+      l.from.nodeId,
+      l.to.nodeId,
+    ]);
+    expect(linkNodes).not.toContain('carol');
+    expect(linkNodes).toContain('alice');
   });
 
   describe('Fetching', () => {
@@ -220,7 +258,6 @@ describe('Network model', () => {
         customNodes: {
           '123': 1, // LND
           '456': 1, // c-lightning
-          '789': 1, // Eclair
           '012': 1, // bitcoind
           '999': 1, // invalid
         },
@@ -235,7 +272,6 @@ describe('Network model', () => {
   describe('Adding a Node', () => {
     const lndLatest = defaultRepoState.images.LND.latest;
     const clnLatest = defaultRepoState.images['c-lightning'].latest;
-    const eclairLatest = defaultRepoState.images.eclair.latest;
 
     beforeEach(async () => {
       await store.getActions().network.addNetwork(addNetworkArgs);
@@ -261,15 +297,6 @@ describe('Network model', () => {
       expect(lightning).toHaveLength(6);
       expect(lightning[1].name).toBe('bob');
       expect(lightning[1].implementation).toBe('c-lightning');
-    });
-
-    it('should add an Eclair node to an existing network', async () => {
-      const payload = { id: firstNetwork().id, type: 'eclair', version: eclairLatest };
-      store.getActions().network.addNode(payload);
-      const { lightning } = firstNetwork().nodes;
-      expect(lightning).toHaveLength(6);
-      expect(lightning[2].name).toBe('carol');
-      expect(lightning[2].implementation).toBe('eclair');
     });
 
     it('should throw an error if the network id is invalid', async () => {
@@ -970,7 +997,7 @@ describe('Network model', () => {
     });
 
     it('should update node ports when starting', async () => {
-      const portsInUse = [8084];
+      const portsInUse = [8085];
       detectPortMock.mockImplementation(port =>
         Promise.resolve(portsInUse.includes(port) ? port + 1 : port),
       );
@@ -979,7 +1006,7 @@ describe('Network model', () => {
       await toggleNode(node);
       // get a reference to the updated nodes
       node = firstNetwork().nodes.lightning[4];
-      expect(node.ports.rest).toBe(8085);
+      expect(node.ports.rest).toBe(8086);
     });
 
     it('should start the node with its updated ports, not the stale ones', async () => {

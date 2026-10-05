@@ -135,16 +135,16 @@ describe('MCP model > createNetwork', () => {
 
   it('should reject implementations missing from the repo state', async () => {
     const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
-    delete (repoState.images as Record<string, unknown>).eclair;
+    delete (repoState.images as Record<string, unknown>)['c-lightning'];
     store.getActions().app.setRepoState(repoState);
 
     await expect(
       store.getActions().mcp.createNetwork({
         name: 'missing-repo-image',
-        nodes: [{ implementation: 'bitcoind' }, { implementation: 'eclair' }],
+        nodes: [{ implementation: 'bitcoind' }, { implementation: 'c-lightning' }],
       }),
     ).rejects.toThrow(
-      'Implementation "eclair" is not available in the current repo state.',
+      'Implementation "c-lightning" is not available in the current repo state.',
     );
   });
 
@@ -218,20 +218,13 @@ describe('MCP model > createNetwork', () => {
     expect(result.network.nodes.bitcoin).toHaveLength(1);
   });
 
-  it('should create a network with latest eclair and litd nodes', async () => {
+  it('should create a network with latest litd nodes', async () => {
     const result = await store.getActions().mcp.createNetwork({
-      name: 'eclair-litd-latest',
-      nodes: [
-        { implementation: 'bitcoind' },
-        { implementation: 'eclair' },
-        { implementation: 'litd' },
-      ],
+      name: 'litd-latest',
+      nodes: [{ implementation: 'bitcoind' }, { implementation: 'litd' }],
     });
 
     expect(result.success).toBe(true);
-    expect(
-      result.network.nodes.lightning.filter(n => n.implementation === 'eclair'),
-    ).toHaveLength(1);
     expect(
       result.network.nodes.lightning.filter(n => n.implementation === 'litd'),
     ).toHaveLength(1);

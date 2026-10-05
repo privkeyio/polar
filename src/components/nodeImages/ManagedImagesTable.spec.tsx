@@ -19,7 +19,7 @@ describe('ManagedImagesTable Component', () => {
       managed: [
         ...testManagedImages,
         // add a dummy image
-        { implementation: 'eclair', version: 'test', command: 'test-lnd-command' },
+        { implementation: 'btcd', version: 'test', command: 'test-lnd-command' },
       ] as ManagedImage[],
     };
     const initialState = {

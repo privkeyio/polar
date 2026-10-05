@@ -319,7 +319,6 @@ const lightningModel: LightningModel = {
     const nodeDelays: Record<LightningNode['implementation'], number> = {
       LND: 1,
       'c-lightning': 2,
-      eclair: 2,
       litd: 1,
     };
     // determine the highest delay of all implementations

@@ -26,10 +26,10 @@ import {
   SEED_RESTORE_RECOVERY_WINDOW,
 } from 'utils/constants';
 import { readBuffer, rm } from 'utils/files';
+import { removeUnsupportedNodes } from 'utils/migrations';
 import {
   createBitcoindNetworkNode,
   createCLightningNetworkNode,
-  createEclairNetworkNode,
   createLitdNetworkNode,
   createLndNetworkNode,
   createNetwork,
@@ -58,7 +58,6 @@ interface AddNetworkArgs {
   description: string;
   lndNodes: number;
   clightningNodes: number;
-  eclairNodes: number;
   bitcoindNodes: number;
   tapdNodes: number;
   litdNodes: number;
@@ -312,7 +311,9 @@ const networkModel: NetworkModel = {
       .forEach(n => (n.ports = { ...n.ports, ...ports[n.name] }));
   }),
   load: thunk(async (actions, payload, { injections, getStoreActions }) => {
-    const { networks, charts } = await injections.dockerService.loadNetworks();
+    const { networks, charts } = removeUnsupportedNodes(
+      await injections.dockerService.loadNetworks(),
+    );
     if (networks && networks.length) {
       actions.setNetworks(networks);
     }
@@ -360,7 +361,6 @@ const networkModel: NetworkModel = {
         description: payload.description,
         lndNodes: payload.lndNodes,
         clightningNodes: payload.clightningNodes,
-        eclairNodes: payload.eclairNodes,
         bitcoindNodes: payload.bitcoindNodes,
         tapdNodes: payload.tapdNodes,
         litdNodes: payload.litdNodes,
@@ -383,7 +383,6 @@ const networkModel: NetworkModel = {
         newNodeCounts: {
           LND: payload.lndNodes,
           'c-lightning': payload.clightningNodes,
-          eclair: payload.eclairNodes,
           bitcoind: payload.bitcoindNodes,
           tapd: payload.tapdNodes,
           litd: payload.litdNodes,
@@ -439,17 +438,6 @@ const networkModel: NetworkModel = {
             docker,
             undefined,
             settings.basePorts['c-lightning'],
-          );
-          network.nodes.lightning.push(node);
-          break;
-        case 'eclair':
-          node = createEclairNetworkNode(
-            network,
-            version,
-            dockerRepoState.images.eclair.compatibility,
-            docker,
-            undefined,
-            settings.basePorts.eclair,
           );
           network.nodes.lightning.push(node);
           break;

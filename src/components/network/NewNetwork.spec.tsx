@@ -76,7 +76,6 @@ describe('NewNetwork component', () => {
     const { getByLabelText, queryByText } = renderComponent();
     expect(getByLabelText('LND')).toHaveValue('1');
     expect(getByLabelText('Core Lightning')).toHaveValue('1');
-    expect(getByLabelText('Eclair')).toHaveValue('1');
     expect(getByLabelText('Bitcoin Core')).toHaveValue('1');
     expect(queryByText('My Test Image')).not.toBeInTheDocument();
   });

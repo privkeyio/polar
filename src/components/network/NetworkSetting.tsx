@@ -55,9 +55,6 @@ const NetworkSetting: React.FC = () => {
           rest: values['c-lightning'],
           grpc: values['grpcC-lightning'],
         },
-        eclair: {
-          rest: values.eclair,
-        },
         bitcoind: {
           rest: values.bitcoind,
         },
@@ -89,7 +86,6 @@ const NetworkSetting: React.FC = () => {
           initialValues={{
             LND: settings.basePorts.LND.rest,
             'c-lightning': settings.basePorts['c-lightning'].rest,
-            eclair: settings.basePorts.eclair.rest,
             bitcoind: settings.basePorts.bitcoind.rest,
             tapd: settings.basePorts.tapd.rest,
             grpcLND: settings.basePorts.LND.grpc,
@@ -108,11 +104,6 @@ const NetworkSetting: React.FC = () => {
             </Col>
             <Col span={6}>
               <Form.Item name="c-lightning" label={dockerConfigs['c-lightning'].name}>
-                <InputNumber />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="eclair" label={dockerConfigs.eclair.name}>
                 <InputNumber />
               </Form.Item>
             </Col>

@@ -57,7 +57,7 @@ describe('LightningNodeSelect', () => {
       alice: {
         walletBalance: defaultStateBalances({ confirmed: '100' }),
       },
-      dave: {
+      carol: {
         walletBalance: defaultStateBalances({ confirmed: '200' }),
       },
     };
@@ -72,7 +72,7 @@ describe('LightningNodeSelect', () => {
     // click on bob option
     // Select renders two lists of the options to the dom. click on the
     // second one if it exists, otherwise click the only one
-    fireEvent.click(getAllByText('dave')[1]);
+    fireEvent.click(getAllByText('carol')[1]);
     // confirm the balance updates
     expect(await findByText('Balance: 200 sats')).toBeInTheDocument();
   });

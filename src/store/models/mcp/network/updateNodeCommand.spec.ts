@@ -20,7 +20,6 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,
@@ -53,7 +52,6 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,
@@ -86,7 +84,6 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 1,
-      eclairNodes: 1,
       bitcoindNodes: 1,
       tapdNodes: 1,
       litdNodes: 1,
@@ -106,15 +103,15 @@ describe('MCP model > updateNodeCommand', () => {
     expect(bitcoinResult.success).toBe(true);
     expect(bitcoinResult.nodeName).toBe('backend1');
 
-    // Test with lightning node (eclair node should be 'carol')
+    // Test with lightning node (c-lightning node should be 'bob')
     const lightningResult = await store.getActions().mcp.updateNodeCommand({
       networkId: network.id,
-      nodeName: 'carol',
-      command: 'eclair --custom-flag',
+      nodeName: 'bob',
+      command: 'lightningd --custom-flag',
     });
 
     expect(lightningResult.success).toBe(true);
-    expect(lightningResult.nodeName).toBe('carol');
+    expect(lightningResult.nodeName).toBe('bob');
 
     // Test with tap node - use the correct name
     const tapNodeNames = network.nodes.tap.map(n => n.name);
@@ -174,7 +171,6 @@ describe('MCP model > updateNodeCommand', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
-      eclairNodes: 0,
       bitcoindNodes: 1,
       tapdNodes: 0,
       litdNodes: 0,

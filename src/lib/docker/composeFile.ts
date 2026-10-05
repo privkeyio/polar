@@ -2,20 +2,14 @@ import {
   BitcoinNode,
   CLightningNode,
   CommonNode,
-  EclairNode,
   LitdNode,
   LndNode,
   TapdNode,
 } from 'shared/types';
-import {
-  bitcoinCredentials,
-  dockerConfigs,
-  eclairCredentials,
-  litdCredentials,
-} from 'utils/constants';
+import { bitcoinCredentials, dockerConfigs, litdCredentials } from 'utils/constants';
 import { getContainerName, getDefaultCommand } from 'utils/network';
 import { isWindows } from 'utils/system';
-import { bitcoind, clightning, eclair, litd, lnd, simln, tapd } from './nodeTemplates';
+import { bitcoind, clightning, litd, lnd, simln, tapd } from './nodeTemplates';
 
 export interface ComposeService {
   image: string;
@@ -146,29 +140,6 @@ class ComposeFile {
       command,
       namedVolumeName,
     );
-    this.addService(svc);
-  }
-
-  addEclair(node: EclairNode, backend: CommonNode) {
-    const { name, version, ports } = node;
-    const { rest, p2p } = ports;
-    const container = getContainerName(node);
-    // define the variable substitutions
-    const variables = {
-      name: node.name,
-      backendName: getContainerName(backend),
-      eclairPass: eclairCredentials.pass,
-      rpcUser: bitcoinCredentials.user,
-      rpcPass: bitcoinCredentials.pass,
-    };
-    // use the node's custom image or the default for the implementation
-    const image = node.docker.image || `${dockerConfigs.eclair.imageName}:${version}`;
-    // use the node's custom command or the default for the implementation
-    const nodeCommand = node.docker.command || getDefaultCommand('eclair', version);
-    // replace the variables in the command
-    const command = this.mergeCommand(nodeCommand, variables);
-    // add the docker service
-    const svc = eclair(name, container, image, rest, p2p, command);
     this.addService(svc);
   }
 

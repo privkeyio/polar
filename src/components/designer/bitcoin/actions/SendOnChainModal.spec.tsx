@@ -23,7 +23,6 @@ describe('SendOnChainModal', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 1,
-      eclairNodes: 1,
       bitcoindNodes: 3,
       tapdNodes: 0,
       litdNodes: 0,

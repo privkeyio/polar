@@ -98,32 +98,6 @@ export const clightning = (
   ].filter(p => !!p), // filer out empty strings
 });
 
-export const eclair = (
-  name: string,
-  container: string,
-  image: string,
-  restPort: number,
-  p2pPort: number,
-  command: string,
-): ComposeService => ({
-  image,
-  container_name: container,
-  hostname: name,
-  command: trimInside(command),
-  restart: 'always',
-  volumes: [
-    `./volumes/${dockerConfigs.eclair.volumeDirName}/${name}:/home/eclair/.eclair`,
-  ],
-  expose: [
-    '8080', // REST
-    '9735', // p2p
-  ],
-  ports: [
-    `${restPort}:8080`, // REST
-    `${p2pPort}:9735`, // p2p
-  ],
-});
-
 export const tapd = (
   name: string,
   container: string,

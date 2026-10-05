@@ -2,7 +2,6 @@ import detectPort from 'detect-port';
 import {
   BitcoinNode,
   CLightningNode,
-  EclairNode,
   LightningNode,
   LitdNode,
   LndNode,
@@ -154,9 +153,8 @@ describe('Network Utils', () => {
         id: 1,
         name: 'my-test',
         description: 'my-test-description',
-        lndNodes: 2,
+        lndNodes: 3,
         clightningNodes: 1,
-        eclairNodes: 1,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 1,
@@ -278,7 +276,7 @@ describe('Network Utils', () => {
     });
 
     it('should update the p2p ports for lightning nodes', async () => {
-      const portsInUse = [9735, 9836, 9937, 9737];
+      const portsInUse = [9735, 9836, 9737];
       mockDetectPort.mockImplementation(port =>
         Promise.resolve(portsInUse.includes(port) ? port + 1 : port),
       );
@@ -287,30 +285,29 @@ describe('Network Utils', () => {
       expect(ports).toBeDefined();
       expect(ports[network.nodes.lightning[0].name].p2p).toBe(9736);
       expect(ports[network.nodes.lightning[1].name].p2p).toBe(9837);
-      expect(ports[network.nodes.lightning[2].name].p2p).toBe(9938);
       expect(ports[network.nodes.lightning[4].name].p2p).toBe(9739);
     });
 
     it('should update the p2p ports for litd nodes', async () => {
-      const portsInUse = [9638];
+      const portsInUse = [9637];
       mockDetectPort.mockImplementation(port =>
         Promise.resolve(portsInUse.includes(port) ? port + 1 : port),
       );
       network.nodes.bitcoin = [];
       const ports = (await getOpenPorts(network)) as OpenPorts;
       expect(ports).toBeDefined();
-      expect(ports[network.nodes.lightning[3].name].p2p).toBe(9639);
+      expect(ports[network.nodes.lightning[2].name].p2p).toBe(9638);
     });
 
     it('should update the web ports for litd nodes', async () => {
-      const portsInUse = [8446];
+      const portsInUse = [8445];
       mockDetectPort.mockImplementation(port =>
         Promise.resolve(portsInUse.includes(port) ? port + 1 : port),
       );
       network.nodes.bitcoin = [];
       const ports = (await getOpenPorts(network)) as OpenPorts;
       expect(ports).toBeDefined();
-      expect(ports[network.nodes.lightning[3].name].web).toBe(8447);
+      expect(ports[network.nodes.lightning[2].name].web).toBe(8446);
     });
 
     it('should not update ports if none are in use', async () => {
@@ -373,7 +370,7 @@ describe('Network Utils', () => {
       // alice ports should not be changed
       expect(ports[network.nodes.lightning[0].name]).toBeUndefined();
       // bob ports should change
-      const lnd2 = network.nodes.lightning[4] as LndNode;
+      const lnd2 = network.nodes.lightning[3] as LndNode;
       expect(ports[lnd2.name].grpc).toBe(lnd2.ports.grpc + 1);
       expect(ports[lnd2.name].rest).toBe(lnd2.ports.rest + 1);
     });
@@ -386,7 +383,7 @@ describe('Network Utils', () => {
       // a locked node is still holding its ports, so they should not be changed
       expect(ports[network.nodes.lightning[0].name]).toBeUndefined();
       // bob ports should change
-      const lnd2 = network.nodes.lightning[4] as LndNode;
+      const lnd2 = network.nodes.lightning[3] as LndNode;
       expect(ports[lnd2.name].grpc).toBe(lnd2.ports.grpc + 1);
       expect(ports[lnd2.name].rest).toBe(lnd2.ports.rest + 1);
     });
@@ -528,7 +525,6 @@ describe('Network Utils', () => {
         description: 'my-test-description',
         lndNodes: 2,
         clightningNodes: 1,
-        eclairNodes: 1,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 1,
@@ -567,17 +563,6 @@ describe('Network Utils', () => {
       );
     });
 
-    it('should rename an Eclair node', async () => {
-      const node = network.nodes.lightning.find(
-        n => n.implementation === 'eclair',
-      ) as EclairNode;
-      expect(node).toBeDefined();
-      const newName = 'new-eclair-node-name';
-      const updatedNode = await renameNode(network, node, newName);
-      expect(updatedNode).toBeDefined();
-      expect(updatedNode.name).toBe(newName);
-    });
-
     it('should rename a litd node', async () => {
       const node = network.nodes.lightning.find(
         n => n.implementation === 'litd',
@@ -606,7 +591,7 @@ describe('Network Utils', () => {
         Status.Stopped,
       );
       network.nodes.lightning.push(lnd);
-      expect(network.nodes.lightning.length).toBe(6);
+      expect(network.nodes.lightning.length).toBe(5);
       const tap = createTapdNetworkNode(
         network,
         defaultRepoState.images.tapd.latest,

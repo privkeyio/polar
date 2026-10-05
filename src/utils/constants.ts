@@ -2,7 +2,6 @@ import { NodeImplementation, NodeImplementationWithSimln } from 'shared/types';
 import { DockerConfig, DockerRepoState } from 'types';
 import bitcoindLogo from 'resources/bitcoin.svg';
 import clightningLogo from 'resources/clightning.png';
-import eclairLogo from 'resources/eclair.png';
 import litdLogo from 'resources/litd.svg';
 import lndLogo from 'resources/lnd.png';
 import tapLogo from 'resources/tap.svg';
@@ -71,10 +70,6 @@ export const BasePorts: Record<NodeImplementation, Record<string, number>> = {
     p2p: 9835,
     grpc: 11001,
   },
-  eclair: {
-    rest: 8281,
-    p2p: 9935,
-  },
   btcd: {},
   tapd: {
     grpc: 12029,
@@ -93,10 +88,6 @@ export const bitcoinCredentials = {
   pass: 'polarpass',
   rpcauth:
     '5e5e98c21f5c814568f8b55d83b23c1c$$066b03f92df30b11de8e4b1b1cd5b1b4281aa25205bd57df9be82caf97a05526',
-};
-
-export const eclairCredentials = {
-  pass: 'eclairpw',
 };
 
 export const litdCredentials = {
@@ -170,41 +161,6 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
     variables: ['name', 'backendName', 'rpcUser', 'rpcPass'],
     dataDir: 'lightningd',
     apiDir: 'rest-api',
-  },
-  eclair: {
-    name: 'Eclair',
-    imageName: 'polarlightning/eclair',
-    logo: eclairLogo,
-    platforms: ['mac', 'linux', 'windows'],
-    volumeDirName: 'eclair',
-    command: [
-      'polar-eclair',
-      '--node-alias={{name}}',
-      '--server.public-ips.0={{name}}',
-      '--server.port=9735',
-      '--api.enabled=true',
-      '--api.binding-ip=0.0.0.0',
-      '--api.port=8080',
-      '--api.password={{eclairPass}}',
-      '--chain=regtest',
-      '--bitcoind.host={{backendName}}',
-      '--bitcoind.rpcport=18443',
-      '--bitcoind.rpcuser={{rpcUser}}',
-      '--bitcoind.rpcpassword={{rpcPass}}',
-      '--bitcoind.zmqblock=tcp://{{backendName}}:28336',
-      '--bitcoind.zmqtx=tcp://{{backendName}}:28335',
-      '--datadir=/home/eclair/.eclair',
-      '--printToConsole=true',
-      '--on-chain-fees.feerate-tolerance.ratio-low=0.00001',
-      '--on-chain-fees.feerate-tolerance.ratio-high=10000.0',
-      '--channel.max-htlc-value-in-flight-percent=100',
-      '--channel.max-htlc-value-in-flight-msat=5000000000000', // 50 BTC in msats
-      '--features.keysend=optional',
-      '--channel.min-final-expiry-delta-blocks=22', // Default is 30 for eclair, however it is 22 for CLN (the lowest).
-      '--channel.fulfill-safety-before-timeout-blocks=20', // When `channel.min-final-expiry-delta-blocks` is set, this is required and most be less than it. Default is 24.
-    ].join('\n  '),
-    // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
-    variables: ['name', 'eclairPass', 'backendName', 'rpcUser', 'rpcPass'],
   },
   bitcoind: {
     name: 'Bitcoin Core',
@@ -408,10 +364,6 @@ export const defaultRepoState: DockerRepoState = {
     'c-lightning': {
       latest: '25.12',
       versions: ['25.12', '25.09.3', '25.05', '25.02.2', '25.02', '24.11.1', '24.08.1'],
-    },
-    eclair: {
-      latest: '0.13.1',
-      versions: ['0.13.1', '0.12.0', '0.11.0', '0.10.0', '0.9.0'],
     },
     bitcoind: {
       latest: '30.0',

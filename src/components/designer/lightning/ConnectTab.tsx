@@ -5,21 +5,14 @@ import styled from '@emotion/styled';
 import * as LND from '@lightningpolar/lnd-api';
 import { Alert, Button, Radio, Tooltip } from 'antd';
 import { usePrefixedTranslation } from 'hooks';
-import {
-  CLightningNode,
-  EclairNode,
-  LightningNode,
-  LitdNode,
-  LndNode,
-  Status,
-} from 'shared/types';
+import { CLightningNode, LightningNode, LitdNode, LndNode, Status } from 'shared/types';
 import { useStoreActions, useStoreState } from 'store';
-import { eclairCredentials, litdCredentials } from 'utils/constants';
+import { litdCredentials } from 'utils/constants';
 import { ellipseInner } from 'utils/strings';
 import { Loader } from 'components/common';
 import CopyIcon from 'components/common/CopyIcon';
 import DetailsList, { DetailValues } from 'components/common/DetailsList';
-import { BasicAuth, EncodedStrings, FilePaths, LndConnect } from './connect';
+import { EncodedStrings, FilePaths, LndConnect } from './connect';
 import LncSessionsList from './connect/LncSessionsList';
 
 const Styled = {
@@ -55,7 +48,6 @@ const authTypeLabelKeys: Record<string, string> = {
   hex: 'hexStrings',
   base64: 'base64Strings',
   lndc: 'lndConnect',
-  basic: 'basicAuth',
 };
 
 export interface ConnectionInfo {
@@ -74,8 +66,6 @@ export interface ConnectionInfo {
     clientCert?: string;
     clientKey?: string;
     rune?: string;
-    // Eclair
-    basicAuth?: string;
     // litd macaroons
     lit?: string;
     tap?: string;
@@ -91,11 +81,7 @@ interface Props {
 const ConnectTab: React.FC<Props> = ({ node }) => {
   const { l } = usePrefixedTranslation('cmps.designer.lightning.ConnectTab');
   const [authType, setAuthType] = useState<string>(
-    node.implementation === 'eclair'
-      ? 'basic'
-      : node.implementation === 'litd'
-      ? 'lnc'
-      : 'paths',
+    node.implementation === 'litd' ? 'lnc' : 'paths',
   );
   const { openInBrowser } = useStoreActions(s => s.app);
   const { getWalletState } = useStoreActions(s => s.lightning);
@@ -151,17 +137,6 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
           },
           p2pUriExternal: `${pubkey}@127.0.0.1:${cln.ports.p2p}`,
           authTypes: ['paths', 'hex', 'base64'],
-        };
-      } else if (node.implementation === 'eclair') {
-        const eln = node as EclairNode;
-        return {
-          restUrl: `http://127.0.0.1:${eln.ports.rest}`,
-          restDocsUrl: 'https://acinq.github.io/eclair',
-          credentials: {
-            basicAuth: eclairCredentials.pass,
-          },
-          p2pUriExternal: `${pubkey}@127.0.0.1:${eln.ports.p2p}`,
-          authTypes: ['basic'],
         };
       } else if (node.implementation === 'litd') {
         const litd = node as LitdNode;
@@ -296,7 +271,6 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
     hex: <EncodedStrings credentials={credentials} encoding="hex" />,
     base64: <EncodedStrings credentials={credentials} encoding="base64" />,
     lndc: node.implementation === 'LND' && <LndConnect node={node as LndNode} />,
-    basic: credentials.basicAuth && <BasicAuth password={credentials.basicAuth} />,
   };
 
   return (

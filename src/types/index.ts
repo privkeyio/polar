@@ -66,7 +66,6 @@ export interface CustomImage {
 export interface NodeBasePorts {
   LND: { rest: number; grpc: number };
   'c-lightning': { rest: number; grpc: number };
-  eclair: { rest: number };
   bitcoind: { rest: number };
   tapd: { rest: number; grpc: number };
 }
@@ -356,12 +355,9 @@ export interface ActivityConfig {
 export interface SimulationNodeConfig {
   id: string;
   address?: string;
-  base_url?: string;
   macaroon?: string;
   cert?: string;
   ca_cert?: string;
   client_cert?: string;
   client_key?: string;
-  api_username?: string;
-  api_password?: string;
 }

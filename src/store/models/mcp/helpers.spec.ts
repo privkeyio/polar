@@ -14,7 +14,6 @@ describe('MCP Helpers', () => {
       // - 1 bitcoin node: backend1
       // - 2 LND nodes: alice, bob
       // - 1 c-lightning node: carol
-      // - 1 eclair node: dave
     });
 
     describe('Bitcoin nodes', () => {
@@ -52,7 +51,7 @@ describe('MCP Helpers', () => {
         const node = findNode(network, 'alice', 'lightning');
         expect(node).toBeDefined();
         expect(node.name).toBe('alice');
-        expect(['LND', 'c-lightning', 'eclair', 'litd']).toContain(node.implementation);
+        expect(['LND', 'c-lightning', 'litd']).toContain(node.implementation);
       });
 
       it('should throw error if lightning node not found', () => {

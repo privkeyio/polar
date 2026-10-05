@@ -10,7 +10,6 @@ import {
   BitcoinNode,
   CLightningNode,
   CommonNode,
-  EclairNode,
   LightningNode,
   LitdNode,
   LndNode,
@@ -58,7 +57,6 @@ const groupNodes = (network: Network) => {
     clightning: lightning.filter(
       n => n.implementation === 'c-lightning',
     ) as CLightningNode[],
-    eclair: lightning.filter(n => n.implementation === 'eclair') as EclairNode[],
     litd: lightning.filter(n => n.implementation === 'litd') as LitdNode[],
     tapd: tap.filter(n => n.implementation === 'tapd') as TapdNode[],
   };
@@ -265,42 +263,6 @@ export const createCLightningNetworkNode = (
   };
 };
 
-export const createEclairNetworkNode = (
-  network: Network,
-  version: string,
-  compatibility: DockerRepoImage['compatibility'],
-  docker: CommonNode['docker'],
-  status = Status.Stopped,
-  basePort = BasePorts.eclair,
-): EclairNode => {
-  const { bitcoin, lightning } = network.nodes;
-  const implementation: EclairNode['implementation'] = 'eclair';
-  const backends = filterCompatibleBackends(
-    implementation,
-    version,
-    compatibility,
-    bitcoin,
-  );
-  const id = lightning.length ? Math.max(...lightning.map(n => n.id)) + 1 : 0;
-  const name = getName(id);
-  return {
-    id,
-    networkId: network.id,
-    name: name,
-    type: 'lightning',
-    implementation,
-    version,
-    status,
-    // alternate between backend nodes
-    backendName: backends[id % backends.length].name,
-    ports: {
-      rest: basePort.rest + id,
-      p2p: BasePorts.eclair.p2p + id,
-    },
-    docker,
-  };
-};
-
 export const createLitdNetworkNode = (
   network: Network,
   version: string,
@@ -448,7 +410,6 @@ export const createNetwork = (config: {
   description: string;
   lndNodes: number;
   clightningNodes: number;
-  eclairNodes: number;
   bitcoindNodes: number;
   tapdNodes: number;
   litdNodes: number;
@@ -466,7 +427,6 @@ export const createNetwork = (config: {
     description,
     lndNodes,
     clightningNodes,
-    eclairNodes,
     bitcoindNodes,
     tapdNodes,
     litdNodes,
@@ -541,22 +501,16 @@ export const createNetwork = (config: {
 
   // add custom lightning nodes
   customImages
-    .filter(i => ['LND', 'c-lightning', 'eclair'].includes(i.image.implementation))
+    .filter(i => ['LND', 'c-lightning'].includes(i.image.implementation))
     .forEach(({ image, count }) => {
       const { latest, compatibility } = repoState.images.LND;
       const docker = { image: image.dockerImage, command: image.command };
       const createFunc =
         image.implementation === 'LND'
           ? createLndNetworkNode
-          : image.implementation === 'c-lightning'
-          ? createCLightningNetworkNode
-          : createEclairNetworkNode;
+          : createCLightningNetworkNode;
       const basePort =
-        image.implementation === 'LND'
-          ? basePorts?.LND
-          : image.implementation === 'c-lightning'
-          ? basePorts?.['c-lightning']
-          : basePorts?.eclair;
+        image.implementation === 'LND' ? basePorts?.LND : basePorts?.['c-lightning'];
       range(count).forEach(() => {
         lightning.push(
           createFunc(network, latest, compatibility, docker, status, basePort),
@@ -565,7 +519,7 @@ export const createNetwork = (config: {
     });
 
   // add lightning nodes in an alternating pattern
-  range(Math.max(lndNodes, clightningNodes, eclairNodes, litdNodes)).forEach(i => {
+  range(Math.max(lndNodes, clightningNodes, litdNodes)).forEach(i => {
     if (i < lndNodes) {
       const { latest, compatibility } = repoState.images.LND;
       const cmd = getImageCommand(managedImages, 'LND', latest);
@@ -591,20 +545,6 @@ export const createNetwork = (config: {
           dockerWrap(cmd),
           status,
           basePorts?.['c-lightning'],
-        ),
-      );
-    }
-    if (i < eclairNodes) {
-      const { latest, compatibility } = repoState.images.eclair;
-      const cmd = getImageCommand(managedImages, 'eclair', latest);
-      lightning.push(
-        createEclairNetworkNode(
-          network,
-          latest,
-          compatibility,
-          dockerWrap(cmd),
-          status,
-          basePorts?.eclair,
         ),
       );
     }
@@ -652,12 +592,6 @@ export const renameNode = async (network: Network, node: AnyNode, newName: strin
           clnNode.name = newName;
           clnNode.paths = getCLightningFilePaths(newName, supportsGrpc, network);
           return clnNode;
-        case 'eclair':
-          const eclairNode = network.nodes.lightning.find(
-            n => n.id === node.id,
-          ) as EclairNode;
-          eclairNode.name = newName;
-          return eclairNode;
         case 'litd':
           const litdNode = network.nodes.lightning.find(
             n => n.id === node.id,
@@ -842,7 +776,7 @@ export const getOpenPorts = async (network: Network): Promise<OpenPorts | undefi
     }
   }
 
-  let { lnd, clightning, eclair, litd, tapd } = groupNodes(network);
+  let { lnd, clightning, litd, tapd } = groupNodes(network);
 
   // filter out nodes that are already running since their ports are in use by themselves
   lnd = lnd.filter(n => !isNodeRunning(n.status));
@@ -902,28 +836,6 @@ export const getOpenPorts = async (network: Network): Promise<OpenPorts | undefi
       openPorts.forEach((port, index) => {
         ports[clightning[index].name] = {
           ...(ports[clightning[index].name] || {}),
-          p2p: port,
-        };
-      });
-    }
-  }
-
-  eclair = eclair.filter(n => !isNodeRunning(n.status));
-  if (eclair.length) {
-    let existingPorts = eclair.map(n => n.ports.rest);
-    let openPorts = await getOpenPortRange(existingPorts);
-    if (openPorts.join() !== existingPorts.join()) {
-      openPorts.forEach((port, index) => {
-        ports[eclair[index].name] = { rest: port };
-      });
-    }
-
-    existingPorts = eclair.map(n => n.ports.p2p);
-    openPorts = await getOpenPortRange(existingPorts);
-    if (openPorts.join() !== existingPorts.join()) {
-      openPorts.forEach((port, index) => {
-        ports[eclair[index].name] = {
-          ...(ports[eclair[index].name] || {}),
           p2p: port,
         };
       });
@@ -1082,7 +994,7 @@ export const importNetworkFromZip = async (
       const cln = ln as CLightningNode;
       const supportsGrpc = cln.ports.grpc !== 0;
       cln.paths = getCLightningFilePaths(cln.name, supportsGrpc, network);
-    } else if (ln.implementation !== 'eclair') {
+    } else {
       throw new Error(l('unknownImplementation', { implementation: ln.implementation }));
     }
   });

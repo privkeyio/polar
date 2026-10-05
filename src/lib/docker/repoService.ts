@@ -62,7 +62,6 @@ class RepoService implements RepoServiceInjection {
     const updates: DockerRepoUpdates['updates'] = {
       LND: [],
       'c-lightning': [],
-      eclair: [],
       litd: [],
       bitcoind: [],
       btcd: [],

@@ -281,7 +281,6 @@ describe('OpenChannelModal', () => {
         description: 'network description',
         lndNodes: 1,
         clightningNodes: 0,
-        eclairNodes: 0,
         bitcoindNodes: 1,
         tapdNodes: 0,
         litdNodes: 3,

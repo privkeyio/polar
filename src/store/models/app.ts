@@ -5,6 +5,7 @@ import { notification } from 'antd';
 import { ArgsProps } from 'antd/lib/notification';
 import { push } from 'connected-react-router';
 import { Action, action, Computed, computed, Thunk, thunk } from 'easy-peasy';
+import { pick } from 'lodash';
 import { ipcChannels } from 'shared';
 import { NodeImplementation } from 'shared/types';
 import {
@@ -16,7 +17,7 @@ import {
   ManagedImage,
   StoreInjections,
 } from 'types';
-import { BasePorts, defaultRepoState } from 'utils/constants';
+import { BasePorts, defaultRepoState, dockerConfigs } from 'utils/constants';
 import { isWindows } from 'utils/system';
 import { changeTheme } from 'utils/theme';
 import { NETWORK_VIEW } from 'components/routing';
@@ -82,7 +83,6 @@ const appModel: AppModel = {
     newNodeCounts: {
       LND: 1,
       'c-lightning': 1,
-      eclair: 1,
       bitcoind: 1,
       btcd: 0,
       tapd: 0,
@@ -95,7 +95,6 @@ const appModel: AppModel = {
         grpc: BasePorts['c-lightning'].grpc,
         rest: BasePorts['c-lightning'].rest,
       },
-      eclair: { rest: BasePorts.eclair.rest },
       tapd: { grpc: BasePorts.tapd.grpc, rest: BasePorts.tapd.rest },
     },
   },
@@ -156,6 +155,11 @@ const appModel: AppModel = {
 
     const settings = await injections.settingsService.load();
     if (settings) {
+      if (settings.nodeImages) {
+        settings.nodeImages.custom = settings.nodeImages.custom.filter(
+          i => !!dockerConfigs[i.implementation],
+        );
+      }
       actions.setSettings(settings);
       await getI18n().changeLanguage(settings.lang);
       changeTheme(settings.theme || 'dark');
@@ -221,7 +225,8 @@ const appModel: AppModel = {
     actions.setDockerImages(images);
   }),
   setRepoState: action((state, repoState) => {
-    state.dockerRepoState = repoState;
+    const images = pick(repoState.images, Object.keys(defaultRepoState.images));
+    state.dockerRepoState = { ...repoState, images } as DockerRepoState;
   }),
   loadRepoState: thunk(async (actions, _, { injections, getState }) => {
     const defaultState = getState().dockerRepoState;
