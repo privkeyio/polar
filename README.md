@@ -15,14 +15,27 @@ This is an unofficial fork of [Polar](https://github.com/jamaljsr/polar) that fo
 
 ## Releases
 
-Published under [Releases](https://github.com/privkeyio/polar/releases) with a signed shasums file covering every artifact:
+Published under [Releases](https://github.com/privkeyio/polar/releases) with a signed `SHA256SUMS` covering every file:
 
 ```bash
-gpg --verify polar-*-shasums.txt.asc polar-*-shasums.txt
-sha256sum -c polar-*-shasums.txt --ignore-missing
+gpg --import privkeyio-signing-key.asc
+gpg --verify SHA256SUMS.asc SHA256SUMS
+sha256sum --ignore-missing -c SHA256SUMS
 ```
 
-The signing key is `A47D 99B6 DB0D 715D 40C5 9A20 23AE 8A8E A7E2 4E38`.
+Signed by Kyle Santiago <kyle@privkey.io>, key `A47D99B6DB0D715D40C59A2023AE8A8EA7E24E38`.
+
+The macOS builds are not notarized and the Windows installers are not Authenticode signed, so both are reported as untrusted on first launch. Verify `SHA256SUMS` first, because clearing quarantine removes the check that would otherwise stop a tampered download:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Polar BLAKE2b.app"
+```
+
+The node images are built by the `Images` workflow from the Dockerfiles in [docker](docker), each pinned to a signed checksum file or, for LND, a source commit, as listed in [docker/README.md](docker/README.md).
+
+## Reporting issues
+
+Use the [Issues](https://github.com/privkeyio/polar/issues) tab for problems specific to this fork. Anything else belongs [upstream](https://github.com/jamaljsr/polar/issues).
 
 ---
 
