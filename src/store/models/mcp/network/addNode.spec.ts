@@ -25,7 +25,7 @@ describe('MCP model > addNode', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('Bitcoin Core node');
+      expect(result.message).toContain('Bitcoin Knots node');
       expect(result.message).toContain('added to network');
       expect(result.message).toContain('successfully');
       expect(result.node).toBeDefined();
@@ -36,7 +36,7 @@ describe('MCP model > addNode', () => {
       const result = await store.getActions().mcp.addNode({
         networkId: 1,
         implementation: 'bitcoind',
-        version: '29.0',
+        version: '29.4.2',
       });
 
       expect(result.success).toBe(true);
@@ -85,7 +85,7 @@ describe('MCP model > addNode', () => {
       const result = await store.getActions().mcp.addNode({
         networkId: 1,
         implementation: 'LND',
-        version: '0.19.2-beta',
+        version: '0.21.3-beta-blake2b.17',
       });
 
       expect(result.success).toBe(true);

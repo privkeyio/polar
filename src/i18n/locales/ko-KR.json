@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "취소",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "백엔드 변경",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "백엔드 노드를 변경할 수 없습니다",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} 은 {{ln.implementation}} v{{ln.version}} 를 실행 중이며 Bitcoin Core v{{requiredVersion}} 및 이전 버전과 호환됩니다. {{backend.name}} 는 v{{backend.version}} 실행 중이므로 사용할 수 없습니다.",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} 은 {{ln.implementation}} v{{ln.version}} 를 실행 중이며 Bitcoin Knots v{{requiredVersion}} 및 이전 버전과 호환됩니다. {{backend.name}} 는 v{{backend.version}} 실행 중이므로 사용할 수 없습니다.",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "백엔드 노드를 성공적으로 업데이트했습니다",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "{{ln}} 노드는 {{backend}} 에서 체인 데이터를 가져옵니다",
   "cmps.designer.lightning.actions.Deposit.title": "예금 기금",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "이 시스템에서 사용할 수없는 사용자 정의 노드 이미지가 포함되어 네트워크를 시작할 수 없습니다",
   "store.models.network.missingNetworkName": "Network must have a name",
   "store.models.network.nodeNotStarted": "The {{nodeName}} node is not started",
-  "utils.network.backendCompatError": "이 네트워크에는 {{implementation}} v{{version}} 필요한 Bitcoin Core v{{requiredVersion}} (또는 그 이하) 노드가 없습니다.",
+  "utils.network.backendCompatError": "이 네트워크에는 {{implementation}} v{{version}} 필요한 Bitcoin Knots v{{requiredVersion}} (또는 그 이하) 노드가 없습니다.",
   "utils.network.incompatibleImplementation": "노드가 {{implementation}} 네트워크 가져 오기는 {{platform}} 지원되지 않습니다.",
   "utils.network.unknownImplementation": "알 수없는 Lightning 구현 '{{implementation}}' 을 (를) 가져올 수 없습니다."
 }

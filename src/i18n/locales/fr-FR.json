@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "Annuler",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "Changer de backend",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "Impossible de modifier le nœud principal",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} exécute {{ln.implementation}} v{{ln.version}} qui est compatible avec Bitcoin Core v{{requiredVersion}} et versions antérieures. {{backend.name}} est en cours d'exécution v{{backend.version}} donc il ne peut pas être utilisé.",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} exécute {{ln.implementation}} v{{ln.version}} qui est compatible avec Bitcoin Knots v{{requiredVersion}} et versions antérieures. {{backend.name}} est en cours d'exécution v{{backend.version}} donc il ne peut pas être utilisé.",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "Mise à jour réussie du nœud principal",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "Le nœud {{ln}} tirera les données de chaîne de {{backend}}",
   "cmps.designer.lightning.actions.Deposit.title": "Fonds de dépôt",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "Impossible de démarrer le réseau car il contient des images de noeud personnalisées qui ne sont pas disponibles sur cette machine",
   "store.models.network.missingNetworkName": "Le réseau doit avoir un nom",
   "store.models.network.nodeNotStarted": "Le noeud {{nodeName}} n'est pas démarré",
-  "utils.network.backendCompatError": "Ce réseau ne contient pas de nœud Bitcoin Core v{{requiredVersion}} (ou inférieur) requis pour {{implementation}} v{{version}}",
+  "utils.network.backendCompatError": "Ce réseau ne contient pas de nœud Bitcoin Knots v{{requiredVersion}} (ou inférieur) requis pour {{implementation}} v{{version}}",
   "utils.network.incompatibleImplementation": "L'importation de réseaux avec {{implementation}} nœuds n'est pas prise en charge sur {{platform}}",
   "utils.network.unknownImplementation": "Impossible d'importer l'implémentation d'un noeud inconnu '{{implementation}}'"
 }

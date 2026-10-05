@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "Cancelar",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "Cambiar backend",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "No se puede cambiar el nodo de fondo",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} ejecuta {{ln.implementation}} v{{ln.version}} que es compatible con Bitcoin Core v{{requiredVersion}} y versiones anteriores. {{backend.name}} ejecuta v{{backend.version}} por lo que no se puede usar.",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} ejecuta {{ln.implementation}} v{{ln.version}} que es compatible con Bitcoin Knots v{{requiredVersion}} y versiones anteriores. {{backend.name}} ejecuta v{{backend.version}} por lo que no se puede usar.",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "Se actualizó correctamente el nodo de fondo",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "El nodo {{ln}} extraerá datos de la cadena de {{backend}}",
   "cmps.designer.lightning.actions.Deposit.title": "Depositar fondos",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "No se puede iniciar la red porque contiene imágenes de nodos personalizadas que no están disponibles en esta máquina",
   "store.models.network.missingNetworkName": "La red debe tener un nombre",
   "store.models.network.nodeNotStarted": "El nodo {{nodeName}} no se ha iniciado",
-  "utils.network.backendCompatError": "Esta red no contiene un nodo Bitcoin Core v{{requiredVersion}} (o inferior) que se requiere para {{implementation}} v{{version}}",
+  "utils.network.backendCompatError": "Esta red no contiene un nodo Bitcoin Knots v{{requiredVersion}} (o inferior) que se requiere para {{implementation}} v{{version}}",
   "utils.network.incompatibleImplementation": "La importación de redes con {{implementation}} nodos no es compatible con {{platform}}",
   "utils.network.unknownImplementation": "No se puede importar implementación de nodo desconocido '{{implementation}}'"
 }

@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "Abbrechen",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "Backend ändern",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "Der Backend Knoten kann nicht geändert werden",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} läuft auf {{ln.implementation}} v{{ln.version}}, die mit Bitcoin Core v{{requiredVersion}} und älter kompatibel ist. {{backend.name}} läuft auf v{{backend.version}} und kann deswegen nicht verwendet werden.",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} läuft auf {{ln.implementation}} v{{ln.version}}, die mit Bitcoin Knots v{{requiredVersion}} und älter kompatibel ist. {{backend.name}} läuft auf v{{backend.version}} und kann deswegen nicht verwendet werden.",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "Der Backend Knoten wurde erfolgreich aktualisiert",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "Der {{ln}} Knoten wird die Chain-Daten von {{backend}} abrufen",
   "cmps.designer.lightning.actions.Deposit.title": "Guthaben einzahlen",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "Das Netzwerk kann nicht gestartet werden, da es benutzerdefinierte Node-Images enthält, die auf diesem Rechner nicht verfügbar sind",
   "store.models.network.missingNetworkName": "Das Netzwerk muss einen Namen haben",
   "store.models.network.nodeNotStarted": "Der {{nodeName}} Knoten ist nicht gestartet",
-  "utils.network.backendCompatError": "Dieses Netzwerk enthält keine Bitcoin Core v{{requiredVersion}} (oder niedriger) Node. Dies ist für {{implementation}} v{{version}} aber erforderlich",
+  "utils.network.backendCompatError": "Dieses Netzwerk enthält keine Bitcoin Knots v{{requiredVersion}} (oder niedriger) Node. Dies ist für {{implementation}} v{{version}} aber erforderlich",
   "utils.network.incompatibleImplementation": "Das Importieren von Netzwerken mit {{implementation}}-Nodes wird auf {{platform}} nicht unterstützt",
   "utils.network.unknownImplementation": "Unbekannte Node-Implementierung '{{implementation}} ' kann nicht importiert werden"
 }

@@ -26,8 +26,8 @@ export interface AddNodeResult {
 export const addNodeDefinition: McpToolDefinition = {
   name: 'add_node',
   description:
-    'Adds a Bitcoin Core or Lightning Network node to an existing Polar network. ' +
-    'Supports Bitcoin Core (bitcoind), LND, and c-lightning implementations. ' +
+    'Adds a Bitcoin Knots or Lightning Network node to an existing Polar network. ' +
+    'Supports Bitcoin Knots (bitcoind), LND, and c-lightning implementations. ' +
     'If the network is started, the node will be automatically started as well.',
   inputSchema: {
     type: 'object',
@@ -114,7 +114,7 @@ export const addNodeTool: Thunk<
 
     // Return the node info
     const implementationName =
-      args.implementation === 'bitcoind' ? 'Bitcoin Core' : args.implementation;
+      args.implementation === 'bitcoind' ? 'Bitcoin Knots' : args.implementation;
     return {
       success: true,
       node,

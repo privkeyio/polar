@@ -1,6 +1,6 @@
 import { NodeImplementation, NodeImplementationWithSimln } from 'shared/types';
 import { DockerConfig, DockerRepoState } from 'types';
-import bitcoindLogo from 'resources/bitcoin.svg';
+import bitcoindLogo from 'resources/bitcoin-knots.svg';
 import clightningLogo from 'resources/clightning.png';
 import lndLogo from 'resources/lnd.png';
 import packageJson from '../../package.json';
@@ -9,7 +9,7 @@ import packageJson from '../../package.json';
 export const APP_VERSION = packageJson.version;
 
 // Docker
-export const DOCKER_REPO = 'polarlightning';
+export const DOCKER_REPO = 'ghcr.io/privkeyio/polar';
 
 // bitcoind
 export const INITIAL_BLOCK_REWARD = 50;
@@ -78,7 +78,7 @@ export const bitcoinCredentials = {
 export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = {
   LND: {
     name: 'LND',
-    imageName: 'polarlightning/lnd',
+    imageName: 'ghcr.io/privkeyio/polar/lnd',
     logo: lndLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'lnd',
@@ -105,13 +105,14 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
       '--bitcoind.zmqpubrawtx=tcp://{{backendName}}:28335',
       '--accept-keysend',
       '--accept-amp',
+      '--bitcoin.blake2b-activation-height=1',
     ].join('\n  '),
     // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
     variables: ['name', 'containerName', 'backendName', 'rpcUser', 'rpcPass'],
   },
   'c-lightning': {
     name: 'Core Lightning',
-    imageName: 'polarlightning/clightning',
+    imageName: 'ghcr.io/privkeyio/polar/clightning',
     logo: clightningLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'c-lightning',
@@ -144,8 +145,8 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
     apiDir: 'rest-api',
   },
   bitcoind: {
-    name: 'Bitcoin Core',
-    imageName: 'polarlightning/bitcoind',
+    name: 'Bitcoin Knots',
+    imageName: 'ghcr.io/privkeyio/polar/bitcoind',
     logo: bitcoindLogo,
     platforms: ['mac', 'linux', 'windows'],
     volumeDirName: 'bitcoind',
@@ -169,6 +170,8 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
       '-fallbackfee=0.0002',
       '-blockfilterindex=1',
       '-peerblockfilters=1',
+      '-testactivationheight=blake2b@1',
+      '-rejectparasites=0',
     ].join('\n  '),
     // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
     variables: ['rpcUser', 'rpcAuth'],
@@ -204,57 +207,31 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
  * images and use new versions without needing to update the Polar app
  */
 export const REPO_STATE_URL =
-  'https://raw.githubusercontent.com/jamaljsr/polar/master/docker/nodes.json';
+  'https://raw.githubusercontent.com/privkeyio/polar/master/docker/nodes.json';
 
 /**
  * this defines the hard-coded list of docker images available in the Polar app. When new images
  * are pushed to Docker Hub, this list should be updated along with the /docker/nodes.json file.
  */
 export const defaultRepoState: DockerRepoState = {
-  version: 77,
+  version: 1,
   images: {
     LND: {
-      latest: '0.20.0-beta',
-      versions: [
-        '0.20.0-beta',
-        '0.19.3-beta',
-        '0.19.2-beta',
-        '0.19.1-beta',
-        '0.19.0-beta',
-        '0.18.5-beta',
-        '0.18.4-beta',
-        '0.18.3-beta',
-        '0.18.2-beta',
-        '0.18.1-beta',
-        '0.18.0-beta',
-        '0.17.5-beta',
-        '0.16.4-beta',
-      ],
+      latest: '0.21.3-beta-blake2b.17',
+      versions: ['0.21.3-beta-blake2b.17'],
       // not all LND versions are compatible with all bitcoind versions.
       // this mapping specifies the highest compatible bitcoind for each LND version
       compatibility: {
-        '0.20.0-beta': '30.0',
-        '0.19.3-beta': '30.0',
-        '0.19.2-beta': '30.0',
-        '0.19.1-beta': '30.0',
-        '0.19.0-beta': '30.0',
-        '0.18.5-beta': '30.0',
-        '0.18.4-beta': '30.0',
-        '0.18.3-beta': '27.0',
-        '0.18.2-beta': '27.0',
-        '0.18.1-beta': '27.0',
-        '0.18.0-beta': '27.0',
-        '0.17.5-beta': '27.0',
-        '0.16.4-beta': '27.0',
+        '0.21.3-beta-blake2b.17': '29.4.2',
       },
     },
     'c-lightning': {
-      latest: '25.12',
-      versions: ['25.12', '25.09.3', '25.05', '25.02.2', '25.02', '24.11.1', '24.08.1'],
+      latest: '26.06.8-blake2b.6',
+      versions: ['26.06.8-blake2b.6'],
     },
     bitcoind: {
-      latest: '30.0',
-      versions: ['30.0', '29.0', '28.0', '27.0', '26.0'],
+      latest: '29.4.2',
+      versions: ['29.4.2'],
     },
     btcd: {
       latest: '',

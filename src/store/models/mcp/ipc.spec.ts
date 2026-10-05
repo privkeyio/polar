@@ -405,7 +405,7 @@ describe('MCP model > IPC', () => {
         expect(electronMock.ipcRenderer.send).toHaveBeenCalledWith(responseChannel, {
           data: expect.objectContaining({
             success: true,
-            message: expect.stringContaining('Bitcoin Core node'),
+            message: expect.stringContaining('Bitcoin Knots node'),
             node: expect.any(Object),
           }),
         });

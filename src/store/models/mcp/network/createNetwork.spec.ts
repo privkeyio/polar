@@ -1,7 +1,6 @@
 import { createStore } from 'easy-peasy';
 import { DockerRepoState } from 'types';
-import { defaultRepoState } from 'utils/constants';
-import { createMockRootModel, injections } from 'utils/tests';
+import { createMockRootModel, injections, testRepoState } from 'utils/tests';
 
 describe('MCP model > createNetwork', () => {
   const rootModel = createMockRootModel();
@@ -12,6 +11,7 @@ describe('MCP model > createNetwork', () => {
   beforeEach(() => {
     // reset the store before each test run
     store = createStore(rootModel, { injections });
+    store.getActions().app.setRepoState(testRepoState);
     jest.clearAllMocks();
   });
 
@@ -133,7 +133,7 @@ describe('MCP model > createNetwork', () => {
   });
 
   it('should reject implementations missing from the repo state', async () => {
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     delete (repoState.images as Record<string, unknown>)['c-lightning'];
     store.getActions().app.setRepoState(repoState);
 
@@ -180,7 +180,7 @@ describe('MCP model > createNetwork', () => {
   it('should throw when the network cannot be found after creation', async () => {
     const actions = store.getActions();
     const originalAddNode = actions.network.addNode;
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     repoState.images.LND.compatibility = {
       ...(repoState.images.LND.compatibility || {}),
       '0.18.3-beta': '30.0',
@@ -244,7 +244,7 @@ describe('MCP model > createNetwork', () => {
   });
 
   it('should handle LND versions with no bitcoind compatibility requirement', async () => {
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     // Set compatibility to undefined for a specific version
     repoState.images.LND.compatibility = {
       '0.18.3-beta': undefined as any,
@@ -264,7 +264,7 @@ describe('MCP model > createNetwork', () => {
   });
 
   it('should fail when no bitcoind version satisfies LND compatibility', async () => {
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     // Force an incompatible scenario
     repoState.images.LND.compatibility = {
       '0.18.3-beta': '25.0',
@@ -313,7 +313,7 @@ describe('MCP model > createNetwork', () => {
 
     expect(result.success).toBe(true);
     expect(result.network.nodes.bitcoin[0].version).toBe(
-      defaultRepoState.images.bitcoind.latest,
+      testRepoState.images.bitcoind.latest,
     );
     expect(result.network.nodes.lightning).toHaveLength(2);
     expect(
@@ -327,7 +327,7 @@ describe('MCP model > createNetwork', () => {
     // defaultBitcoindVersion should remain as latestBitcoind
     // We test this by ensuring the latest LND version has no compatibility entry,
     // but we need to ensure network.ts doesn't get undefined, so we'll set it to latest bitcoind
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     const latestLnd = repoState.images.LND.latest;
     // Delete the compatibility entry to test the undefined path
     delete repoState.images.LND.compatibility![latestLnd];
@@ -358,7 +358,7 @@ describe('MCP model > createNetwork', () => {
     // We need baseCounts.lndNodes > 0 AND compatibleBitcoind to be falsy
     // We delete the compatibility entry to make compatibleBitcoind undefined (falsy)
     // network.ts now handles this by falling back to latest bitcoind
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     const latestLnd = repoState.images.LND.latest;
     // Delete the compatibility entry - this makes compatibleBitcoind undefined (falsy)
     delete repoState.images.LND.compatibility![latestLnd];
@@ -383,7 +383,7 @@ describe('MCP model > createNetwork', () => {
 
   it('should exercise app state dockerRepoState present path', async () => {
     // This ensures line 451 first branch is covered (app.dockerRepoState exists)
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     store.getActions().app.setRepoState(repoState);
 
     const result = await store.getActions().mcp.createNetwork({
@@ -399,7 +399,7 @@ describe('MCP model > createNetwork', () => {
     // This covers line 223: const lndCompatibility = repoState.images.LND.compatibility || {};
     // Test the defensive fallback by setting compatibility to undefined
     // We only create bitcoind nodes to avoid network.ts accessing undefined compatibility
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     (repoState.images.LND as any).compatibility = undefined;
     store.getActions().app.setRepoState(repoState);
 
@@ -415,7 +415,7 @@ describe('MCP model > createNetwork', () => {
   it('should handle missing LND compatibility property in validateCompatibility', async () => {
     // This covers line 318: const lndCompatibility = repoState.images.LND.compatibility || {};
     // Test the defensive fallback by setting compatibility to undefined
-    const repoState = JSON.parse(JSON.stringify(defaultRepoState)) as DockerRepoState;
+    const repoState = JSON.parse(JSON.stringify(testRepoState)) as DockerRepoState;
     (repoState.images.LND as any).compatibility = undefined;
     store.getActions().app.setRepoState(repoState);
 

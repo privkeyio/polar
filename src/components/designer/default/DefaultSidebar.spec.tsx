@@ -6,7 +6,7 @@ import { Status } from 'shared/types';
 import { CustomImage } from 'types';
 import { initChartFromNetwork } from 'utils/chart';
 import { defaultRepoState } from 'utils/constants';
-import { getNetwork, injections, renderWithProviders } from 'utils/tests';
+import { getNetwork, injections, renderWithProviders, testRepoState } from 'utils/tests';
 import DefaultSidebar from './DefaultSidebar';
 
 jest.mock('os', () => {
@@ -24,7 +24,7 @@ const mockRepoService = injections.repoService as jest.Mocked<
 >;
 
 describe('DefaultSidebar Component', () => {
-  const lndLatest = defaultRepoState.images.LND.latest;
+  const lndLatest = testRepoState.images.LND.latest;
   const customImages: CustomImage[] = [
     {
       id: '123',
@@ -40,7 +40,7 @@ describe('DefaultSidebar Component', () => {
     const chart = initChartFromNetwork(network);
     const initialState = {
       app: {
-        dockerRepoState: defaultRepoState,
+        dockerRepoState: testRepoState,
         settings: {
           nodeImages: {
             custom: images || [],
@@ -74,7 +74,7 @@ describe('DefaultSidebar Component', () => {
   it('should expand the list of LND nodes', async () => {
     const { getByText, getAllByLabelText } = renderComponent();
     expect(getByText(`LND v${lndLatest}`)).toBeInTheDocument();
-    const prevVersion = defaultRepoState.images.LND.versions[2];
+    const prevVersion = testRepoState.images.LND.versions[2];
     expect(getByText(`LND v${prevVersion}`)).not.toBeVisible();
     fireEvent.click(getAllByLabelText('down')[0]);
     expect(getByText(`LND v${prevVersion}`)).toBeVisible();

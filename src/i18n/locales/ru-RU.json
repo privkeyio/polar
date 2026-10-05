@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "Отмена",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "Изменить бэкэнд",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "Невозможно изменить внутренний узел",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} работает {{ln.implementation}} v{{ln.version}} что совместимо с Bitcoin Core v{{requiredVersion}} и старше. {{backend.name}} работает v{{backend.version}} поэтому его нельзя использовать.",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} работает {{ln.implementation}} v{{ln.version}} что совместимо с Bitcoin Knots v{{requiredVersion}} и старше. {{backend.name}} работает v{{backend.version}} поэтому его нельзя использовать.",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "Успешно обновлен серверный узел",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "Узел {{ln}} будет извлекать цепочку данных из {{backend}}",
   "cmps.designer.lightning.actions.Deposit.title": "Депозитные средства",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "Невозможно запустить сеть, так как она содержит пользовательские изображения узлов, недоступные на этой машине",
   "store.models.network.missingNetworkName": "Сеть должна иметь имя",
   "store.models.network.nodeNotStarted": "Узел {{nodeName}} не запущен",
-  "utils.network.backendCompatError": "Эта сеть не содержит узла Bitcoin Core v{{requiredVersion}} (или ниже), который требуется для {{implementation}} v{{version}}",
+  "utils.network.backendCompatError": "Эта сеть не содержит узла Bitcoin Knots v{{requiredVersion}} (или ниже), который требуется для {{implementation}} v{{version}}",
   "utils.network.incompatibleImplementation": "Импорт сетей с {{implementation}} узлами не поддерживается на {{platform}}",
   "utils.network.unknownImplementation": "Невозможно импортировать реализацию неизвестного узла '{{implementation}}'"
 }

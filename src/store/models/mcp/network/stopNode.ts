@@ -26,7 +26,7 @@ export const stopNodeDefinition: McpToolDefinition = {
   name: 'stop_node',
   description:
     'Stops a specific node in a Polar network. The node must be in Started state. ' +
-    'Supports Bitcoin Core and Lightning Network nodes.',
+    'Supports Bitcoin Knots and Lightning Network nodes.',
   inputSchema: {
     type: 'object',
     properties: {

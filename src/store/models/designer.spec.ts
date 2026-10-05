@@ -514,7 +514,7 @@ describe('Designer model', () => {
             expect.objectContaining({
               message: 'Failed to add node',
               error: new Error(
-                'This network does not contain a Bitcoin Core v0.18.1 (or lower) node which is required for LND v0.7.1-beta',
+                'This network does not contain a Bitcoin Knots v0.18.1 (or lower) node which is required for LND v0.7.1-beta',
               ),
             }),
           );

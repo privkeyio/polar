@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "取消",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "变更后端",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "无法更改后端节点",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} 正在运行 {{ln.implementation}} v{{ln.version}} ，它与Bitcoin Core v{{requiredVersion}} 和更早版本兼容。 {{backend.name}} 正在运行v{{backend.version}} 因此无法使用。",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} 正在运行 {{ln.implementation}} v{{ln.version}} ，它与Bitcoin Knots v{{requiredVersion}} 和更早版本兼容。 {{backend.name}} 正在运行v{{backend.version}} 因此无法使用。",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "成功更新后端节点",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "{{ln}} 节点将从 {{backend}} 提取链数据",
   "cmps.designer.lightning.actions.Deposit.title": "存款资金",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "无法启动网络，因为它包含此计算机上不可用的自定义节点映像",
   "store.models.network.missingNetworkName": "必须为网络起个名字",
   "store.models.network.nodeNotStarted": "The {{nodeName}} node is not started",
-  "utils.network.backendCompatError": "该网络不包含 {{implementation}} v{{version}} 所需的 Bitcoin Core v{{requiredVersion}} (或更低版本) 节点",
+  "utils.network.backendCompatError": "该网络不包含 {{implementation}} v{{version}} 所需的 Bitcoin Knots v{{requiredVersion}} (或更低版本) 节点",
   "utils.network.incompatibleImplementation": "{{platform}} 上不支持导入具有 {{implementation}} 节点的网络",
   "utils.network.unknownImplementation": "无法导入未知节点实现'{{implementation}}'"
 }

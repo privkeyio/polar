@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "Annulla",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "Cambia backend",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "Impossibile modificare il nodo back-end",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} esegue {{ln.implementation}} v{{ln.version}} che è compatibile con Bitcoin Core v{{requiredVersion}} e precedenti. {{backend.name}} esegue v{{backend.version}} quindi non può essere utilizzato.",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} esegue {{ln.implementation}} v{{ln.version}} che è compatibile con Bitcoin Knots v{{requiredVersion}} e precedenti. {{backend.name}} esegue v{{backend.version}} quindi non può essere utilizzato.",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "Aggiornato correttamente il nodo back-end",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "Il nodo {{ln}} estraerà i dati della catena da {{backend}}",
   "cmps.designer.lightning.actions.Deposit.title": "Fondi di deposito",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "Non è possibile avviare la rete perché contiene immagini di nodo personalizzato che non sono disponibili su questa macchina",
   "store.models.network.missingNetworkName": "La rete deve avere un nome",
   "store.models.network.nodeNotStarted": "Il nodo {{nodeName}} non è stato avviato",
-  "utils.network.backendCompatError": "Questa rete non contiene un nodo Bitcoin Core v{{requiredVersion}} (o inferiore) richiesto per {{implementation}} v{{version}}",
+  "utils.network.backendCompatError": "Questa rete non contiene un nodo Bitcoin Knots v{{requiredVersion}} (o inferiore) richiesto per {{implementation}} v{{version}}",
   "utils.network.incompatibleImplementation": "L'importazione di reti con {{implementation}} nodi non è supportata su {{platform}}",
   "utils.network.unknownImplementation": "Impossibile importare implementazione nodo sconosciuto '{{implementation}}'"
 }

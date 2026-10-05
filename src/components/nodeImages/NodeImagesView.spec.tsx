@@ -54,13 +54,13 @@ describe('NodeImagesView Component', () => {
 
   it('should display all managed images', () => {
     const { getAllByText } = renderComponent();
-    expect(getAllByText('polarlightning/lnd')).toHaveLength(
+    expect(getAllByText('ghcr.io/privkeyio/polar/lnd')).toHaveLength(
       defaultRepoState.images.LND.versions.length,
     );
-    expect(getAllByText('polarlightning/clightning')).toHaveLength(
+    expect(getAllByText('ghcr.io/privkeyio/polar/clightning')).toHaveLength(
       defaultRepoState.images['c-lightning'].versions.length,
     );
-    expect(getAllByText('polarlightning/bitcoind')).toHaveLength(
+    expect(getAllByText('ghcr.io/privkeyio/polar/bitcoind')).toHaveLength(
       defaultRepoState.images.bitcoind.versions.length,
     );
   });

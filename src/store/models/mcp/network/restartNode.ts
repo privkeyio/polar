@@ -27,7 +27,7 @@ export const restartNodeDefinition: McpToolDefinition = {
   description:
     'Restarts a specific node in a Polar network. The node must be in Started or Error state. ' +
     'This operation stops the node first, then starts it again. ' +
-    'Supports Bitcoin Core and Lightning Network nodes.',
+    'Supports Bitcoin Knots and Lightning Network nodes.',
   inputSchema: {
     type: 'object',
     properties: {

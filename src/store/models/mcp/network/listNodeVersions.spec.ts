@@ -17,13 +17,13 @@ describe('MCP model > listNodeVersions', () => {
     const result = await store.getActions().mcp.listNodeVersions({});
 
     expect(result.versions).toBeDefined();
-    expect(result.versions.bitcoind).toContain('29.0');
-    expect(result.versions.LND).toContain('0.19.2-beta');
-    expect(result.versions['c-lightning']).toContain('25.05');
+    expect(result.versions.bitcoind).toContain('29.4.2');
+    expect(result.versions.LND).toContain('0.21.3-beta-blake2b.17');
+    expect(result.versions['c-lightning']).toContain('26.06.8-blake2b.6');
     expect(result.latest).toBeDefined();
     expect(result.compatibility).toBeDefined();
     expect(result.compatibility.LND).toBeDefined();
-    expect(result.compatibility.LND?.['0.19.2-beta']).toBe('30.0');
+    expect(result.compatibility.LND?.['0.21.3-beta-blake2b.17']).toBe('29.4.2');
     expect(result.message).toContain('All supported node versions');
   });
 
@@ -34,8 +34,8 @@ describe('MCP model > listNodeVersions', () => {
 
     expect(result.versions).toBeDefined();
     expect(result.versions.bitcoind).toBeDefined();
-    expect(result.versions.bitcoind).toContain('29.0');
-    expect(result.latest.bitcoind).toBe('30.0');
+    expect(result.versions.bitcoind).toContain('29.4.2');
+    expect(result.latest.bitcoind).toBe('29.4.2');
     expect(result.compatibility.bitcoind).toBeUndefined(); // bitcoind has no compatibility requirements
     // Should not contain other implementations when filtered
     expect(result.versions.LND).toBeUndefined();

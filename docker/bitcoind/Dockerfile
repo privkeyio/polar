@@ -9,9 +9,11 @@ RUN apt-get update -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN SYS_ARCH="$(uname -m)" \
-  && curl -SLO https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-${SYS_ARCH}-linux-gnu.tar.gz \
+  && curl -SLO https://github.com/bitcoinknots/bitcoin/releases/download/v${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-${SYS_ARCH}-linux-gnu.tar.gz \
+  && curl -SLO https://github.com/bitcoinknots/bitcoin/releases/download/v${BITCOIN_VERSION}/SHA256SUMS \
+  && sha256sum --ignore-missing -c SHA256SUMS \
   && tar -xzf *.tar.gz -C /opt \
-  && rm *.tar.gz
+  && rm *.tar.gz SHA256SUMS
 
 RUN curl -SLO https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/completions/bash/bitcoin-cli.bash \
   && mkdir -p /etc/bash_completion.d \

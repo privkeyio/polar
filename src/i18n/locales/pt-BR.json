@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "Cancelar",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "Alterar back-end",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "Não foi possível alterar o nó de back-end",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} está executando {{ln.implementation}} v{{ln.version}} que é compatível com o Bitcoin Core v{{requiredVersion}} e mais antigo. {{backend.name}} está executando a versão{{backend.version}} portanto, não pode ser usado.",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} está executando {{ln.implementation}} v{{ln.version}} que é compatível com o Bitcoin Knots v{{requiredVersion}} e mais antigo. {{backend.name}} está executando a versão{{backend.version}} portanto, não pode ser usado.",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "Atualizou com êxito o nó de back-end",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "O nó {{ln}} extrairá dados da cadeia de {{backend}}",
   "cmps.designer.lightning.actions.Deposit.title": "Fundos de depósito",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "Não é possível iniciar a rede porque ela contém imagens de nó personalizadas que não estão disponíveis nesta máquina",
   "store.models.network.missingNetworkName": "A rede deve ter um nome",
   "store.models.network.nodeNotStarted": "O nó {{nodeName}} não está iniciado",
-  "utils.network.backendCompatError": "Esta rede não contém um nó Bitcoin Core v{{requiredVersion}} (ou inferior) necessário para {{implementation}} v{{version}}",
+  "utils.network.backendCompatError": "Esta rede não contém um nó Bitcoin Knots v{{requiredVersion}} (ou inferior) necessário para {{implementation}} v{{version}}",
   "utils.network.incompatibleImplementation": "A importação de redes com {{implementation}} nós não é suportada em {{platform}}",
   "utils.network.unknownImplementation": "Impossível importar implementação de nó desconhecido '{{implementation}}'"
 }

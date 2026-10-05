@@ -213,7 +213,7 @@
   "cmps.designer.lightning.actions.ChangeBackendModal.cancelBtn": "キャンセル",
   "cmps.designer.lightning.actions.ChangeBackendModal.okBtn": "バックエンドを変更",
   "cmps.designer.lightning.actions.ChangeBackendModal.submitError": "バックエンドノードを変更できません",
-  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} はBitcoin Core v{{requiredVersion}} 以前と互換性のある {{ln.implementation}} v{{ln.version}} を実行しています。 {{backend.name}} はv{{backend.version}} 実行しているため、使用できません。",
+  "cmps.designer.lightning.actions.ChangeBackendModal.compatWarning": "{{ln.name}} はBitcoin Knots v{{requiredVersion}} 以前と互換性のある {{ln.implementation}} v{{ln.version}} を実行しています。 {{backend.name}} はv{{backend.version}} 実行しているため、使用できません。",
   "cmps.designer.lightning.actions.ChangeBackendModal.successTitle": "バックエンドノードを正常に更新しました",
   "cmps.designer.lightning.actions.ChangeBackendModal.successDesc": "{{ln}} ノードは {{backend}} からチェーンデータをプルします",
   "cmps.designer.lightning.actions.Deposit.title": "資金をデポジット",
@@ -463,7 +463,7 @@
   "store.models.network.missingImages": "送信元ノードが開始されている必要があります",
   "store.models.network.missingNetworkName": "ネットワークには名前が必要です",
   "store.models.network.nodeNotStarted": "{{nodeName}} ノードは開始されていません",
-  "utils.network.backendCompatError": "このネットワークには、{{implementation}} v{{version}} 必要な Bitcoin Core v{{requiredVersion}} (またはそれ以下) ノードが含まれていません",
+  "utils.network.backendCompatError": "このネットワークには、{{implementation}} v{{version}} 必要な Bitcoin Knots v{{requiredVersion}} (またはそれ以下) ノードが含まれていません",
   "utils.network.incompatibleImplementation": "{{implementation}} ノードのネットワークのインポートは {{platform}} ではサポートされていません",
   "utils.network.unknownImplementation": "不明なノードの実装 '{{implementation}} ' をインポートできません。"
 }
