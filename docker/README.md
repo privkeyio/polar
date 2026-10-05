@@ -57,10 +57,10 @@ Replace `<version>` with a tag of [paulscode/lightning-fork](https://github.com/
 
 ```sh
 $ cd clightning
-$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> --build-arg CLN_SHA256SUMS=<sums> --build-arg BITCOIN_VERSION=<knots> --build-arg BITCOIN_SHA256SUMS=<knots-sums> -t ghcr.io/privkeyio/polar/clightning:<version> --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> -t ghcr.io/privkeyio/polar/clightning:<version> --push .
 ```
 
-Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.8-blake2b.6`) `<sums>` with the sha256 of its `SHA256SUMS-v<version>` once you have checked the `.asc` against the privkeyio key `A47D 99B6 DB0D 715D 40C5 9A20 23AE 8A8E A7E2 4E38` (for `26.06.8-blake2b.6`: `00de890637f5476a65de70bf52943d62173a5633b1c76b799bb2938b84bbd6bb`), and `<knots>` and `<knots-sums>` as for Bitcoin Knots above, whose `bitcoin-cli` it uses.
+Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.8-blake2b.6`). The image builds on `ghcr.io/privkeyio/lightningd`, which privkeyio/lightning publishes for each release.
 
 The images can also be built and pushed from master with the `Images` workflow in GitHub Actions, passing the same build args one per line.
 

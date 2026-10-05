@@ -31,7 +31,7 @@ The macOS builds are not notarized and the Windows installers are not Authentico
 xattr -dr com.apple.quarantine "/Applications/Polar BLAKE2b.app"
 ```
 
-The node images are built by the `Images` workflow from the Dockerfiles in [docker](docker), each pinned to a signed checksum file or, for LND, a source commit, as listed in [docker/README.md](docker/README.md).
+The node images are built by the `Images` workflow from the Dockerfiles in [docker](docker), Bitcoin Knots is pinned to its signed checksum file, LND to a source commit, and Core Lightning builds on the `lightningd` image privkeyio/lightning publishes for each release; see [docker/README.md](docker/README.md).
 
 ## Reporting issues
 
