@@ -2,6 +2,7 @@ import detectPort from 'detect-port';
 import {
   BitcoinNode,
   CLightningNode,
+  LampoNode,
   LightningNode,
   LndNode,
   NodeImplementation,
@@ -146,6 +147,7 @@ describe('Network Utils', () => {
         description: 'my-test-description',
         lndNodes: 4,
         clightningNodes: 1,
+        lampoNodes: 0,
         bitcoindNodes: 1,
         status: Status.Stopped,
         repoState: defaultRepoState,
@@ -277,6 +279,35 @@ describe('Network Utils', () => {
       expect(ports[network.nodes.lightning[4].name].p2p).toBe(9740);
     });
 
+    it('should update the rest and p2p ports for lampo nodes', async () => {
+      network = createNetwork({
+        id: 1,
+        name: 'my-test',
+        description: 'my-test-description',
+        lndNodes: 0,
+        clightningNodes: 0,
+        lampoNodes: 2,
+        bitcoindNodes: 1,
+        status: Status.Stopped,
+        repoState: defaultRepoState,
+        managedImages: testManagedImages,
+        customImages: [],
+        manualMineCount: 6,
+      });
+      const portsInUse = [8281, 9936];
+      mockDetectPort.mockImplementation(port =>
+        Promise.resolve(portsInUse.includes(port) ? port + 1 : port),
+      );
+      network.nodes.bitcoin = [];
+      const [alice, bob] = network.nodes.lightning as LampoNode[];
+      const ports = (await getOpenPorts(network)) as OpenPorts;
+      expect(ports).toBeDefined();
+      expect(ports[alice.name].rest).toBe(8282);
+      expect(ports[alice.name].p2p).toBe(9935);
+      expect(ports[bob.name].rest).toBe(8283);
+      expect(ports[bob.name].p2p).toBe(9937);
+    });
+
     it('should not update ports if none are in use', async () => {
       const portsInUse: number[] = [];
       mockDetectPort.mockImplementation(port =>
@@ -338,6 +369,7 @@ describe('Network Utils', () => {
         description: 'my-test-description',
         lndNodes: 2,
         clightningNodes: 1,
+        lampoNodes: 1,
         bitcoindNodes: 1,
         status: Status.Stopped,
         repoState: defaultRepoState,
@@ -372,6 +404,16 @@ describe('Network Utils', () => {
       expect((updatedNode as CLightningNode).paths).toStrictEqual(
         getCLightningFilePaths(newName, supportsGrpc, network),
       );
+    });
+
+    it('should rename a lightning lampo node', async () => {
+      const node = network.nodes.lightning.find(
+        n => n.implementation === 'lampo',
+      ) as LampoNode;
+      const newName = 'new-lampo-node-name';
+      const updatedNode = await renameNode(network, node, newName);
+      expect(updatedNode).toBeDefined();
+      expect(updatedNode.name).toBe(newName);
     });
 
     it('should rename a bitcoin node', async () => {

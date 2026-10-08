@@ -1,5 +1,6 @@
 import { LightningNode } from 'shared/types';
 import { clightningService } from 'lib/lightning/clightning';
+import { lampoService } from 'lib/lightning/lampo';
 import { lndService } from 'lib/lightning/lnd';
 import { LightningService } from 'types';
 
@@ -17,6 +18,7 @@ class LightningFactory {
     this._services = {
       LND: lndService,
       'c-lightning': clightningService,
+      lampo: lampoService,
     };
   }
 

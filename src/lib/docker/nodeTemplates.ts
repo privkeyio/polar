@@ -98,6 +98,30 @@ export const clightning = (
   ].filter(p => !!p), // filer out empty strings
 });
 
+export const lampo = (
+  name: string,
+  container: string,
+  image: string,
+  restPort: number,
+  p2pPort: number,
+  command: string,
+): ComposeService => ({
+  image,
+  container_name: container,
+  hostname: name,
+  command: trimInside(command),
+  restart: 'always',
+  volumes: [`./volumes/${dockerConfigs.lampo.volumeDirName}/${name}:/home/lampo/.lampo`],
+  expose: [
+    '7979', // REST
+    '9735', // p2p
+  ],
+  ports: [
+    `127.0.0.1:${restPort}:7979`, // REST, which has no authentication
+    `${p2pPort}:9735`, // p2p
+  ],
+});
+
 export const simln = (
   name: string,
   container: string,

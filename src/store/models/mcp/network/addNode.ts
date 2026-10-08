@@ -27,7 +27,7 @@ export const addNodeDefinition: McpToolDefinition = {
   name: 'add_node',
   description:
     'Adds a Bitcoin Knots or Lightning Network node to an existing Polar network. ' +
-    'Supports Bitcoin Knots (bitcoind), LND, and c-lightning implementations. ' +
+    'Supports Bitcoin Knots (bitcoind), LND, c-lightning, and lampo implementations. ' +
     'If the network is started, the node will be automatically started as well.',
   inputSchema: {
     type: 'object',

@@ -23,6 +23,7 @@ describe('SendOnChainModal', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 1,
+      lampoNodes: 0,
       bitcoindNodes: 3,
       status: Status.Started,
       repoState: defaultRepoState,

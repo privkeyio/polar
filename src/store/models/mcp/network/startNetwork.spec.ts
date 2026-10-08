@@ -27,6 +27,7 @@ describe('MCP model > startNetwork', () => {
       description: 'Test',
       lndNodes: 1,
       clightningNodes: 0,
+      lampoNodes: 0,
       bitcoindNodes: 1,
       customNodes: {},
       manualMineCount: 6,

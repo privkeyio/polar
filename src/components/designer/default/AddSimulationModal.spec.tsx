@@ -17,6 +17,7 @@ describe('AddSimulationModal', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 0,
+      lampoNodes: 0,
       bitcoindNodes: 2,
       repoState: defaultRepoState,
       managedImages: testManagedImages,

@@ -1,8 +1,14 @@
-import { BitcoinNode, CLightningNode, CommonNode, LndNode } from 'shared/types';
+import {
+  BitcoinNode,
+  CLightningNode,
+  CommonNode,
+  LampoNode,
+  LndNode,
+} from 'shared/types';
 import { bitcoinCredentials, dockerConfigs } from 'utils/constants';
 import { getContainerName, getDefaultCommand } from 'utils/network';
 import { isWindows } from 'utils/system';
-import { bitcoind, clightning, lnd, simln } from './nodeTemplates';
+import { bitcoind, clightning, lampo, lnd, simln } from './nodeTemplates';
 
 export interface ComposeService {
   image: string;
@@ -133,6 +139,27 @@ class ComposeFile {
       command,
       namedVolumeName,
     );
+    this.addService(svc);
+  }
+
+  addLampo(node: LampoNode, backend: CommonNode) {
+    const { name, version, ports } = node;
+    const { rest, p2p } = ports;
+    const container = getContainerName(node);
+    // define the variable substitutions
+    const variables = {
+      backendName: getContainerName(backend),
+      rpcUser: bitcoinCredentials.user,
+      rpcPass: bitcoinCredentials.pass,
+    };
+    // use the node's custom image or the default for the implementation
+    const image = node.docker.image || `${dockerConfigs.lampo.imageName}:${version}`;
+    // use the node's custom command or the default for the implementation
+    const nodeCommand = node.docker.command || getDefaultCommand('lampo', version);
+    // replace the variables in the command
+    const command = this.mergeCommand(nodeCommand, variables);
+    // add the docker service
+    const svc = lampo(name, container, image, rest, p2p, command);
     this.addService(svc);
   }
 

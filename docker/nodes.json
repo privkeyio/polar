@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "images": {
     "LND": {
       "latest": "0.21.3-beta-blake2b.17",
@@ -11,6 +11,10 @@
     "c-lightning": {
       "latest": "26.06.8-blake2b.6",
       "versions": ["26.06.8-blake2b.6"]
+    },
+    "lampo": {
+      "latest": "0.1.0-blake2b.1",
+      "versions": ["0.1.0-blake2b.1"]
     },
     "bitcoind": {
       "latest": "29.4.2",

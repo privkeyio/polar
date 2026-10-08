@@ -49,6 +49,7 @@ describe('App model', () => {
       newNodeCounts: {
         LND: 1,
         'c-lightning': 1,
+        lampo: 0,
         bitcoind: 1,
         btcd: 0,
       },
@@ -63,6 +64,9 @@ describe('App model', () => {
         'c-lightning': {
           rest: 8181,
           grpc: 11001,
+        },
+        lampo: {
+          rest: 8281,
         },
       },
     });
@@ -94,9 +98,30 @@ describe('App model', () => {
     expect(store.getState().app.settings.newNodeCounts).toEqual({
       LND: 2,
       'c-lightning': 0,
+      lampo: 0,
       bitcoind: 1,
       btcd: 0,
     });
+  });
+
+  it('should keep defaults for implementations missing from saved settings', async () => {
+    mockSettingsService.load.mockResolvedValue({
+      lang: 'en-US',
+      theme: 'dark',
+      nodeImages: { custom: [], managed: [] },
+      newNodeCounts: { LND: 3, 'c-lightning': 2, bitcoind: 1, btcd: 0 },
+      basePorts: {
+        LND: { rest: 8080, grpc: 10001 },
+        'c-lightning': { rest: 8181, grpc: 11001 },
+        bitcoind: { rest: 18443 },
+      },
+    } as any);
+    await store.getActions().app.initialize();
+    const { newNodeCounts, basePorts } = store.getState().app.settings;
+    expect(newNodeCounts.LND).toEqual(3);
+    expect(newNodeCounts.lampo).toEqual(0);
+    expect(basePorts.LND.rest).toEqual(8080);
+    expect(basePorts.lampo).toEqual({ rest: 8281 });
   });
 
   it('should ignore unsupported implementations in saved settings and repo state', async () => {
@@ -165,6 +190,7 @@ describe('App model', () => {
         newNodeCounts: {
           LND: 1,
           'c-lightning': 1,
+          lampo: 0,
           bitcoind: 1,
           btcd: 1,
         },
@@ -179,6 +205,9 @@ describe('App model', () => {
           'c-lightning': {
             rest: 8181,
             grpc: 11001,
+          },
+          lampo: {
+            rest: 8281,
           },
         },
       });
@@ -200,6 +229,7 @@ describe('App model', () => {
         updates: {
           LND: ['0.99.0-beta'], // a new version available for LND
           'c-lightning': [],
+          lampo: [],
           bitcoind: [],
           btcd: [],
         },

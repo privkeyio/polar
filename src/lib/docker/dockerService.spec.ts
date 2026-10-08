@@ -186,6 +186,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 1,
         clightningNodes: 0,
+        lampoNodes: 0,
         bitcoindNodes: 1,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
@@ -209,6 +210,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 0,
         clightningNodes: 1,
+        lampoNodes: 0,
         bitcoindNodes: 1,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
@@ -222,6 +224,28 @@ describe('DockerService', () => {
         expect.stringContaining(
           `container_name: polar-n1-${network.nodes.lightning[0].name}`,
         ),
+      );
+    });
+
+    it('should save the lampo node with the first bitcoin node as backend', () => {
+      const net = createNetwork({
+        id: 1,
+        name: 'my network',
+        description: 'network description',
+        lndNodes: 0,
+        clightningNodes: 0,
+        lampoNodes: 1,
+        bitcoindNodes: 1,
+        repoState: defaultRepoState,
+        managedImages: testManagedImages,
+        customImages: [],
+        manualMineCount: 6,
+      });
+      net.nodes.lightning[0].backendName = 'invalid';
+      dockerService.saveComposeFile(net);
+      expect(filesMock.write).toHaveBeenCalledWith(
+        expect.stringContaining('docker-compose.yml'),
+        expect.stringContaining('--core-url=http://polar-n1-backend1:18443'),
       );
     });
 
@@ -253,6 +277,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 2,
         clightningNodes: 1,
+        lampoNodes: 0,
         bitcoindNodes: 1,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
@@ -375,6 +400,7 @@ describe('DockerService', () => {
         description: 'network description',
         lndNodes: 2,
         clightningNodes: 1,
+        lampoNodes: 0,
         bitcoindNodes: 1,
         repoState: defaultRepoState,
         managedImages: testManagedImages,
@@ -723,6 +749,7 @@ describe('DockerService', () => {
       description: 'network description',
       lndNodes: 1,
       clightningNodes: 1,
+      lampoNodes: 0,
       bitcoindNodes: 1,
       repoState: defaultRepoState,
       managedImages: testManagedImages,
@@ -894,6 +921,26 @@ describe('DockerService', () => {
       expect(lndNode?.cert).toBe(`/home/simln/.lnd/${lnd.name}/tls.cert`);
       expect(lndNode?.macaroon).toBe(
         `/home/simln/.lnd/${lnd.name}/data/chain/bitcoin/regtest/admin.macaroon`,
+      );
+    });
+
+    it('should throw for lampo nodes in a simulation', () => {
+      const net = getNetwork();
+      net.nodes.lightning[1].implementation = 'lampo';
+      net.simulation = {
+        activity: [
+          {
+            id: 0,
+            source: net.nodes.lightning[0].name,
+            destination: net.nodes.lightning[1].name,
+            intervalSecs: 60,
+            amountMsat: 1000,
+          },
+        ],
+        status: Status.Stopped,
+      };
+      expect(() => dockerService.constructSimJson(net)).toThrow(
+        'SimLN does not support lampo nodes',
       );
     });
 

@@ -59,6 +59,7 @@ describe('NetworkSetting Component', () => {
     const { getByLabelText, getAllByLabelText } = renderComponent();
     expect(getAllByLabelText('LND')[0]).toHaveValue('8081');
     expect(getAllByLabelText('Core Lightning')[0]).toHaveValue('8181');
+    expect(getByLabelText('Lampo')).toHaveValue('8281');
     expect(getByLabelText('Bitcoin Knots')).toHaveValue('18443');
     expect(getAllByLabelText('LND')[1]).toHaveValue('10001');
     expect(getAllByLabelText('Core Lightning')[1]).toHaveValue('11001');

@@ -25,8 +25,10 @@ import {
 import { readBuffer, rm } from 'utils/files';
 import { removeUnsupportedNodes } from 'utils/migrations';
 import {
+  assertPlatformSupported,
   createBitcoindNetworkNode,
   createCLightningNetworkNode,
+  createLampoNetworkNode,
   createLndNetworkNode,
   createNetwork,
   filterCompatibleBackends,
@@ -53,6 +55,7 @@ interface AddNetworkArgs {
   description: string;
   lndNodes: number;
   clightningNodes: number;
+  lampoNodes: number;
   bitcoindNodes: number;
   customNodes: Record<string, number>;
   manualMineCount: number;
@@ -344,6 +347,7 @@ const networkModel: NetworkModel = {
         description: payload.description,
         lndNodes: payload.lndNodes,
         clightningNodes: payload.clightningNodes,
+        lampoNodes: payload.lampoNodes,
         bitcoindNodes: payload.bitcoindNodes,
         repoState: dockerRepoState,
         managedImages: computedManagedImages,
@@ -351,6 +355,9 @@ const networkModel: NetworkModel = {
         basePorts: settings.basePorts,
         manualMineCount: 6,
       });
+      if (network.nodes.lightning.some(n => n.implementation === 'lampo')) {
+        assertPlatformSupported('lampo');
+      }
       actions.add(network);
       const { networks } = getState();
       const newNetwork = networks[networks.length - 1];
@@ -364,6 +371,7 @@ const networkModel: NetworkModel = {
         newNodeCounts: {
           LND: payload.lndNodes,
           'c-lightning': payload.clightningNodes,
+          lampo: payload.lampoNodes,
           bitcoind: payload.bitcoindNodes,
           btcd: 0,
         },
@@ -417,6 +425,18 @@ const networkModel: NetworkModel = {
             docker,
             undefined,
             settings.basePorts['c-lightning'],
+          );
+          network.nodes.lightning.push(node);
+          break;
+        case 'lampo':
+          assertPlatformSupported(type);
+          node = createLampoNetworkNode(
+            network,
+            version,
+            dockerRepoState.images.lampo.compatibility,
+            docker,
+            undefined,
+            settings.basePorts.lampo,
           );
           network.nodes.lightning.push(node);
           break;

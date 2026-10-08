@@ -55,6 +55,9 @@ const NetworkSetting: React.FC = () => {
           rest: values['c-lightning'],
           grpc: values['grpcC-lightning'],
         },
+        lampo: {
+          rest: values.lampo,
+        },
         bitcoind: {
           rest: values.bitcoind,
         },
@@ -82,6 +85,7 @@ const NetworkSetting: React.FC = () => {
           initialValues={{
             LND: settings.basePorts.LND.rest,
             'c-lightning': settings.basePorts['c-lightning'].rest,
+            lampo: settings.basePorts.lampo.rest,
             bitcoind: settings.basePorts.bitcoind.rest,
             grpcLND: settings.basePorts.LND.grpc,
             'grpcC-lightning': settings.basePorts['c-lightning'].grpc,
@@ -98,6 +102,11 @@ const NetworkSetting: React.FC = () => {
             </Col>
             <Col span={6}>
               <Form.Item name="c-lightning" label={dockerConfigs['c-lightning'].name}>
+                <InputNumber />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item name="lampo" label={dockerConfigs.lampo.name}>
                 <InputNumber />
               </Form.Item>
             </Col>

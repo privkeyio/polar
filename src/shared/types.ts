@@ -23,7 +23,7 @@ export interface CommonNode {
 
 export interface LightningNode extends CommonNode {
   type: 'lightning';
-  implementation: 'LND' | 'c-lightning';
+  implementation: 'LND' | 'c-lightning' | 'lampo';
   backendName: string;
   ports: Record<string, number | undefined>;
 }
@@ -54,6 +54,14 @@ export interface CLightningNode extends LightningNode {
   ports: {
     rest: number;
     grpc: number;
+    p2p: number;
+  };
+}
+
+export interface LampoNode extends LightningNode {
+  implementation: 'lampo';
+  ports: {
+    rest: number;
     p2p: number;
   };
 }

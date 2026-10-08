@@ -31,6 +31,7 @@ describe('RenameNodeModal', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 1,
+      lampoNodes: 0,
       bitcoindNodes: 3,
       status,
       repoState: defaultRepoState,

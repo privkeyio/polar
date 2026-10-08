@@ -2,6 +2,7 @@ import { NodeImplementation, NodeImplementationWithSimln } from 'shared/types';
 import { DockerConfig, DockerRepoState } from 'types';
 import bitcoindLogo from 'resources/bitcoin-knots.svg';
 import clightningLogo from 'resources/clightning.png';
+import lampoLogo from 'resources/lampo.png';
 import lndLogo from 'resources/lnd.png';
 import packageJson from '../../package.json';
 
@@ -64,6 +65,10 @@ export const BasePorts: Record<NodeImplementation, Record<string, number>> = {
     rest: 8181,
     p2p: 9835,
     grpc: 11001,
+  },
+  lampo: {
+    rest: 8281,
+    p2p: 9935,
   },
   btcd: {},
 };
@@ -144,6 +149,27 @@ export const dockerConfigs: Record<NodeImplementationWithSimln, DockerConfig> = 
     dataDir: 'lightningd',
     apiDir: 'rest-api',
   },
+  lampo: {
+    name: 'Lampo',
+    imageName: `${DOCKER_REPO}/lampo`,
+    logo: lampoLogo,
+    platforms: ['mac', 'linux'],
+    volumeDirName: 'lampo',
+    command: [
+      'lampod-cli',
+      '--data-dir=/home/lampo/.lampo',
+      '--network=regtest',
+      '--client=core',
+      '--core-url=http://{{backendName}}:18443',
+      '--core-user={{rpcUser}}',
+      '--core-pass={{rpcPass}}',
+      '--api-host=0.0.0.0',
+      '--api-port=7979',
+      '--log-level=debug',
+    ].join('\n  '),
+    // if vars are modified, also update composeFile.ts & the i18n strings for cmps.nodes.CommandVariables
+    variables: ['backendName', 'rpcUser', 'rpcPass'],
+  },
   bitcoind: {
     name: 'Bitcoin Knots',
     imageName: `${DOCKER_REPO}/bitcoind`,
@@ -214,7 +240,7 @@ export const REPO_STATE_URL =
  * are pushed to Docker Hub, this list should be updated along with the /docker/nodes.json file.
  */
 export const defaultRepoState: DockerRepoState = {
-  version: 1,
+  version: 2,
   images: {
     LND: {
       latest: '0.21.3-beta-blake2b.17',
@@ -228,6 +254,10 @@ export const defaultRepoState: DockerRepoState = {
     'c-lightning': {
       latest: '26.06.8-blake2b.6',
       versions: ['26.06.8-blake2b.6'],
+    },
+    lampo: {
+      latest: '0.1.0-blake2b.1',
+      versions: ['0.1.0-blake2b.1'],
     },
     bitcoind: {
       latest: '29.4.2',

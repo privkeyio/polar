@@ -1,10 +1,10 @@
 import React from 'react';
 import { shell } from 'electron';
 import { fireEvent, waitFor } from '@testing-library/react';
-import { LightningNode, Status } from 'shared/types';
+import { LampoNode, LightningNode, Status } from 'shared/types';
 import { Network } from 'types';
 import * as files from 'utils/files';
-import { createCLightningNetworkNode } from 'utils/network';
+import { createCLightningNetworkNode, createLampoNetworkNode } from 'utils/network';
 import {
   defaultStateBalances,
   defaultStateInfo,
@@ -357,6 +357,38 @@ describe('LightningDetails', () => {
         await waitFor(() => {
           expect(shell.openExternal).toBeCalledWith(
             'https://docs.corelightning.org/docs/rest',
+          );
+        });
+      });
+    });
+
+    describe('lampo', () => {
+      beforeEach(() => {
+        node = createLampoNetworkNode(network, '0.1.0-blake2b.1', undefined, {
+          image: '',
+          command: '',
+        });
+        network.nodes.lightning.push(node);
+      });
+
+      it('should display the REST Host and P2P address without credentials', async () => {
+        const lampo = node as LampoNode;
+        const { getByText, queryByText, findByText } = renderComponent(Status.Started);
+        fireEvent.click(await findByText('Connect'));
+        expect(getByText('REST Host')).toBeInTheDocument();
+        expect(getByText(`http://127.0.0.1:${lampo.ports.rest}`)).toBeInTheDocument();
+        expect(queryByText('GRPC Host')).not.toBeInTheDocument();
+        expect(queryByText('File Paths')).not.toBeInTheDocument();
+      });
+
+      it('should open the API Doc link in the browser', async () => {
+        shell.openExternal = jest.fn().mockResolvedValue(true);
+        const { getByText, findByText } = renderComponent(Status.Started);
+        fireEvent.click(await findByText('Connect'));
+        fireEvent.click(getByText('REST'));
+        await waitFor(() => {
+          expect(shell.openExternal).toBeCalledWith(
+            'https://github.com/privkeyio/lampo.rs',
           );
         });
       });
