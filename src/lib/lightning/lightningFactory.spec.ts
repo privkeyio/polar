@@ -2,12 +2,15 @@ import { defaultLndInfo } from 'shared';
 import { getNetwork } from 'utils/tests';
 import { LightningFactory } from './';
 import * as clightningApi from './clightning/clightningApi';
+import * as lampoApi from './lampo/lampoApi';
 import lndProxyClient from './lnd/lndProxyClient';
 
 jest.mock('./lnd/lndProxyClient');
 jest.mock('./clightning/clightningApi');
+jest.mock('./lampo/lampoApi');
 
 const clightningApiMock = clightningApi as jest.Mocked<typeof clightningApi>;
+const lampoApiMock = lampoApi as jest.Mocked<typeof lampoApi>;
 
 describe('LightningFactory', () => {
   const network = getNetwork();
@@ -31,5 +34,15 @@ describe('LightningFactory', () => {
     const service = factory.getService(node);
     await service.getInfo(node);
     expect(clightningApiMock.httpPost).toBeCalledTimes(1);
+  });
+
+  it('should return a working lampo service', async () => {
+    lampoApiMock.httpPost
+      .mockResolvedValueOnce({ nodeId: 'asdf' })
+      .mockResolvedValueOnce({ channels: [] });
+    const node = { ...network.nodes.lightning[1], implementation: 'lampo' } as any;
+    const service = factory.getService(node);
+    await service.getInfo(node);
+    expect(lampoApiMock.httpPost).toBeCalledWith(node, 'getinfo');
   });
 });

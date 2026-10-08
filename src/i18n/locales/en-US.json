@@ -420,6 +420,7 @@
   "cmps.network.NewNetwork.managedLabel": "How many Managed Nodes?",
   "cmps.network.NewNetwork.btnCreate": "Create Network",
   "cmps.network.NewNetwork.createError": "Unable to create the new network",
+  "cmps.network.NewNetwork.lampoWindows": "Not supported on Windows yet.",
   "cmps.network.NetworkSetting.title": "Network Setting",
   "cmps.network.NetworkSetting.restPorts": "REST Base Ports",
   "cmps.network.NetworkSetting.grpcPorts": "GRPC Base Ports",
@@ -511,5 +512,6 @@
   "store.models.network.nodeNotStarted": "The {{nodeName}} node is not started",
   "utils.network.backendCompatError": "This network does not contain a Bitcoin Knots v{{requiredVersion}} (or lower) node which is required for {{implementation}} v{{version}}",
   "utils.network.incompatibleImplementation": "Importing networks with {{implementation}} nodes is not supported on {{platform}}",
+  "utils.network.unsupportedPlatform": "{{implementation}} nodes are not supported on {{platform}}",
   "utils.network.unknownImplementation": "Cannot import unknown node implementation '{{implementation}}'"
 }

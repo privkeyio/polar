@@ -59,6 +59,7 @@ export interface CustomImage {
 export interface NodeBasePorts {
   LND: { rest: number; grpc: number };
   'c-lightning': { rest: number; grpc: number };
+  lampo: { rest: number };
   bitcoind: { rest: number };
 }
 

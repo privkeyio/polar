@@ -76,8 +76,17 @@ describe('NewNetwork component', () => {
     const { getByLabelText, queryByText } = renderComponent();
     expect(getByLabelText('LND')).toHaveValue('1');
     expect(getByLabelText('Core Lightning')).toHaveValue('1');
+    expect(getByLabelText('Lampo')).toHaveValue('0');
+    expect(getByLabelText('Lampo')).toBeEnabled();
     expect(getByLabelText('Bitcoin Knots')).toHaveValue('1');
     expect(queryByText('My Test Image')).not.toBeInTheDocument();
+  });
+
+  it('should disable Lampo nodes on Windows', () => {
+    mockOS.platform.mockReturnValue('win32');
+    const { getByLabelText, getByText } = renderComponent();
+    expect(getByLabelText('Lampo')).toBeDisabled();
+    expect(getByText('Not supported on Windows yet.')).toBeInTheDocument();
   });
 
   it('should display custom nodes', () => {

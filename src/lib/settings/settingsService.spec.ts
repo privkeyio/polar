@@ -22,6 +22,7 @@ describe('SettingsService', () => {
       newNodeCounts: {
         LND: 1,
         'c-lightning': 1,
+        lampo: 0,
         bitcoind: 1,
         btcd: 0,
       },
@@ -36,6 +37,9 @@ describe('SettingsService', () => {
         'c-lightning': {
           rest: 8181,
           grpc: 11001,
+        },
+        lampo: {
+          rest: 8281,
         },
       },
     };

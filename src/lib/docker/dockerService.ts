@@ -11,6 +11,7 @@ import {
   BitcoinNode,
   CLightningNode,
   CommonNode,
+  LampoNode,
   LightningNode,
   LndNode,
 } from 'shared/types';
@@ -143,6 +144,11 @@ class DockerService implements DockerLibrary {
         const cln = node as CLightningNode;
         const backend = bitcoin.find(n => n.name === cln.backendName) || bitcoin[0];
         file.addClightning(cln, backend);
+      }
+      if (node.implementation === 'lampo') {
+        const lampo = node as LampoNode;
+        const backend = bitcoin.find(n => n.name === lampo.backendName) || bitcoin[0];
+        file.addLampo(lampo, backend);
       }
     });
     if (network.simulation) {
@@ -452,6 +458,9 @@ class DockerService implements DockerLibrary {
               client_key: `/home/simln/.${getPosixPath(cln.paths.tlsClientKey)}`,
             };
             break;
+
+          default:
+            throw new Error(`SimLN does not support ${node.implementation} nodes`);
         }
 
         // Add the node to the nodes Set.

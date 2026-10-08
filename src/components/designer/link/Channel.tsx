@@ -27,7 +27,9 @@ const Channel: React.FC<Props> = ({ link, from, to }) => {
     { label: l('sourceBalance'), value: `${format(fromBalance)} sats` },
     { label: l('destinationBalance'), value: `${format(toBalance)} sats` },
     {
-      label: from.implementation === 'LND' ? l('channelPoint') : l('channelId'),
+      label: ['LND', 'lampo'].includes(from.implementation)
+        ? l('channelPoint')
+        : l('channelId'),
       value: (
         <CopyIcon
           value={channelPoint}

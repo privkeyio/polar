@@ -37,6 +37,7 @@ interface NetworkPlan {
   baseCounts: {
     lndNodes: number;
     clightningNodes: number;
+    lampoNodes: number;
     bitcoindNodes: number;
   };
   additionalNodes: NormalizedNodeRequest[];
@@ -52,15 +53,21 @@ const SUPPORTED_IMPLEMENTATIONS: NodeImplementation[] = [
   'bitcoind',
   'LND',
   'c-lightning',
+  'lampo',
 ];
 
 const ADDITION_PRIORITY: readonly NodeImplementation[] = [
   'bitcoind',
   'LND',
   'c-lightning',
+  'lampo',
 ];
 
-const LIGHTNING_IMPLEMENTATIONS = new Set<NodeImplementation>(['LND', 'c-lightning']);
+const LIGHTNING_IMPLEMENTATIONS = new Set<NodeImplementation>([
+  'LND',
+  'c-lightning',
+  'lampo',
+]);
 
 const DEFAULT_NODE_REQUESTS: CreateNetworkNodeRequest[] = [
   { implementation: 'LND', count: 2 },
@@ -153,6 +160,7 @@ const buildPlanContext = (
   const baseCounts = {
     lndNodes: 0,
     clightningNodes: 0,
+    lampoNodes: 0,
     bitcoindNodes: 0,
   };
 
@@ -175,6 +183,9 @@ const buildPlanContext = (
           return;
         case 'c-lightning':
           baseCounts.clightningNodes += 1;
+          return;
+        case 'lampo':
+          baseCounts.lampoNodes += 1;
           return;
       }
     }
@@ -229,12 +240,15 @@ const validateNetworkDependencies = ({
   additionalNodes,
   bitcoindVersions,
 }: PlanContext) => {
-  // Lightning nodes (LND, CLN) cannot run without at least one bitcoind backend
+  // Lightning nodes (LND, CLN, Lampo) cannot run without at least one bitcoind backend
   const additionalLightningCount = additionalNodes.filter(node =>
     LIGHTNING_IMPLEMENTATIONS.has(node.implementation),
   ).length;
   const totalLightningNodes =
-    baseCounts.lndNodes + baseCounts.clightningNodes + additionalLightningCount;
+    baseCounts.lndNodes +
+    baseCounts.clightningNodes +
+    baseCounts.lampoNodes +
+    additionalLightningCount;
 
   if (totalLightningNodes > 0 && bitcoindVersions.size === 0) {
     throw new Error(
@@ -313,7 +327,7 @@ export const createNetworkDefinition: McpToolDefinition = {
           properties: {
             implementation: {
               type: 'string',
-              enum: ['bitcoind', 'LND', 'c-lightning'],
+              enum: ['bitcoind', 'LND', 'c-lightning', 'lampo'],
               description: 'Node implementation to add to the network',
             },
             version: {
@@ -359,6 +373,7 @@ export const createNetworkTool = thunk<
     description: args.description || '',
     lndNodes: baseCounts.lndNodes,
     clightningNodes: baseCounts.clightningNodes,
+    lampoNodes: baseCounts.lampoNodes,
     bitcoindNodes: baseCounts.bitcoindNodes,
     customNodes: {},
     manualMineCount: 6,

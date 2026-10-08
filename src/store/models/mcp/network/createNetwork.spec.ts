@@ -1,5 +1,6 @@
 import { createStore } from 'easy-peasy';
 import { DockerRepoState } from 'types';
+import * as system from 'utils/system';
 import { createMockRootModel, injections, testRepoState } from 'utils/tests';
 
 describe('MCP model > createNetwork', () => {
@@ -103,6 +104,34 @@ describe('MCP model > createNetwork', () => {
       result.network.nodes.lightning.every(n => n.implementation === 'c-lightning'),
     ).toBe(true);
     expect(result.network.nodes.bitcoin).toHaveLength(1);
+  });
+
+  it('should create a network with Lampo nodes when requested', async () => {
+    const spy = jest.spyOn(system, 'getPolarPlatform').mockReturnValue('linux');
+    try {
+      const result = await store.getActions().mcp.createNetwork({
+        name: 'lampo-network',
+        nodes: [{ implementation: 'bitcoind' }, { implementation: 'lampo', count: 2 }],
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.network.nodes.lightning).toHaveLength(2);
+      expect(
+        result.network.nodes.lightning.every(n => n.implementation === 'lampo'),
+      ).toBe(true);
+      expect(result.network.nodes.bitcoin).toHaveLength(1);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('should require a bitcoind backend for Lampo nodes', async () => {
+    await expect(
+      store.getActions().mcp.createNetwork({
+        name: 'lampo-no-backend',
+        nodes: [{ implementation: 'lampo' }],
+      }),
+    ).rejects.toThrow('Lightning nodes require at least one bitcoind backend');
   });
 
   it('should reject non-positive node counts', async () => {

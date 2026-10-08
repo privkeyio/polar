@@ -28,7 +28,7 @@ export interface GetWalletBalanceResult {
 export const getWalletBalanceDefinition: McpToolDefinition = {
   name: 'get_wallet_balance',
   description:
-    'Get the on-chain wallet balance for a Lightning node (LND or c-lightning). ' +
+    'Get the on-chain wallet balance for a Lightning node (LND, c-lightning, or lampo). ' +
     'Returns the total, confirmed, and unconfirmed balances in satoshis. This shows the funds ' +
     "available in the node's on-chain Bitcoin wallet that can be used to open channels or for " +
     'on-chain transactions. Note: This does not return channel balances - use list_channels to see ' +

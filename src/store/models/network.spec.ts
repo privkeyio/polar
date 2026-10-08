@@ -13,6 +13,7 @@ import {
   SEED_RESTORE_RECOVERY_WINDOW,
 } from 'utils/constants';
 import * as files from 'utils/files';
+import * as system from 'utils/system';
 import {
   bitcoinServiceMock,
   getNetwork,
@@ -68,6 +69,7 @@ describe('Network model', () => {
     description: 'test description',
     lndNodes: 4,
     clightningNodes: 1,
+    lampoNodes: 0,
     bitcoindNodes: 1,
     customNodes: {},
     manualMineCount: 6,
@@ -254,6 +256,46 @@ describe('Network model', () => {
       expect(node.docker.image).toBe(custom[0].dockerImage);
       expect(node.docker.command).toBe(custom[0].command);
     });
+
+    it('should give a custom lampo node the lampo version', async () => {
+      const spy = jest.spyOn(system, 'getPolarPlatform').mockReturnValue('linux');
+      try {
+        const custom: CustomImage[] = [
+          {
+            id: '789',
+            name: 'My Lampo',
+            implementation: 'lampo',
+            dockerImage: 'my-lampo:latest',
+            command: 'my-command',
+          },
+        ];
+        store.getActions().app.setSettings({ nodeImages: { managed: [], custom } });
+        await store
+          .getActions()
+          .network.addNetwork({ ...addNetworkArgs, customNodes: { '789': 1 } });
+        const node = firstNetwork().nodes.lightning.find(
+          n => n.implementation === 'lampo',
+        );
+        expect(node?.docker.image).toBe('my-lampo:latest');
+        expect(node?.version).toBe(
+          store.getState().app.dockerRepoState.images.lampo.latest,
+        );
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it('should not add a network with lampo nodes on Windows', async () => {
+      const spy = jest.spyOn(system, 'getPolarPlatform').mockReturnValue('windows');
+      try {
+        await expect(
+          store.getActions().network.addNetwork({ ...addNetworkArgs, lampoNodes: 1 }),
+        ).rejects.toThrow('lampo nodes are not supported on windows');
+        expect(store.getState().network.networks).toHaveLength(0);
+      } finally {
+        spy.mockRestore();
+      }
+    });
   });
 
   describe('Adding a Node', () => {
@@ -284,6 +326,41 @@ describe('Network model', () => {
       expect(lightning).toHaveLength(6);
       expect(lightning[1].name).toBe('bob');
       expect(lightning[1].implementation).toBe('c-lightning');
+    });
+
+    it('should add a lampo node to an existing network', async () => {
+      const spy = jest.spyOn(system, 'getPolarPlatform').mockReturnValue('linux');
+      try {
+        const payload = {
+          id: firstNetwork().id,
+          type: 'lampo',
+          version: defaultRepoState.images.lampo.latest,
+        };
+        await store.getActions().network.addNode(payload);
+        const { lightning } = firstNetwork().nodes;
+        expect(lightning).toHaveLength(6);
+        expect(lightning[5].implementation).toBe('lampo');
+        expect(lightning[5].ports).toEqual({ rest: 8281 + 5, p2p: 9935 + 5 });
+      } finally {
+        spy.mockRestore();
+      }
+    });
+
+    it('should not add a lampo node on Windows', async () => {
+      const spy = jest.spyOn(system, 'getPolarPlatform').mockReturnValue('windows');
+      try {
+        const payload = {
+          id: firstNetwork().id,
+          type: 'lampo',
+          version: defaultRepoState.images.lampo.latest,
+        };
+        await expect(store.getActions().network.addNode(payload)).rejects.toThrow(
+          'lampo nodes are not supported on windows',
+        );
+        expect(firstNetwork().nodes.lightning).toHaveLength(5);
+      } finally {
+        spy.mockRestore();
+      }
     });
 
     it('should throw an error if the network id is invalid', async () => {

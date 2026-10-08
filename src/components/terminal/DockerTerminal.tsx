@@ -62,6 +62,10 @@ const nodeConfig: Record<string, { user: string; commands: string[] }> = {
     user: 'clightning',
     commands: ['alias lightning-cli="lightning-cli --network regtest"'],
   },
+  lampo: {
+    user: 'lampo',
+    commands: ['alias lampo-cli="lampo-cli --url http://127.0.0.1:7979"'],
+  },
   bitcoind: {
     user: 'bitcoin',
     commands: ['alias bitcoin-cli="bitcoin-cli -regtest"'],

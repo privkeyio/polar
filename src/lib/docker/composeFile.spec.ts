@@ -1,5 +1,5 @@
 import os from 'os';
-import { CLightningNode, LndNode } from 'shared/types';
+import { CLightningNode, LampoNode, LndNode } from 'shared/types';
 import { bitcoinCredentials, defaultRepoState } from 'utils/constants';
 import { createNetwork } from 'utils/network';
 import { testManagedImages } from 'utils/tests';
@@ -17,6 +17,7 @@ describe('ComposeFile', () => {
     description: 'network description',
     lndNodes: 1,
     clightningNodes: 1,
+    lampoNodes: 1,
     bitcoindNodes: 1,
     repoState: defaultRepoState,
     managedImages: testManagedImages,
@@ -26,6 +27,7 @@ describe('ComposeFile', () => {
   const btcNode = network.nodes.bitcoin[0];
   const lndNode = network.nodes.lightning[0] as LndNode;
   const clnNode = network.nodes.lightning[1] as CLightningNode;
+  const lampoNode = network.nodes.lightning[2] as LampoNode;
 
   beforeEach(() => {
     composeFile = new ComposeFile(1);
@@ -135,6 +137,29 @@ describe('ComposeFile', () => {
     clnNode.docker = { image: 'my-image', command: 'my-command' };
     composeFile.addClightning(clnNode, btcNode);
     const service = composeFile.content.services['bob'];
+    expect(service.image).toBe('my-image');
+    expect(service.command).toBe('my-command');
+  });
+
+  it('should create the correct lampo docker compose values', () => {
+    composeFile.addLampo(lampoNode, btcNode);
+    const service = composeFile.content.services['carol'];
+    expect(service.image).toEqual(`ghcr.io/privkeyio/polar/lampo:${lampoNode.version}`);
+    expect(service.container_name).toEqual('polar-n1-carol');
+    expect(service.command).toContain('--core-url=http://polar-n1-backend1:18443');
+    expect(service.command).toContain(`--core-user=${bitcoinCredentials.user}`);
+    expect(service.command).toContain(`--core-pass=${bitcoinCredentials.pass}`);
+    expect(service.volumes).toEqual(['./volumes/lampo/carol:/home/lampo/.lampo']);
+    expect(service.ports).toEqual([
+      `127.0.0.1:${lampoNode.ports.rest}:7979`,
+      `${lampoNode.ports.p2p}:9735`,
+    ]);
+  });
+
+  it('should use the lampo nodes docker data', () => {
+    lampoNode.docker = { image: 'my-image', command: 'my-command' };
+    composeFile.addLampo(lampoNode, btcNode);
+    const service = composeFile.content.services['carol'];
     expect(service.image).toBe('my-image');
     expect(service.command).toBe('my-command');
   });

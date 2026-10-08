@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import * as LND from '@lightningpolar/lnd-api';
 import { Alert, Button, Radio, Tooltip } from 'antd';
 import { usePrefixedTranslation } from 'hooks';
-import { CLightningNode, LightningNode, LndNode, Status } from 'shared/types';
+import { CLightningNode, LampoNode, LightningNode, LndNode, Status } from 'shared/types';
 import { useStoreActions, useStoreState } from 'store';
 import { ellipseInner } from 'utils/strings';
 import { Loader } from 'components/common';
@@ -124,6 +124,15 @@ const ConnectTab: React.FC<Props> = ({ node }) => {
           },
           p2pUriExternal: `${pubkey}@127.0.0.1:${cln.ports.p2p}`,
           authTypes: ['paths', 'hex', 'base64'],
+        };
+      } else if (node.implementation === 'lampo') {
+        const lampo = node as LampoNode;
+        return {
+          restUrl: `http://127.0.0.1:${lampo.ports.rest}`,
+          restDocsUrl: 'https://github.com/privkeyio/lampo.rs',
+          credentials: {},
+          p2pUriExternal: `${pubkey}@127.0.0.1:${lampo.ports.p2p}`,
+          authTypes: [],
         };
       }
     }

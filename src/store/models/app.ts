@@ -83,6 +83,7 @@ const appModel: AppModel = {
     newNodeCounts: {
       LND: 1,
       'c-lightning': 1,
+      lampo: 0,
       bitcoind: 1,
       btcd: 0,
     },
@@ -93,6 +94,7 @@ const appModel: AppModel = {
         grpc: BasePorts['c-lightning'].grpc,
         rest: BasePorts['c-lightning'].rest,
       },
+      lampo: { rest: BasePorts.lampo.rest },
     },
   },
   dockerVersions: { docker: '', compose: '' },
@@ -157,7 +159,12 @@ const appModel: AppModel = {
           i => !!dockerConfigs[i.implementation],
         );
       }
-      actions.setSettings(settings);
+      const { newNodeCounts, basePorts } = getState().settings;
+      actions.setSettings({
+        ...settings,
+        newNodeCounts: { ...newNodeCounts, ...settings.newNodeCounts },
+        basePorts: { ...basePorts, ...settings.basePorts },
+      });
       await getI18n().changeLanguage(settings.lang);
       changeTheme(settings.theme || 'dark');
     }

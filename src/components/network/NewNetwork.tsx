@@ -18,6 +18,7 @@ import { useTheme } from 'hooks/useTheme';
 import { useStoreActions, useStoreState } from 'store';
 import { ThemeColors } from 'theme/colors';
 import { dockerConfigs } from 'utils/constants';
+import { isWindows } from 'utils/system';
 import { HOME } from 'components/routing';
 
 const Styled = {
@@ -76,6 +77,7 @@ const NewNetwork: React.FC = () => {
           initialValues={{
             lndNodes: settings.newNodeCounts.LND,
             clightningNodes: settings.newNodeCounts['c-lightning'],
+            lampoNodes: settings.newNodeCounts.lampo,
             bitcoindNodes: settings.newNodeCounts.bitcoind,
             customNodes: initialCustomValues,
           }}
@@ -131,6 +133,16 @@ const NewNetwork: React.FC = () => {
                 rules={[{ required: true, message: l('cmps.forms.required') }]}
               >
                 <InputNumber min={0} max={10} />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item
+                name="lampoNodes"
+                label={dockerConfigs.lampo.name}
+                extra={isWindows() ? l('lampoWindows') : ''}
+                rules={[{ required: true, message: l('cmps.forms.required') }]}
+              >
+                <InputNumber min={0} max={10} disabled={isWindows()} />
               </Form.Item>
             </Col>
             <Col span={6}>

@@ -20,6 +20,11 @@ export const testManagedImages: ManagedImage[] = [
     command: '',
   },
   {
+    implementation: 'lampo',
+    version: defaultRepoState.images.lampo.latest,
+    command: '',
+  },
+  {
     implementation: 'bitcoind',
     version: defaultRepoState.images.bitcoind.latest,
     command: '',
@@ -144,6 +149,10 @@ export const testRepoState: DockerRepoState = {
       latest: '24.08',
       versions: ['24.08', '24.05', '24.02.2', '23.11.2'],
     },
+    lampo: {
+      latest: '0.1.0-blake2b.1',
+      versions: ['0.1.0-blake2b.1'],
+    },
     bitcoind: {
       latest: '30.0',
       versions: [
@@ -181,6 +190,7 @@ export const getNetwork = (
     description: description || 'my-test-description',
     lndNodes: 3,
     clightningNodes: 1,
+    lampoNodes: 0,
     bitcoindNodes: 1,
     status,
     repoState: defaultRepoState,

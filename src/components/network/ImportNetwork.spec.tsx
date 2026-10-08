@@ -64,6 +64,7 @@ describe('ImportNetwork component', () => {
       description: 'network description',
       lndNodes: 2,
       clightningNodes: 1,
+      lampoNodes: 1,
       bitcoindNodes: 1,
       status: Status.Started,
       repoState: defaultRepoState,
@@ -159,6 +160,16 @@ describe('ImportNetwork component', () => {
     fireEvent.change(fileInput);
     expect(await findByText("Could not import 'file.zip'")).toBeInTheDocument();
     const msg = "Cannot import unknown node implementation 'asdf'";
+    expect(await findByText(msg)).toBeInTheDocument();
+  });
+
+  it('should throw if a lampo node is imported on Windows', async () => {
+    osMock.platform.mockReturnValue('win32');
+    filesMock.read.mockResolvedValue(JSON.stringify({ network, chart }));
+    const { findByText, fileInput } = renderComponent();
+    fireEvent.change(fileInput);
+    expect(await findByText("Could not import 'file.zip'")).toBeInTheDocument();
+    const msg = 'Importing networks with lampo nodes is not supported on windows';
     expect(await findByText(msg)).toBeInTheDocument();
   });
 

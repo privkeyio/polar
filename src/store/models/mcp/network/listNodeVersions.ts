@@ -30,7 +30,7 @@ export const listNodeVersionsDefinition: McpToolDefinition = {
     properties: {
       implementation: {
         type: 'string',
-        enum: ['bitcoind', 'LND', 'c-lightning'],
+        enum: ['bitcoind', 'LND', 'c-lightning', 'lampo'],
         description:
           'Filter to show versions for a specific implementation only (optional)',
       },
@@ -52,6 +52,7 @@ export const listNodeVersionsTool: Thunk<
     'bitcoind',
     'LND',
     'c-lightning',
+    'lampo',
     'btcd',
   ];
 
