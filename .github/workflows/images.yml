@@ -9,7 +9,7 @@ on:
         type: choice
         options: [bitcoind, lnd, clightning, lampo]
       tag:
-        description: Image tag (ex. 29.4.2, 0.21.3-beta-blake2b.17, 26.06.8-blake2b.6, 0.1.0-blake2b.1)
+        description: Image tag (ex. 29.4.2, 0.21.3-beta-blake2b.17, 26.06.9-blake2b.7, 0.1.0-blake2b.1)
         required: true
       build_args:
         description: Build args, one KEY=VALUE per line (see docker/README.md)
