@@ -9,8 +9,8 @@
       }
     },
     "c-lightning": {
-      "latest": "26.06.8-blake2b.6",
-      "versions": ["26.06.8-blake2b.6"]
+      "latest": "26.06.9-blake2b.7",
+      "versions": ["26.06.9-blake2b.7"]
     },
     "lampo": {
       "latest": "0.1.0-blake2b.1",

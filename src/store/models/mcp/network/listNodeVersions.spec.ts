@@ -19,7 +19,7 @@ describe('MCP model > listNodeVersions', () => {
     expect(result.versions).toBeDefined();
     expect(result.versions.bitcoind).toContain('29.4.2');
     expect(result.versions.LND).toContain('0.21.3-beta-blake2b.17');
-    expect(result.versions['c-lightning']).toContain('26.06.8-blake2b.6');
+    expect(result.versions['c-lightning']).toContain('26.06.9-blake2b.7');
     expect(result.latest).toBeDefined();
     expect(result.compatibility).toBeDefined();
     expect(result.compatibility.LND).toBeDefined();

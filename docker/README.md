@@ -51,7 +51,7 @@ Replace `<version>` with a tag of [paulscode/lightning-fork](https://github.com/
 
 ### Tags
 
-- `26.06.8-blake2b.6` ([clightning/Dockerfile](clightning/Dockerfile))
+- `26.06.9-blake2b.7` ([clightning/Dockerfile](clightning/Dockerfile))
 
 **Building the image**
 
@@ -60,7 +60,7 @@ $ cd clightning
 $ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> -t ghcr.io/privkeyio/polar/clightning:<version> --push .
 ```
 
-Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.8-blake2b.6`). The image builds on `ghcr.io/privkeyio/lightningd`, which privkeyio/lightning publishes for each release.
+Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.9-blake2b.7`). The image builds on `ghcr.io/privkeyio/lightningd`, which privkeyio/lightning publishes for each release.
 
 ## Lampo
 
