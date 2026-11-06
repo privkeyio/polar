@@ -256,8 +256,8 @@ export const defaultRepoState: DockerRepoState = {
       versions: ['26.06.10-blake2b.1'],
     },
     lampo: {
-      latest: '0.1.0-blake2b.1',
-      versions: ['0.1.0-blake2b.1'],
+      latest: '0.1.0-blake2b.2',
+      versions: ['0.1.0-blake2b.2'],
     },
     bitcoind: {
       latest: '29.4.2',
