@@ -364,7 +364,7 @@ describe('LightningDetails', () => {
 
     describe('lampo', () => {
       beforeEach(() => {
-        node = createLampoNetworkNode(network, '0.1.0-blake2b.1', undefined, {
+        node = createLampoNetworkNode(network, '0.1.0-blake2b.2', undefined, {
           image: '',
           command: '',
         });

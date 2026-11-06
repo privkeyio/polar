@@ -51,7 +51,7 @@ Replace `<version>` with a tag of [paulscode/lightning-fork](https://github.com/
 
 ### Tags
 
-- `26.06.9-blake2b.7` ([clightning/Dockerfile](clightning/Dockerfile))
+- `26.06.10-blake2b.1` ([clightning/Dockerfile](clightning/Dockerfile))
 
 **Building the image**
 
@@ -60,13 +60,13 @@ $ cd clightning
 $ docker buildx build --platform linux/amd64,linux/arm64 --build-arg CLN_VERSION=<version> -t ghcr.io/privkeyio/polar/clightning:<version> --push .
 ```
 
-Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.9-blake2b.7`). The image builds on `ghcr.io/privkeyio/lightningd`, which privkeyio/lightning publishes for each release.
+Replace `<version>` with a release of [privkeyio/lightning](https://github.com/privkeyio/lightning) without the leading `v` (ex: `26.06.10-blake2b.1`). The image builds on `ghcr.io/privkeyio/lightningd`, which privkeyio/lightning publishes for each release.
 
 ## Lampo
 
 ### Tags
 
-- `0.1.0-blake2b.1` ([lampo/Dockerfile](lampo/Dockerfile))
+- `0.1.0-blake2b.2` ([lampo/Dockerfile](lampo/Dockerfile))
 
 **Building the image**
 
@@ -75,7 +75,7 @@ $ cd lampo
 $ docker buildx build --platform linux/amd64,linux/arm64 --build-arg LAMPO_VERSION=<version> --build-arg LAMPO_COMMIT=<commit> -t ghcr.io/privkeyio/polar/lampo:<version> --push .
 ```
 
-Replace `<version>` with a tag of [privkeyio/lampo.rs](https://github.com/privkeyio/lampo.rs) without the leading `v` (ex: `0.1.0-blake2b.1`) and `<commit>` with the commit that tag points at. It is built from source, and the build fails if the tag has moved.
+Replace `<version>` with a tag of [privkeyio/lampo.rs](https://github.com/privkeyio/lampo.rs) without the leading `v` (ex: `0.1.0-blake2b.2`) and `<commit>` with the commit that tag points at. It is built from source, and the build fails if the tag has moved.
 
 The images can also be built and pushed from master with the `Images` workflow in GitHub Actions, passing the same build args one per line.
 

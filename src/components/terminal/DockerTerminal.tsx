@@ -5,6 +5,8 @@ import { useParams } from 'react-router';
 import { clipboard, remote } from 'electron';
 import { debug, info } from 'electron-log';
 import styled from '@emotion/styled';
+import Dockerode from 'dockerode';
+import { Duplex } from 'stream';
 import 'xterm/css/xterm.css';
 import { message } from 'antd';
 import { usePrefixedTranslation } from 'hooks';
@@ -21,7 +23,6 @@ const execCommand = {
   AttachStderr: true,
   AttachStdin: true,
   Tty: true,
-  Cmd: ['/bin/bash'],
 };
 
 const execOptions = {
@@ -37,6 +38,7 @@ const execOptions = {
 // I clearly got too carried away with this code here ;)
 const yellow = (text: string) => `\x1b[33m${text}\u001b[0m`;
 const green = (text: string) => `\x1b[32m${text}\u001b[0m`;
+const red = (text: string) => `\x1b[31m${text}\u001b[0m`;
 const randColor = (text: string) =>
   `\x1b[3${Math.floor(Math.random() * 6) + 1}m${text}\u001b[0m`;
 const polar = `
@@ -56,11 +58,13 @@ U |  _"\\ u  \\/"_ \\/  |"|   U  /"\\  uU |  _"\\ u
 const nodeConfig: Record<string, { user: string; commands: string[] }> = {
   LND: {
     user: 'lnd',
-    commands: ['alias lncli="lncli --network regtest"'],
+    commands: ['alias lncli="lncli --network regtest --lnddir=/home/lnd/.lnd"'],
   },
   'c-lightning': {
     user: 'clightning',
-    commands: ['alias lightning-cli="lightning-cli --network regtest"'],
+    commands: [
+      'alias lightning-cli="lightning-cli --network regtest --lightning-dir=/home/clightning/.lightning"',
+    ],
   },
   lampo: {
     user: 'lampo',
@@ -68,7 +72,9 @@ const nodeConfig: Record<string, { user: string; commands: string[] }> = {
   },
   bitcoind: {
     user: 'bitcoin',
-    commands: ['alias bitcoin-cli="bitcoin-cli -regtest"'],
+    commands: [
+      'alias bitcoin-cli="bitcoin-cli -regtest -datadir=/home/bitcoin/.bitcoin"',
+    ],
   },
 };
 
@@ -92,11 +98,70 @@ const connectStreams = async (term: Terminal, name: string, type: string, l: any
   if (!container) throw new Error(l('containerErr', { name }));
 
   // create an exec instance
-  const exec = await container.exec({ ...execCommand, User: config.user });
+  // Custom images may not contain the user or the shell that Polar's managed
+  // images provide. Attempt a series of fallbacks instead.
+  const attempts = [
+    { user: config.user, shell: '/bin/bash' },
+    { user: config.user, shell: '/bin/sh' },
+    { user: undefined, shell: '/bin/bash' },
+    { user: undefined, shell: '/bin/sh' },
+  ];
+
+  let exec: Dockerode.Exec | undefined;
+  let stream: Duplex | undefined;
+  let connected: (typeof attempts)[number] | undefined;
+  const errors: string[] = [];
+  for (const attempt of attempts) {
+    const attemptDesc = `user '${attempt.user || '(image default)'}' shell '${
+      attempt.shell
+    }'`;
+    let s: Duplex | undefined;
+    try {
+      debug(`attempting to exec with ${attemptDesc}`);
+      const e = await container.exec({
+        ...execCommand,
+        Cmd: [attempt.shell],
+        User: attempt.user,
+      });
+      s = await e.start(execOptions);
+      // a missing shell binary may not throw on start with a TTY. give the
+      // shell a moment to fail fast, then confirm it is still running
+      await delay(100);
+      const execState = await e.inspect();
+      if (!execState.Running) {
+        throw new Error(`shell exited with code ${execState.ExitCode}`);
+      }
+      exec = e;
+      stream = s;
+      connected = attempt;
+      break;
+    } catch (error: any) {
+      debug(`exec failed for ${attemptDesc}: ${error.message}`);
+      errors.push(`${attemptDesc}: ${error.message}`);
+      s?.destroy();
+    }
+  }
+
+  if (!exec || !stream || !connected) {
+    // write the errors to the terminal so the user can read them
+    term.writeln(red(l('execErr')));
+    errors.forEach(e => term.writeln(red(`  - ${e}`)));
+    throw new Error(l('connectErr'));
+  }
+
+  // inform the user when a fallback was used
+  if (connected.user !== config.user) {
+    term.writeln(yellow(l('userFallback', { user: config.user })));
+  }
+  if (connected.shell !== '/bin/bash') {
+    term.writeln(yellow(l('shellFallback', { shell: connected.shell })));
+  }
+  if (errors.length > 0) {
+    errors.forEach(e => term.writeln(yellow(`  - ${e}`)));
+  }
+
   // initialize the size of the docker session based on the xterm size
   exec.resize({ w: term.cols, h: term.rows });
-  // run exec to connect to the container
-  const stream = await exec.start(execOptions);
 
   // pass data from xterm to docker
   term.onData(data => stream.write(data));

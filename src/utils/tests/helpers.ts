@@ -150,8 +150,8 @@ export const testRepoState: DockerRepoState = {
       versions: ['24.08', '24.05', '24.02.2', '23.11.2'],
     },
     lampo: {
-      latest: '0.1.0-blake2b.1',
-      versions: ['0.1.0-blake2b.1'],
+      latest: '0.1.0-blake2b.2',
+      versions: ['0.1.0-blake2b.2'],
     },
     bitcoind: {
       latest: '30.0',
