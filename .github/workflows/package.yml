@@ -14,8 +14,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            # x64 runner builds x64 Linux packages
+          - os: ubuntu-24.04
+            # x64 runner builds x64 Linux packages. Pinned because the rpm 6
+            # on ubuntu-26.04 fails with electron-builder's bundled fpm 1.9.3.
             linux_targets: deb rpm AppImage
           - os: ubuntu-24.04-arm
             # arm64 runner builds arm64 AppImage (AppImage cannot be cross-compiled)
