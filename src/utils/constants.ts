@@ -252,8 +252,8 @@ export const defaultRepoState: DockerRepoState = {
       },
     },
     'c-lightning': {
-      latest: '26.06.9-blake2b.7',
-      versions: ['26.06.9-blake2b.7'],
+      latest: '26.06.10-blake2b.1',
+      versions: ['26.06.10-blake2b.1'],
     },
     lampo: {
       latest: '0.1.0-blake2b.1',
